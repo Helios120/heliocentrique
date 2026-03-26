@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Logiciel degrés — Helios Astro</title>
+  <meta name="description" content="Testez la lecture par degrés Helios Astro : signe, position, décan, phase et prélecture symbolique.">
+  <link rel="canonical" href="https://heliosastro.com/logiciel.html">
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a href="index.html" class="brand">
+        <img src="assets/logo-heliosastro.png" alt="Logo Helios Astro">
+        <div><strong>Helios Astro</strong><span>Astrologie géométrique premium</span></div>
+      </a>
+      <button class="nav-toggle" type="button" aria-label="Ouvrir le menu" data-nav-toggle>☰</button>
+      <nav class="site-nav" data-nav>
+        <a href="index.html">Accueil</a>
+        <a href="offres.html">Offres</a>
+        <a href="logiciel.html" class="active">Logiciel</a>
+        <a href="livre.html">Livre</a>
+        <a href="heliosastrosite.html">Méthode</a>
+        <a href="contact.html" class="btn btn-small">Commander</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="page-hero section">
+      <div class="container">
+        <p class="eyebrow">Logiciel degrés</p>
+        <h1>Lecture par degrés, propre et démonstrative.</h1>
+        <p class="lead">Cette page montre la logique Helios Astro : signe, degré, décan, phase et axe symbolique.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container split">
+        <div class="card software-panel">
+          <h2>Test interactif</h2>
+
+          <label class="inline-label">
+            Degré :
+            <input type="range" min="0" max="359.9" step="0.1" value="0" data-degree-input>
+          </label>
+
+          <label class="inline-label">
+            Valeur exacte :
+            <input type="number" min="0" max="359.9" step="0.1" value="0" data-degree-number>
+          </label>
+
+          <div class="result-box">
+            <p><strong>Degré :</strong> <span data-degree-output>0°</span></p>
+            <p><strong>Signe :</strong> <span data-sign-output>♈ Bélier</span></p>
+            <p><strong>Position :</strong> <span data-pos-output>0° — décan 1 — phase amorce</span></p>
+            <p><strong>Lecture :</strong> <span data-tone-output>Impulsion, départ, affirmation.</span></p>
+          </div>
+
+          <div class="mini-form">
+            <input type="text" placeholder="Nom" data-name>
+            <input type="text" placeholder="Lieu de naissance" data-place>
+            <input type="date" data-date>
+            <input type="time" data-time>
+            <button class="btn" type="button" data-generate-summary>Générer une prélecture</button>
+          </div>
+
+          <div class="summary-box" data-summary>
+            Prélecture Helios prête à être générée.
+          </div>
+        </div>
+
+        <div>
+          <div class="degree-wheel" data-degree-wheel></div>
+          <div class="image-frame software-image">
+            <img src="assets/zodiac-wheel-blue.png" alt="Roue zodiacale de référence">
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-wrap">
+      <p>© <span data-year></span> Helios Astro</p>
+      <div class="footer-links">
+        <a href="index.html">Accueil</a>
+        <a href="offres.html">Offres</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/app.js"></script>
+  <script src="assets/logiciel.js"></script>
+</body>
+</html>
