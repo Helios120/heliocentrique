@@ -629,3 +629,28 @@ textarea:focus{
     align-items:flex-start;
   }
 }
+.helios-chart-card{
+  padding:18px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:720px;
+}
+
+#helios-chart-canvas{
+  width:min(100%, 760px);
+  height:auto;
+  display:block;
+  margin:auto;
+  background:
+    radial-gradient(circle at center, rgba(80,140,255,0.05), rgba(0,0,0,0) 45%),
+    #000000;
+  border:1px solid rgba(113,224,255,0.16);
+  border-radius:28px;
+  box-shadow:0 20px 70px rgba(0,0,0,0.45);
+}
+
+.software-panel code{
+  color: var(--blue);
+  word-break: break-word;
+}
