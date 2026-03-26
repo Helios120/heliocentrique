@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact — Helios Astro</title>
+  <meta name="description" content="Contactez Helios Astro pour commander votre thème astral visuel, géométrique et vibratoire.">
+  <link rel="canonical" href="https://heliosastro.com/contact.html">
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a href="index.html" class="brand">
+        <img src="assets/logo-heliosastro.png" alt="Logo Helios Astro">
+        <div><strong>Helios Astro</strong><span>Astrologie géométrique premium</span></div>
+      </a>
+      <button class="nav-toggle" type="button" aria-label="Ouvrir le menu" data-nav-toggle>☰</button>
+      <nav class="site-nav" data-nav>
+        <a href="index.html">Accueil</a>
+        <a href="offres.html">Offres</a>
+        <a href="logiciel.html">Logiciel</a>
+        <a href="livre.html">Livre</a>
+        <a href="heliosastrosite.html">Méthode</a>
+        <a href="contact.html" class="active btn btn-small">Commander</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="page-hero section">
+      <div class="container">
+        <p class="eyebrow">Commande & contact</p>
+        <h1>Commander votre lecture Helios Astro</h1>
+        <p class="lead">Remplissez ce formulaire puis branche-le à Formspree, Netlify Forms ou EmailJS.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container split">
+        <div class="card content-card">
+          <h2>Informations utiles</h2>
+          <ul class="feature-list">
+            <li>Nom et prénom</li>
+            <li>Date de naissance</li>
+            <li>Heure de naissance si possible</li>
+            <li>Lieu de naissance</li>
+            <li>Offre choisie</li>
+          </ul>
+          <p>
+            Tu peux aussi ajouter ici tes délais, ton mode d’envoi et tes conditions commerciales.
+          </p>
+        </div>
+
+        <div class="card form-card">
+          <form action="#" method="post" class="contact-form">
+            <label>
+              Nom complet
+              <input type="text" name="nom" placeholder="Votre nom" required>
+            </label>
+
+            <label>
+              E-mail
+              <input type="email" name="email" placeholder="votre@email.com" required>
+            </label>
+
+            <label>
+              Date de naissance
+              <input type="date" name="date_naissance">
+            </label>
+
+            <label>
+              Heure de naissance
+              <input type="time" name="heure_naissance">
+            </label>
+
+            <label>
+              Lieu de naissance
+              <input type="text" name="lieu_naissance" placeholder="Ville, pays">
+            </label>
+
+            <label>
+              Offre choisie
+              <select name="offre">
+                <option>Helios Essentiel</option>
+                <option>Helios Premium</option>
+                <option>Couple / Mission</option>
+              </select>
+            </label>
+
+            <label>
+              Message
+              <textarea name="message" rows="6" placeholder="Précisez votre demande"></textarea>
+            </label>
+
+            <button type="submit" class="btn">Envoyer la demande</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container cards-3">
+        <article class="card">
+          <h3>Délais</h3>
+          <p>Indique ici ton délai standard : 24h, 48h, 72h ou 5 jours.</p>
+        </article>
+        <article class="card">
+          <h3>Paiement</h3>
+          <p>Ajoute ton lien PayPal ou Stripe après validation de la commande.</p>
+        </article>
+        <article class="card">
+          <h3>Livraison</h3>
+          <p>PDF envoyé par e-mail, visuel HD inclus selon la formule choisie.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-wrap">
+      <p>© <span data-year></span> Helios Astro</p>
+      <div class="footer-links">
+        <a href="index.html">Accueil</a>
+        <a href="offres.html">Offres</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/app.js"></script>
+</body>
+</html>
