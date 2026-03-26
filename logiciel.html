@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Logiciel degrés — Helios Astro</title>
-  <meta name="description" content="Testez la lecture par degrés Helios Astro : signe, position, décan, phase et prélecture symbolique.">
+  <title>Logiciel Helios Astro</title>
+  <meta name="description" content="Logiciel Helios Astro : carte zodiacale visuelle avec planètes alignées, arcs colorés et lecture graphique inspirée des éphémérides.">
   <link rel="canonical" href="https://heliosastro.com/logiciel.html">
   <link rel="stylesheet" href="assets/styles.css">
 </head>
@@ -35,11 +35,11 @@
   <main>
     <section class="page-hero section">
       <div class="container">
-        <p class="eyebrow">Logiciel degrés</p>
-        <h1>Lecture par degrés, propre et démonstrative.</h1>
+        <p class="eyebrow">Logiciel Helios Astro</p>
+        <h1>Lecture graphique des positions planétaires</h1>
         <p class="lead">
-          Cette page montre la logique Helios Astro : signe, degré, décan, phase et axe symbolique,
-          avec ton vrai modèle visuel comme référence.
+          Cette interface prépare un rendu astrologique premium : planètes alignées sur leur signe,
+          positionnées à l’extérieur du cercle, reliées par des arcs colorés en harmonie avec l’univers Helios Astro.
         </p>
       </div>
     </section>
@@ -47,45 +47,75 @@
     <section class="section">
       <div class="container split">
         <div class="card software-panel">
-          <h2>Test interactif</h2>
+          <h2>Paramètres</h2>
 
           <label class="inline-label">
-            Degré :
-            <input type="range" min="0" max="359.9" step="0.1" value="0" data-degree-input>
+            Date
+            <input type="date" id="astro-date">
           </label>
 
           <label class="inline-label">
-            Valeur exacte :
-            <input type="number" min="0" max="359.9" step="0.1" value="0" data-degree-number>
+            Heure
+            <input type="time" id="astro-time" value="12:00">
           </label>
 
-          <div class="result-box">
-            <p><strong>Degré :</strong> <span data-degree-output>0°</span></p>
-            <p><strong>Signe :</strong> <span data-sign-output>♈ Bélier</span></p>
-            <p><strong>Position :</strong> <span data-pos-output>0° — décan 1 — phase amorce</span></p>
-            <p><strong>Lecture :</strong> <span data-tone-output>Impulsion, départ, affirmation.</span></p>
+          <label class="inline-label">
+            Ville
+            <input type="text" id="astro-city" placeholder="Paris">
+          </label>
+
+          <label class="inline-label">
+            Pays
+            <input type="text" id="astro-country" placeholder="France">
+          </label>
+
+          <div class="btn-row">
+            <button class="btn" id="generate-chart-btn" type="button">Générer la carte</button>
+            <button class="btn btn-outline" id="demo-chart-btn" type="button">Démo Helios</button>
           </div>
 
-          <div class="mini-form">
-            <input type="text" placeholder="Nom" data-name>
-            <input type="text" placeholder="Lieu de naissance" data-place>
-            <input type="date" data-date>
-            <input type="time" data-time>
-            <button class="btn" type="button" data-generate-summary>Générer une prélecture</button>
+          <div class="result-box" id="astro-info-box">
+            <p><strong>Statut :</strong> prêt</p>
+            <p><strong>Mode :</strong> démonstration locale</p>
+            <p><strong>Note :</strong> pour les vraies éphémérides, branche un backend/API sur <code>/api/ephemeris</code>.</p>
           </div>
 
-          <div class="summary-box" data-summary>
-            Prélecture Helios prête à être générée.
-          </div>
-        </div>
-
-        <div>
-          <div class="degree-wheel" data-degree-wheel></div>
-
-          <div class="image-frame software-image">
-            <img src="assets/modele-roue-helios.png" alt="Modèle de roue zodiacale Helios Astro">
+          <div class="summary-box" id="astro-legend-box">
+            Les planètes seront affichées à l’extérieur du cercle, alignées sur leur position zodiacale réelle.
           </div>
         </div>
+
+        <div class="card helios-chart-card">
+          <canvas id="helios-chart-canvas" width="900" height="900" aria-label="Carte astrologique Helios Astro"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container cards-3">
+        <article class="card">
+          <h3>Planètes extérieures</h3>
+          <p>
+            Chaque planète est placée hors du cercle principal pour renforcer la lisibilité
+            et valoriser la structure énergétique du thème.
+          </p>
+        </article>
+
+        <article class="card">
+          <h3>Arcs colorés</h3>
+          <p>
+            Les arcs suivent une dynamique chromatique Helios Astro pour donner une lecture visuelle
+            vivante, cohérente et immédiatement reconnaissable.
+          </p>
+        </article>
+
+        <article class="card">
+          <h3>Éphémérides réelles</h3>
+          <p>
+            La structure est prête à recevoir des longitudes planétaires exactes depuis un moteur
+            d’éphémérides côté serveur.
+          </p>
+        </article>
       </div>
     </section>
   </main>
@@ -96,6 +126,7 @@
       <div class="footer-links">
         <a href="index.html">Accueil</a>
         <a href="offres.html">Offres</a>
+        <a href="contact.html">Contact</a>
       </div>
     </div>
   </footer>
