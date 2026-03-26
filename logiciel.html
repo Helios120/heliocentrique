@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Logiciel Helios Astro</title>
-  <meta name="description" content="Logiciel Helios Astro : carte zodiacale visuelle avec planètes alignées, arcs colorés et lecture graphique inspirée des éphémérides.">
+  <meta name="description" content="Logiciel Helios Astro avec modèle zodiacal personnalisé, planètes alignées sur les signes et arcs colorés.">
   <link rel="canonical" href="https://heliosastro.com/logiciel.html">
   <link rel="stylesheet" href="assets/styles.css">
 </head>
@@ -36,10 +36,10 @@
     <section class="page-hero section">
       <div class="container">
         <p class="eyebrow">Logiciel Helios Astro</p>
-        <h1>Lecture graphique des positions planétaires</h1>
+        <h1>Carte zodiacale vivante</h1>
         <p class="lead">
-          Cette interface prépare un rendu astrologique premium : planètes alignées sur leur signe,
-          positionnées à l’extérieur du cercle, reliées par des arcs colorés en harmonie avec l’univers Helios Astro.
+          Cette version utilise ton propre modèle zodiacal comme base visuelle, puis place les planètes
+          à l’extérieur du cercle selon leur longitude.
         </p>
       </div>
     </section>
@@ -76,46 +76,18 @@
 
           <div class="result-box" id="astro-info-box">
             <p><strong>Statut :</strong> prêt</p>
-            <p><strong>Mode :</strong> démonstration locale</p>
-            <p><strong>Note :</strong> pour les vraies éphémérides, branche un backend/API sur <code>/api/ephemeris</code>.</p>
+            <p><strong>Mode :</strong> modèle zodiacal Helios</p>
+            <p><strong>Support :</strong> ton image personnalisée + planètes dessinées par-dessus</p>
           </div>
 
           <div class="summary-box" id="astro-legend-box">
-            Les planètes seront affichées à l’extérieur du cercle, alignées sur leur position zodiacale réelle.
+            Les planètes seront affichées à l’extérieur du cercle et alignées sur leur position zodiacale.
           </div>
         </div>
 
         <div class="card helios-chart-card">
-          <canvas id="helios-chart-canvas" width="900" height="900" aria-label="Carte astrologique Helios Astro"></canvas>
+          <canvas id="helios-chart-canvas" width="1200" height="1200"></canvas>
         </div>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="container cards-3">
-        <article class="card">
-          <h3>Planètes extérieures</h3>
-          <p>
-            Chaque planète est placée hors du cercle principal pour renforcer la lisibilité
-            et valoriser la structure énergétique du thème.
-          </p>
-        </article>
-
-        <article class="card">
-          <h3>Arcs colorés</h3>
-          <p>
-            Les arcs suivent une dynamique chromatique Helios Astro pour donner une lecture visuelle
-            vivante, cohérente et immédiatement reconnaissable.
-          </p>
-        </article>
-
-        <article class="card">
-          <h3>Éphémérides réelles</h3>
-          <p>
-            La structure est prête à recevoir des longitudes planétaires exactes depuis un moteur
-            d’éphémérides côté serveur.
-          </p>
-        </article>
       </div>
     </section>
   </main>
