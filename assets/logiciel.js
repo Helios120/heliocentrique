@@ -26,6 +26,8 @@
 
   if (!wheel || !input || !number) return;
 
+  wheel.innerHTML = '';
+
   const indicator = document.createElement('div');
   indicator.className = 'degree-indicator';
   wheel.appendChild(indicator);
