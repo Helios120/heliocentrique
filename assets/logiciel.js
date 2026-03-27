@@ -16,10 +16,7 @@
   const infoBox = document.getElementById("astro-info-box");
   const legendBox = document.getElementById("astro-legend-box");
 
-  // Remplace cette URL par ton backend déployé quand tu passeras en prod.
-  // Exemple Render/Railway :
-  // const API_BASE = "https://ton-backend.onrender.com";
-  const API_BASE = window.HELIOS_API_BASE || "http://localhost:3000";
+  const API_BASE = "https://heliosastro-backend.onrender.com";
 
   const modelImage = new Image();
   modelImage.src = "assets/modele-zodiacal-helios.png";
