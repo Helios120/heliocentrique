@@ -54,6 +54,7 @@
     }
 
     .helios-info,
+    .helios-summary,
     .helios-legend{
       border:1px solid rgba(113,224,255,.16);
       background:rgba(255,255,255,.03);
@@ -65,8 +66,13 @@
     }
 
     .helios-info strong,
+    .helios-summary strong,
     .helios-legend strong{
       color:#fff;
+    }
+
+    .helios-summary{
+      color:#e7f4ff;
     }
 
     #heliosCanvas{
@@ -115,8 +121,8 @@
         <p class="eyebrow">Logiciel Helios Astro</p>
         <h1>Visualisation astrologique Helios Astro</h1>
         <p class="lead">
-          Explorez une carte céleste élégante, pensée pour révéler les positions planétaires,
-          l’équilibre symbolique du thème et la signature visuelle propre à l’univers Helios Astro.
+          Explorez une carte céleste élégante, pensée pour révéler l’équilibre du thème,
+          la dynamique planétaire et la signature visuelle propre à l’univers Helios Astro.
         </p>
       </div>
     </section>
@@ -156,9 +162,14 @@
             Renseignez les données de naissance puis lancez le calcul.
           </div>
 
+          <div class="helios-summary" id="astro-summary-box">
+            <strong>Lecture du thème :</strong><br>
+            Une synthèse claire et élégante apparaîtra ici après génération.
+          </div>
+
           <div class="helios-legend" id="astro-legend-box">
-            <strong>Lecture planétaire :</strong><br>
-            Les positions du Soleil, de la Lune et des planètes s’afficheront ici après génération.
+            <strong>Détails astrologiques :</strong><br>
+            Les repères du thème s’afficheront ici après calcul.
           </div>
         </div>
 
