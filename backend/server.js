@@ -1,70 +1,61 @@
 const express = require("express");
-const swisseph = require("swisseph");
+const cors = require("cors");
+const bodyParser = require("body-parser");
+const PDFDocument = require("pdfkit");
 
 const app = express();
-app.use(express.json());
+app.use(cors());
+app.use(bodyParser.json());
 
-swisseph.swe_set_ephe_path(__dirname + "/ephe");
+const PORT = process.env.PORT || 3000;
 
-// Conversion date → Julian Day
-function toJulian(date) {
-  return swisseph.swe_julday(
-    date.getUTCFullYear(),
-    date.getUTCMonth() + 1,
-    date.getUTCDate(),
-    date.getUTCHours() +
-      date.getUTCMinutes() / 60 +
-      date.getUTCSeconds() / 3600,
-    swisseph.SE_GREG_CAL
-  );
-}
-
-// API calcul complet
-app.get("/ephemerides", (req, res) => {
-  const { date, lat, lon } = req.query;
-
-  if (!date || !lat || !lon) {
-    return res.status(400).json({ error: "Paramètres manquants" });
-  }
-
-  const d = new Date(date);
-  const jd = toJulian(d);
-
-  // MAISONS + ASCENDANT
-  const houses = swisseph.swe_houses(jd, lat, lon, "P");
-
-  const ascendant = houses.ascendant;
-  const mc = houses.mc;
-  const houseCusps = houses.house;
-
-  // PLANÈTES
-  const planets = {};
-  const planetIds = {
-    sun: swisseph.SE_SUN,
-    moon: swisseph.SE_MOON,
-    mercury: swisseph.SE_MERCURY,
-    venus: swisseph.SE_VENUS,
-    mars: swisseph.SE_MARS,
-    jupiter: swisseph.SE_JUPITER,
-    saturn: swisseph.SE_SATURN,
-    uranus: swisseph.SE_URANUS,
-    neptune: swisseph.SE_NEPTUNE,
-    pluto: swisseph.SE_PLUTO,
-  };
-
-  for (let key in planetIds) {
-    const result = swisseph.swe_calc_ut(jd, planetIds[key]);
-    planets[key] = result.longitude;
-  }
-
-  res.json({
-    ascendant,
-    mc,
-    houses: houseCusps,
-    planets
-  });
+/* =========================
+   TEST ROOT (IMPORTANT)
+========================= */
+app.get("/", (req, res) => {
+  res.send("HeliosAstro backend OK");
 });
 
-app.listen(3000, () => {
-  console.log("Backend Helios Astro actif");
+/* =========================
+   API EPHEMERIDES (simple stable)
+========================= */
+app.post("/ephemerides", (req, res) => {
+  const { date } = req.body;
+
+  // simulation propre (remplaçable ensuite par vraie lib astro)
+  const planets = [
+    { name: "Soleil", degree: 120 },
+    { name: "Lune", degree: 210 },
+    { name: "Mercure", degree: 95 },
+    { name: "Venus", degree: 180 },
+    { name: "Mars", degree: 260 }
+  ];
+
+  res.json({ planets });
+});
+
+/* =========================
+   GENERATION PDF CLIENT
+========================= */
+app.post("/generate-pdf", (req, res) => {
+  const { name, date } = req.body;
+
+  const doc = new PDFDocument();
+  res.setHeader("Content-Type", "application/pdf");
+  doc.pipe(res);
+
+  doc.fontSize(22).text("Helios Astro", { align: "center" });
+  doc.moveDown();
+  doc.fontSize(14).text(`Nom : ${name}`);
+  doc.text(`Date : ${date}`);
+  doc.text("Thème généré automatiquement");
+
+  doc.end();
+});
+
+/* =========================
+   START SERVER
+========================= */
+app.listen(PORT, () => {
+  console.log("Server running on port", PORT);
 });
