@@ -4,14 +4,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Logiciel Helios Astro</title>
-  <meta name="description" content="Visualisation astrologique Helios Astro avec carte céleste premium, synthèse du thème, répartition planétaire et export PDF.">
+  <meta name="description" content="Carte céleste Helios Astro avec visualisation premium, synthèse du thème, répartition planétaire, export PDF et paiement PayPal.">
   <link rel="canonical" href="https://heliosastro.com/logiciel.html">
   <link rel="stylesheet" href="assets/styles.css">
+
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+  <script 
+    src="https://www.paypal.com/sdk/js?client-id=BAA73-rQL0lxFlgndYGaA-4f6QHDRitW0sUydpnUC7mKt8OaI-KrZ6RXIwBvuGX-p1my5os-g68bzDdzt4&components=hosted-buttons&disable-funding=venmo&currency=EUR">
+  </script>
+
   <style>
     .helios-layout{
       display:grid;
-      grid-template-columns:380px 1fr;
+      grid-template-columns:400px 1fr;
       gap:24px;
       align-items:start;
     }
@@ -28,6 +34,11 @@
     .helios-panel h2{
       margin:0 0 18px;
       font-size:1.9rem;
+    }
+
+    .helios-panel h3{
+      margin:18px 0 10px;
+      font-size:1.15rem;
     }
 
     .helios-panel label{
@@ -56,7 +67,8 @@
 
     .helios-info,
     .helios-summary,
-    .helios-legend{
+    .helios-legend,
+    .helios-payment{
       border:1px solid rgba(113,224,255,.16);
       background:rgba(255,255,255,.03);
       border-radius:18px;
@@ -68,12 +80,36 @@
 
     .helios-info strong,
     .helios-summary strong,
-    .helios-legend strong{
+    .helios-legend strong,
+    .helios-payment strong{
       color:#fff;
     }
 
     .helios-summary{
       color:#eef7ff;
+    }
+
+    .paypal-block{
+      margin-top:16px;
+      padding-top:12px;
+      border-top:1px solid rgba(255,255,255,.08);
+    }
+
+    .paypal-block:first-of-type{
+      border-top:none;
+      padding-top:0;
+    }
+
+    .paypal-block h4{
+      margin:0 0 8px;
+      font-size:1rem;
+      color:#fff;
+    }
+
+    .paypal-block p{
+      margin:0 0 10px;
+      color:#b9d7ff;
+      font-size:.95rem;
     }
 
     #heliosCanvas{
@@ -181,6 +217,29 @@
             <strong>Répartition planétaire :</strong><br>
             Les principaux repères du thème s’afficheront ici après génération.
           </div>
+
+          <div class="helios-payment">
+            <strong>Commander votre lecture</strong><br>
+            Choisissez la formule adaptée à votre besoin. Le paiement s’effectue via PayPal.
+
+            <div class="paypal-block">
+              <h4>Thème astral</h4>
+              <p>Lecture de naissance Helios Astro.</p>
+              <div id="paypal-theme-astral"></div>
+            </div>
+
+            <div class="paypal-block">
+              <h4>Transit pour 3 mois</h4>
+              <p>Lecture de période pour mieux anticiper les dynamiques à venir.</p>
+              <div id="paypal-transit"></div>
+            </div>
+
+            <div class="paypal-block">
+              <h4>Révolution solaire</h4>
+              <p>Lecture annuelle premium autour de votre nouveau cycle.</p>
+              <div id="paypal-revolution"></div>
+            </div>
+          </div>
         </div>
 
         <div class="helios-canvas-shell">
@@ -203,5 +262,23 @@
 
   <script src="assets/app.js"></script>
   <script src="assets/logiciel.js"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      if (window.paypal) {
+        paypal.HostedButtons({
+          hostedButtonId: "QF67W8ATHZX4U"
+        }).render("#paypal-theme-astral");
+
+        paypal.HostedButtons({
+          hostedButtonId: "Z3SZPE6NUZYKG"
+        }).render("#paypal-transit");
+
+        paypal.HostedButtons({
+          hostedButtonId: "7HTYFEY8JA8EN"
+        }).render("#paypal-revolution");
+      }
+    });
+  </script>
 </body>
 </html>
