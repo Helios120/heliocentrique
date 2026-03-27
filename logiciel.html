@@ -4,10 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Logiciel Helios Astro</title>
-  <meta name="description" content="Logiciel Helios Astro avec calcul astrologique, sauvegarde client, génération PDF et compte utilisateur." />
+  <meta name="description" content="Logiciel Helios Astro avec modèle zodiacal personnalisé et planètes alignées à l’extérieur du cercle." />
   <link rel="canonical" href="https://heliosastro.com/logiciel.html" />
   <link rel="stylesheet" href="assets/styles.css" />
-  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
   <style>
     .software-layout{
@@ -63,46 +62,14 @@
       box-shadow:0 0 0 4px rgba(113,224,255,.10);
     }
 
-    .software-card .btn-row{
-      margin-top:12px;
-    }
-
     .software-status,
-    .software-legend,
-    .theme-list{
+    .software-legend{
       border:1px solid rgba(113,224,255,.16);
       background:rgba(255,255,255,.03);
       border-radius:16px;
       padding:16px;
       color:#d7e7ff;
       line-height:1.6;
-    }
-
-    .theme-item{
-      display:flex;
-      justify-content:space-between;
-      gap:12px;
-      align-items:center;
-      border-bottom:1px solid rgba(255,255,255,.06);
-      padding:10px 0;
-    }
-
-    .theme-item:last-child{
-      border-bottom:none;
-    }
-
-    .mini-btn{
-      border:none;
-      border-radius:999px;
-      padding:8px 12px;
-      background:rgba(113,224,255,.12);
-      color:#fff;
-      cursor:pointer;
-      font-weight:700;
-    }
-
-    .mini-btn:hover{
-      background:rgba(113,224,255,.20);
     }
 
     .chart-shell{
@@ -114,7 +81,7 @@
     }
 
     #helios-chart-canvas{
-      width:min(100%, 900px);
+      width:min(100%, 920px);
       height:auto;
       display:block;
       margin:auto;
@@ -122,22 +89,11 @@
       border-radius:22px;
     }
 
-    .auth-note{
+    .mini-note{
+      color:#9eb4d7;
       font-size:.92rem;
-      color:#9fb3d8;
-    }
-
-    .pill{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:8px 12px;
-      border-radius:999px;
-      background:rgba(113,224,255,.08);
-      border:1px solid rgba(113,224,255,.18);
-      color:#71e0ff;
-      font-weight:700;
-      font-size:.9rem;
+      line-height:1.55;
+      margin-top:10px;
     }
 
     @media (max-width: 1100px){
@@ -175,10 +131,10 @@
     <section class="page-hero section">
       <div class="container">
         <p class="eyebrow">Logiciel Helios Astro</p>
-        <h1>Calcul, sauvegarde, PDF, compte client</h1>
+        <h1>Carte zodiacale vivante</h1>
         <p class="lead">
-          Cette version centralise le rendu visuel, les calculs backend, la sauvegarde client
-          et la génération PDF. Le PDF final est déverrouillé après validation du paiement.
+          Cette version utilise ton modèle zodiacal comme base visuelle et positionne les planètes
+          à l’extérieur du cercle selon leur longitude.
         </p>
       </div>
     </section>
@@ -187,47 +143,12 @@
       <div class="container software-layout">
 
         <div class="software-stack">
-
           <div class="software-card">
-            <h2>Compte utilisateur</h2>
+            <h2>Paramètres</h2>
 
             <label>
-              Email
-              <input type="email" id="auth-email" placeholder="email@exemple.com">
-            </label>
-
-            <label>
-              Mot de passe
-              <input type="password" id="auth-password" placeholder="Votre mot de passe">
-            </label>
-
-            <div class="btn-row">
-              <button class="btn" type="button" id="register-btn">Créer un compte</button>
-              <button class="btn btn-outline" type="button" id="login-btn">Connexion</button>
-            </div>
-
-            <p class="auth-note">
-              Les comptes nécessitent un backend avec base de données. Le token utilisateur est conservé localement après connexion.
-            </p>
-
-            <div class="software-status" id="auth-status-box">Non connecté.</div>
-          </div>
-
-          <div class="software-card">
-            <h2>Données astrologiques</h2>
-
-            <label>
-              Nom du client
-              <input type="text" id="client-name" placeholder="Nom du client">
-            </label>
-
-            <label>
-              Offre
-              <select id="offer-type">
-                <option value="theme-astral">Thème astral</option>
-                <option value="transit-3-mois">Transit pour 3 mois</option>
-                <option value="revolution-solaire">Révolution solaire</option>
-              </select>
+              Charger un modèle zodiacal
+              <input type="file" id="upload-model" accept="image/*">
             </label>
 
             <label>
@@ -250,61 +171,35 @@
               <input type="text" id="astro-country" placeholder="France">
             </label>
 
-            <label>
-              Charger votre modèle zodiacal
-              <input type="file" id="upload-model" accept="image/*">
-            </label>
-
             <div class="btn-row">
               <button class="btn" type="button" id="generate-chart-btn">Générer la carte</button>
               <button class="btn btn-outline" type="button" id="demo-chart-btn">Démo Helios</button>
             </div>
 
-            <div class="software-status" id="astro-info-box">
-              Statut : prêt
-            </div>
-
-            <div class="software-legend" id="astro-legend-box">
-              Les positions planétaires seront affichées ici.
-            </div>
-          </div>
-
-          <div class="software-card">
-            <h3>Paiement & PDF</h3>
-
-            <div class="pill" id="payment-pill">Paiement non vérifié</div>
-
-            <div class="btn-row">
-              <button class="btn" type="button" id="verify-payment-btn">Vérifier le paiement</button>
-              <button class="btn btn-outline" type="button" id="save-theme-btn">Sauvegarder le thème</button>
-            </div>
-
-            <div class="btn-row">
-              <button class="btn" type="button" id="download-pdf-btn" disabled>Télécharger le PDF</button>
-            </div>
-
-            <p class="auth-note">
-              Avec tes liens PayPal NCP actuels, la vérification automatique exige un backend PayPal ou webhook.
-              Sans ça, pas de déverrouillage sérieux.
+            <p class="mini-note">
+              Si ton backend Render répond, les positions viennent du serveur.
+              Sinon, une démo visuelle s’affiche automatiquement.
             </p>
           </div>
 
           <div class="software-card">
-            <h3>Thèmes sauvegardés</h3>
-            <div class="theme-list" id="saved-themes-box">
-              Aucun thème chargé.
-            </div>
-            <div class="btn-row">
-              <button class="btn btn-outline" type="button" id="load-themes-btn">Recharger mes thèmes</button>
+            <h3>Statut</h3>
+            <div class="software-status" id="astro-info-box">
+              Statut : prêt.
             </div>
           </div>
 
+          <div class="software-card">
+            <h3>Positions</h3>
+            <div class="software-legend" id="astro-legend-box">
+              Les positions planétaires s’afficheront ici.
+            </div>
+          </div>
         </div>
 
         <div class="chart-shell">
           <canvas id="helios-chart-canvas" width="1200" height="1200"></canvas>
         </div>
-
       </div>
     </section>
   </main>
@@ -324,8 +219,6 @@
 
   <script>
     (() => {
-      const { jsPDF } = window.jspdf;
-
       const API_BASE = "https://heliosastro-backend.onrender.com";
 
       const canvas = document.getElementById("helios-chart-canvas");
@@ -337,37 +230,39 @@
       const uploadInput = document.getElementById("upload-model");
       const generateBtn = document.getElementById("generate-chart-btn");
       const demoBtn = document.getElementById("demo-chart-btn");
-      const verifyPaymentBtn = document.getElementById("verify-payment-btn");
-      const saveThemeBtn = document.getElementById("save-theme-btn");
-      const downloadPdfBtn = document.getElementById("download-pdf-btn");
-      const loadThemesBtn = document.getElementById("load-themes-btn");
-
-      const authEmail = document.getElementById("auth-email");
-      const authPassword = document.getElementById("auth-password");
-      const registerBtn = document.getElementById("register-btn");
-      const loginBtn = document.getElementById("login-btn");
-
-      const clientNameInput = document.getElementById("client-name");
-      const offerTypeInput = document.getElementById("offer-type");
       const dateInput = document.getElementById("astro-date");
       const timeInput = document.getElementById("astro-time");
       const cityInput = document.getElementById("astro-city");
       const countryInput = document.getElementById("astro-country");
-
-      const authStatusBox = document.getElementById("auth-status-box");
       const infoBox = document.getElementById("astro-info-box");
       const legendBox = document.getElementById("astro-legend-box");
-      const savedThemesBox = document.getElementById("saved-themes-box");
-      const paymentPill = document.getElementById("payment-pill");
 
-      const TOKEN_KEY = "heliosastro_token";
-      const USER_KEY = "heliosastro_user";
-
-      let authToken = localStorage.getItem(TOKEN_KEY) || "";
-      let authUser = localStorage.getItem(USER_KEY) || "";
-      let paymentVerified = false;
       let userImage = null;
+      let defaultImageLoaded = false;
       let currentPlanets = [];
+
+      const defaultModel = new Image();
+      defaultModel.onload = function () {
+        defaultImageLoaded = true;
+        if (!userImage) {
+          drawChart(getDemoPlanets(), {
+            status: "ok",
+            mode: "modèle Helios chargé",
+            label: "modèle zodiacal par défaut"
+          });
+        }
+      };
+      defaultModel.onerror = function () {
+        defaultImageLoaded = false;
+        if (!userImage) {
+          drawChart(getDemoPlanets(), {
+            status: "ok",
+            mode: "fallback interne",
+            label: "modèle image non trouvé, roue de secours affichée"
+          });
+        }
+      };
+      defaultModel.src = "assets/modele-zodiacal-helios.png";
 
       const zodiac = [
         { name: "Bélier", glyph: "♈", start: 0 },
@@ -384,7 +279,7 @@
         { name: "Poissons", glyph: "♓", start: 330 }
       ];
 
-      const colors = {
+      const planetColors = {
         "☉": "#ffb300",
         "☽": "#4fc3ff",
         "☿": "#bfbfbf",
@@ -401,8 +296,8 @@
         return ((deg % 360) + 360) % 360;
       }
 
-      function degToRad(d) {
-        return (d - 90) * Math.PI / 180;
+      function degToRad(deg) {
+        return (deg - 90) * Math.PI / 180;
       }
 
       function getSignInfo(longitude) {
@@ -416,23 +311,12 @@
         };
       }
 
-      function setAuthStatus(text) {
-        authStatusBox.textContent = text;
-      }
-
-      function setInfoStatus(html) {
+      function setStatus(html) {
         infoBox.innerHTML = html;
       }
 
-      function updatePaymentUI() {
-        paymentPill.textContent = paymentVerified ? "Paiement vérifié" : "Paiement non vérifié";
-        paymentPill.style.color = paymentVerified ? "#9effc0" : "#71e0ff";
-        paymentPill.style.borderColor = paymentVerified ? "rgba(158,255,192,.35)" : "rgba(113,224,255,.18)";
-        paymentPill.style.background = paymentVerified ? "rgba(158,255,192,.08)" : "rgba(113,224,255,.08)";
-        downloadPdfBtn.disabled = !paymentVerified;
-      }
-
       function clearCanvas() {
+        ctx.clearRect(0, 0, size, size);
         ctx.fillStyle = "#000000";
         ctx.fillRect(0, 0, size, size);
       }
@@ -442,11 +326,11 @@
         const signOuter = 310;
         const signInner = 245;
 
-        const g = ctx.createRadialGradient(cx, cy, 20, cx, cy, 420);
-        g.addColorStop(0, "rgba(0,180,255,0.08)");
-        g.addColorStop(0.55, "rgba(70,100,255,0.04)");
-        g.addColorStop(1, "rgba(0,0,0,0)");
-        ctx.fillStyle = g;
+        const glow = ctx.createRadialGradient(cx, cy, 20, cx, cy, 420);
+        glow.addColorStop(0, "rgba(0,180,255,0.08)");
+        glow.addColorStop(0.55, "rgba(70,100,255,0.04)");
+        glow.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = glow;
         ctx.beginPath();
         ctx.arc(cx, cy, 420, 0, Math.PI * 2);
         ctx.fill();
@@ -468,12 +352,13 @@
 
         for (let i = 0; i < 12; i++) {
           const deg = i * 30;
-          const r = degToRad(deg);
+          const rad = degToRad(deg);
 
           ctx.beginPath();
-          ctx.moveTo(cx + Math.cos(r) * signInner, cy + Math.sin(r) * signInner);
-          ctx.lineTo(cx + Math.cos(r) * outerR, cy + Math.sin(r) * outerR);
+          ctx.moveTo(cx + Math.cos(rad) * signInner, cy + Math.sin(rad) * signInner);
+          ctx.lineTo(cx + Math.cos(rad) * outerR, cy + Math.sin(rad) * outerR);
           ctx.strokeStyle = "rgba(255,255,255,0.75)";
+          ctx.lineWidth = 2;
           ctx.stroke();
         }
 
@@ -484,18 +369,35 @@
 
         for (let i = 0; i < 12; i++) {
           const midDeg = i * 30 + 15;
-          const r = degToRad(midDeg);
-          ctx.fillText(zodiac[i].glyph, cx + Math.cos(r) * 275, cy + Math.sin(r) * 275);
+          const rad = degToRad(midDeg);
+          ctx.fillText(zodiac[i].glyph, cx + Math.cos(rad) * 275, cy + Math.sin(rad) * 275);
         }
+
+        const core = ctx.createRadialGradient(cx, cy, 10, cx, cy, 95);
+        core.addColorStop(0, "rgba(255,255,255,0.92)");
+        core.addColorStop(0.2, "rgba(255,215,80,0.75)");
+        core.addColorStop(0.5, "rgba(0,190,255,0.30)");
+        core.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = core;
+        ctx.beginPath();
+        ctx.arc(cx, cy, 95, 0, Math.PI * 2);
+        ctx.fill();
       }
 
       function drawBase() {
         clearCanvas();
+
         if (userImage) {
           ctx.drawImage(userImage, 100, 100, size - 200, size - 200);
-        } else {
-          drawFallbackWheel();
+          return;
         }
+
+        if (defaultImageLoaded) {
+          ctx.drawImage(defaultModel, 100, 100, size - 200, size - 200);
+          return;
+        }
+
+        drawFallbackWheel();
       }
 
       function drawPlanetArc(longitude, color, radius) {
@@ -513,11 +415,15 @@
       }
 
       function drawPlanetConnector(longitude, color, fromR, toR) {
-        const r = degToRad(longitude);
+        const rad = degToRad(longitude);
+        const x1 = cx + Math.cos(rad) * fromR;
+        const y1 = cy + Math.sin(rad) * fromR;
+        const x2 = cx + Math.cos(rad) * toR;
+        const y2 = cy + Math.sin(rad) * toR;
 
         ctx.beginPath();
-        ctx.moveTo(cx + Math.cos(r) * fromR, cy + Math.sin(r) * fromR);
-        ctx.lineTo(cx + Math.cos(r) * toR, cy + Math.sin(r) * toR);
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
         ctx.strokeStyle = color;
         ctx.lineWidth = 2.5;
         ctx.shadowBlur = 8;
@@ -527,9 +433,9 @@
       }
 
       function drawPlanet(longitude, glyph, color, radius, name) {
-        const r = degToRad(longitude);
-        const x = cx + Math.cos(r) * radius;
-        const y = cy + Math.sin(r) * radius;
+        const rad = degToRad(longitude);
+        const x = cx + Math.cos(rad) * radius;
+        const y = cy + Math.sin(rad) * radius;
 
         ctx.beginPath();
         ctx.arc(x, y, 24, 0, Math.PI * 2);
@@ -550,16 +456,18 @@
         ctx.textBaseline = "middle";
         ctx.fillText(glyph, x, y + 1);
 
+        const lx = cx + Math.cos(rad) * (radius + 40);
+        const ly = cy + Math.sin(rad) * (radius + 40);
         ctx.font = "18px Arial";
-        ctx.fillText(name, cx + Math.cos(r) * (radius + 40), cy + Math.sin(r) * (radius + 40));
+        ctx.fillText(name, lx, ly);
       }
 
       function drawChart(planets, meta) {
         drawBase();
 
-        const connectorRadius = userImage ? 392 : 360;
-        const arcRadius = userImage ? 430 : 395;
-        const planetRadius = userImage ? 500 : 455;
+        const connectorRadius = (userImage || defaultImageLoaded) ? 392 : 360;
+        const arcRadius = (userImage || defaultImageLoaded) ? 430 : 395;
+        const planetRadius = (userImage || defaultImageLoaded) ? 500 : 455;
 
         planets.forEach((p, i) => {
           const lon = normalizeDeg(p.longitude);
@@ -581,7 +489,7 @@
             return `${p.glyph} ${p.name} — ${s.degreeInSign.toFixed(1)}° ${s.sign}`;
           }).join("<br>");
 
-        setInfoStatus(`
+        setStatus(`
           <p><strong>Statut :</strong> ${meta.status}</p>
           <p><strong>Mode :</strong> ${meta.mode}</p>
           <p><strong>Données :</strong> ${meta.label}</p>
@@ -590,83 +498,41 @@
         currentPlanets = planets;
       }
 
-      function demoData() {
+      function getDemoPlanets() {
         return [
-          { name: "Soleil", glyph: "☉", longitude: 320, color: colors["☉"] },
-          { name: "Lune", glyph: "☽", longitude: 14, color: colors["☽"] },
-          { name: "Mercure", glyph: "☿", longitude: 301, color: colors["☿"] },
-          { name: "Vénus", glyph: "♀", longitude: 281, color: colors["♀"] },
-          { name: "Mars", glyph: "♂", longitude: 89, color: colors["♂"] },
-          { name: "Jupiter", glyph: "♃", longitude: 247, color: colors["♃"] },
-          { name: "Saturne", glyph: "♄", longitude: 155, color: colors["♄"] },
-          { name: "Uranus", glyph: "♅", longitude: 32, color: colors["♅"] },
-          { name: "Neptune", glyph: "♆", longitude: 18, color: colors["♆"] },
-          { name: "Pluton", glyph: "♇", longitude: 302, color: colors["♇"] }
+          { name: "Soleil", glyph: "☉", longitude: 320, color: planetColors["☉"] },
+          { name: "Lune", glyph: "☽", longitude: 14, color: planetColors["☽"] },
+          { name: "Mercure", glyph: "☿", longitude: 301, color: planetColors["☿"] },
+          { name: "Vénus", glyph: "♀", longitude: 281, color: planetColors["♀"] },
+          { name: "Mars", glyph: "♂", longitude: 89, color: planetColors["♂"] },
+          { name: "Jupiter", glyph: "♃", longitude: 247, color: planetColors["♃"] },
+          { name: "Saturne", glyph: "♄", longitude: 155, color: planetColors["♄"] },
+          { name: "Uranus", glyph: "♅", longitude: 32, color: planetColors["♅"] },
+          { name: "Neptune", glyph: "♆", longitude: 18, color: planetColors["♆"] },
+          { name: "Pluton", glyph: "♇", longitude: 302, color: planetColors["♇"] }
         ];
       }
 
-      async function api(path, options = {}) {
-        const headers = {
-          "Content-Type": "application/json",
-          ...(authToken ? { "Authorization": `Bearer ${authToken}` } : {}),
-          ...(options.headers || {})
-        };
+      async function fetchHealth() {
+        const response = await fetch(`${API_BASE}/api/health`);
+        if (!response.ok) throw new Error("Backend indisponible");
+        return response.json();
+      }
 
-        const response = await fetch(`${API_BASE}${path}`, {
-          ...options,
-          headers
+      async function fetchEphemeris(payload) {
+        const response = await fetch(`${API_BASE}/api/ephemeris`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
         });
 
-        const text = await response.text();
-        let data = {};
-        try {
-          data = text ? JSON.parse(text) : {};
-        } catch {
-          data = { raw: text };
-        }
-
         if (!response.ok) {
-          throw new Error(data.error || data.detail || "Erreur API");
+          throw new Error("Erreur backend");
         }
 
-        return data;
-      }
-
-      async function register() {
-        try {
-          const data = await api("/api/auth/register", {
-            method: "POST",
-            body: JSON.stringify({
-              email: authEmail.value.trim(),
-              password: authPassword.value
-            })
-          });
-          setAuthStatus(`Compte créé : ${data.email || authEmail.value.trim()}`);
-        } catch (e) {
-          setAuthStatus(`Erreur création compte : ${e.message}`);
-        }
-      }
-
-      async function login() {
-        try {
-          const data = await api("/api/auth/login", {
-            method: "POST",
-            body: JSON.stringify({
-              email: authEmail.value.trim(),
-              password: authPassword.value
-            })
-          });
-
-          authToken = data.token || "";
-          authUser = data.email || authEmail.value.trim();
-
-          localStorage.setItem(TOKEN_KEY, authToken);
-          localStorage.setItem(USER_KEY, authUser);
-
-          setAuthStatus(`Connecté : ${authUser}`);
-        } catch (e) {
-          setAuthStatus(`Erreur connexion : ${e.message}`);
-        }
+        return response.json();
       }
 
       async function generateRealChart() {
@@ -676,7 +542,7 @@
         const country = countryInput.value || "France";
 
         if (!date) {
-          setInfoStatus(`
+          setStatus(`
             <p><strong>Statut :</strong> erreur</p>
             <p><strong>Mode :</strong> attente</p>
             <p><strong>Note :</strong> merci de renseigner une date.</p>
@@ -685,222 +551,44 @@
         }
 
         try {
-          setInfoStatus(`
+          setStatus(`
             <p><strong>Statut :</strong> calcul en cours</p>
             <p><strong>Mode :</strong> backend Render</p>
             <p><strong>Note :</strong> récupération des positions planétaires…</p>
           `);
 
-          const data = await api("/api/ephemeris", {
-            method: "POST",
-            body: JSON.stringify({ date, time, city, country })
-          });
+          await fetchHealth();
+          const data = await fetchEphemeris({ date, time, city, country });
 
-          const planets = data.planets.map((p) => ({
+          const planets = (data.planets || []).map((p) => ({
             name: p.name,
             glyph: p.glyph,
             longitude: p.longitude,
-            color: p.color || colors[p.glyph] || "#ffffff"
+            color: p.color || planetColors[p.glyph] || "#ffffff"
           }));
 
-          drawChart(planets, {
+          drawChart(planets.length ? planets : getDemoPlanets(), {
             status: "ok",
             mode: "éphémérides réelles",
             label: `${date} ${time} — ${city}, ${country}`
           });
-        } catch (e) {
-          drawChart(demoData(), {
+        } catch (error) {
+          drawChart(getDemoPlanets(), {
             status: "démo affichée",
             mode: "secours local",
-            label: `backend inaccessible : ${e.message}`
+            label: "backend inaccessible ou en réveil"
           });
         }
       }
 
-      async function verifyPayment() {
-        try {
-          const data = await api("/api/paypal/verify", {
-            method: "POST",
-            body: JSON.stringify({
-              offer: offerTypeInput.value,
-              email: authUser || authEmail.value.trim()
-            })
-          });
-
-          paymentVerified = !!data.verified;
-          updatePaymentUI();
-          setInfoStatus(`
-            <p><strong>Statut :</strong> ${paymentVerified ? "paiement validé" : "paiement non validé"}</p>
-            <p><strong>Mode :</strong> contrôle backend</p>
-            <p><strong>Note :</strong> ${data.message || "Vérification effectuée."}</p>
-          `);
-        } catch (e) {
-          paymentVerified = false;
-          updatePaymentUI();
-          setInfoStatus(`
-            <p><strong>Statut :</strong> vérification impossible</p>
-            <p><strong>Mode :</strong> backend PayPal requis</p>
-            <p><strong>Note :</strong> ${e.message}</p>
-          `);
-        }
-      }
-
-      async function saveTheme() {
-        if (!authToken) {
-          setInfoStatus(`
-            <p><strong>Statut :</strong> impossible</p>
-            <p><strong>Mode :</strong> sauvegarde</p>
-            <p><strong>Note :</strong> connecte-toi d’abord.</p>
-          `);
-          return;
-        }
-
-        if (!currentPlanets.length) {
-          setInfoStatus(`
-            <p><strong>Statut :</strong> impossible</p>
-            <p><strong>Mode :</strong> sauvegarde</p>
-            <p><strong>Note :</strong> génère d’abord une carte.</p>
-          `);
-          return;
-        }
-
-        try {
-          const payload = {
-            clientName: clientNameInput.value.trim(),
-            offerType: offerTypeInput.value,
-            date: dateInput.value,
-            time: timeInput.value,
-            city: cityInput.value,
-            country: countryInput.value,
-            planets: currentPlanets,
-            imageDataUrl: canvas.toDataURL("image/png")
-          };
-
-          await api("/api/themes", {
-            method: "POST",
-            body: JSON.stringify(payload)
-          });
-
-          setInfoStatus(`
-            <p><strong>Statut :</strong> sauvegardé</p>
-            <p><strong>Mode :</strong> espace client</p>
-            <p><strong>Note :</strong> thème enregistré avec succès.</p>
-          `);
-
-          await loadThemes();
-        } catch (e) {
-          setInfoStatus(`
-            <p><strong>Statut :</strong> erreur</p>
-            <p><strong>Mode :</strong> sauvegarde</p>
-            <p><strong>Note :</strong> ${e.message}</p>
-          `);
-        }
-      }
-
-      async function loadThemes() {
-        if (!authToken) {
-          savedThemesBox.innerHTML = "Connecte-toi pour voir tes thèmes sauvegardés.";
-          return;
-        }
-
-        try {
-          const data = await api("/api/themes", { method: "GET" });
-          const themes = data.themes || [];
-
-          if (!themes.length) {
-            savedThemesBox.innerHTML = "Aucun thème sauvegardé.";
-            return;
-          }
-
-          savedThemesBox.innerHTML = themes.map((theme) => `
-            <div class="theme-item">
-              <div>
-                <strong>${theme.clientName || "Sans nom"}</strong><br>
-                ${theme.offerType || ""} — ${theme.date || ""}
-              </div>
-              <button class="mini-btn" data-load-theme-id="${theme.id}">Charger</button>
-            </div>
-          `).join("");
-
-          document.querySelectorAll("[data-load-theme-id]").forEach((btn) => {
-            btn.addEventListener("click", async () => {
-              const id = btn.getAttribute("data-load-theme-id");
-              await loadSingleTheme(id);
-            });
-          });
-        } catch (e) {
-          savedThemesBox.innerHTML = `Erreur : ${e.message}`;
-        }
-      }
-
-      async function loadSingleTheme(id) {
-        try {
-          const data = await api(`/api/themes/${id}`, { method: "GET" });
-          const theme = data.theme;
-
-          clientNameInput.value = theme.clientName || "";
-          offerTypeInput.value = theme.offerType || "theme-astral";
-          dateInput.value = theme.date || "";
-          timeInput.value = theme.time || "12:00";
-          cityInput.value = theme.city || "";
-          countryInput.value = theme.country || "";
-
-          drawChart(theme.planets || demoData(), {
-            status: "ok",
-            mode: "thème sauvegardé",
-            label: `${theme.clientName || "client"} — ${theme.date || ""}`
-          });
-        } catch (e) {
-          setInfoStatus(`
-            <p><strong>Statut :</strong> erreur</p>
-            <p><strong>Mode :</strong> chargement thème</p>
-            <p><strong>Note :</strong> ${e.message}</p>
-          `);
-        }
-      }
-
-      function generatePdf() {
-        if (!paymentVerified) {
-          setInfoStatus(`
-            <p><strong>Statut :</strong> bloqué</p>
-            <p><strong>Mode :</strong> PDF</p>
-            <p><strong>Note :</strong> paiement non vérifié.</p>
-          `);
-          return;
-        }
-
-        const pdf = new jsPDF({
-          orientation: "portrait",
-          unit: "mm",
-          format: "a4"
+      function drawDemo() {
+        drawChart(getDemoPlanets(), {
+          status: "ok",
+          mode: userImage
+            ? "modèle utilisateur"
+            : (defaultImageLoaded ? "modèle Helios par défaut" : "fallback interne"),
+          label: "visualisation de démonstration"
         });
-
-        const imgData = canvas.toDataURL("image/png", 1.0);
-
-        pdf.setFillColor(7, 11, 22);
-        pdf.rect(0, 0, 210, 297, "F");
-
-        pdf.setTextColor(255, 255, 255);
-        pdf.setFont("helvetica", "bold");
-        pdf.setFontSize(20);
-        pdf.text("HELIOS ASTRO", 105, 18, { align: "center" });
-
-        pdf.setFontSize(12);
-        pdf.setFont("helvetica", "normal");
-        pdf.text(`Client : ${clientNameInput.value || "Non renseigné"}`, 16, 30);
-        pdf.text(`Offre : ${offerTypeInput.value}`, 16, 37);
-        pdf.text(`Date : ${dateInput.value || "-"}`, 16, 44);
-        pdf.text(`Heure : ${timeInput.value || "-"}`, 16, 51);
-        pdf.text(`Lieu : ${cityInput.value || ""} ${countryInput.value || ""}`.trim(), 16, 58);
-
-        pdf.addImage(imgData, "PNG", 15, 68, 180, 180, "", "FAST");
-
-        pdf.setFontSize(10);
-        pdf.setTextColor(180, 210, 255);
-        pdf.text("Document généré après validation du paiement.", 105, 285, { align: "center" });
-
-        const filename = `${(clientNameInput.value || "theme-helios").replace(/\s+/g, "-").toLowerCase()}-${offerTypeInput.value}.pdf`;
-        pdf.save(filename);
       }
 
       uploadInput.addEventListener("change", (e) => {
@@ -909,51 +597,20 @@
 
         const reader = new FileReader();
         reader.onload = (event) => {
-          userImage = new Image();
-          userImage.onload = () => {
-            drawChart(currentPlanets.length ? currentPlanets : demoData(), {
-              status: "ok",
-              mode: "modèle chargé",
-              label: "image personnalisée appliquée"
-            });
+          const img = new Image();
+          img.onload = () => {
+            userImage = img;
+            drawDemo();
           };
-          userImage.src = event.target.result;
+          img.src = event.target.result;
         };
         reader.readAsDataURL(file);
       });
 
-      registerBtn.addEventListener("click", register);
-      loginBtn.addEventListener("click", login);
       generateBtn.addEventListener("click", generateRealChart);
-      demoBtn.addEventListener("click", () => {
-        drawChart(demoData(), {
-          status: "ok",
-          mode: "démo Helios",
-          label: "visualisation locale"
-        });
-      });
-      verifyPaymentBtn.addEventListener("click", verifyPayment);
-      saveThemeBtn.addEventListener("click", saveTheme);
-      loadThemesBtn.addEventListener("click", loadThemes);
-      downloadPdfBtn.addEventListener("click", generatePdf);
+      demoBtn.addEventListener("click", drawDemo);
 
-      updatePaymentUI();
-
-      if (authToken && authUser) {
-        setAuthStatus(`Connecté : ${authUser}`);
-      } else {
-        setAuthStatus("Non connecté.");
-      }
-
-      drawChart(demoData(), {
-        status: "ok",
-        mode: "démo Helios",
-        label: "prêt"
-      });
-
-      if (authToken) {
-        loadThemes();
-      }
+      setTimeout(drawDemo, 900);
     })();
   </script>
 </body>
