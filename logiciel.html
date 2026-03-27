@@ -1,40 +1,29 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Logiciel Helios Astro</title>
-  <meta name="description" content="Logiciel Helios Astro avec modèle zodiacal personnalisé et planètes alignées à l’extérieur du cercle." />
-  <link rel="canonical" href="https://heliosastro.com/logiciel.html" />
-  <link rel="stylesheet" href="assets/styles.css" />
-
+  <meta name="description" content="Logiciel Helios Astro basé sur le modèle graphique original Helios avec planètes extérieures et calcul des éphémérides.">
+  <link rel="stylesheet" href="assets/styles.css">
   <style>
-    .software-layout{
+    .helios-layout{
       display:grid;
-      grid-template-columns: 380px 1fr;
+      grid-template-columns:360px 1fr;
       gap:24px;
       align-items:start;
     }
 
-    .software-stack{
-      display:grid;
-      gap:18px;
-    }
-
-    .software-card{
+    .helios-panel,
+    .helios-canvas-shell{
       background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.015));
       border:1px solid rgba(113,224,255,.16);
-      border-radius:22px;
+      border-radius:24px;
       box-shadow:0 20px 60px rgba(0,0,0,.35);
-      padding:22px;
+      padding:20px;
     }
 
-    .software-card h2,
-    .software-card h3{
-      margin:0 0 14px;
-    }
-
-    .software-card label{
+    .helios-panel label{
       display:grid;
       gap:8px;
       margin-bottom:12px;
@@ -42,46 +31,35 @@
       color:#fff;
     }
 
-    .software-card input,
-    .software-card select,
-    .software-card textarea{
+    .helios-panel input{
       width:100%;
       border-radius:14px;
       border:1px solid rgba(113,224,255,.16);
       background:rgba(255,255,255,.03);
       color:#fff;
-      padding:13px 14px;
+      padding:12px 14px;
       font:inherit;
       outline:none;
     }
 
-    .software-card input:focus,
-    .software-card select:focus,
-    .software-card textarea:focus{
+    .helios-panel input:focus{
       border-color:rgba(113,224,255,.45);
       box-shadow:0 0 0 4px rgba(113,224,255,.10);
     }
 
-    .software-status,
-    .software-legend{
+    .helios-info,
+    .helios-legend{
       border:1px solid rgba(113,224,255,.16);
       background:rgba(255,255,255,.03);
       border-radius:16px;
-      padding:16px;
+      padding:14px;
       color:#d7e7ff;
       line-height:1.6;
+      margin-top:12px;
     }
 
-    .chart-shell{
-      background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.015));
-      border:1px solid rgba(113,224,255,.16);
-      border-radius:28px;
-      box-shadow:0 20px 70px rgba(0,0,0,.45);
-      padding:18px;
-    }
-
-    #helios-chart-canvas{
-      width:min(100%, 920px);
+    #heliosCanvas{
+      width:min(100%, 900px);
       height:auto;
       display:block;
       margin:auto;
@@ -89,15 +67,8 @@
       border-radius:22px;
     }
 
-    .mini-note{
-      color:#9eb4d7;
-      font-size:.92rem;
-      line-height:1.55;
-      margin-top:10px;
-    }
-
-    @media (max-width: 1100px){
-      .software-layout{
+    @media (max-width: 1000px){
+      .helios-layout{
         grid-template-columns:1fr;
       }
     }
@@ -131,74 +102,55 @@
     <section class="page-hero section">
       <div class="container">
         <p class="eyebrow">Logiciel Helios Astro</p>
-        <h1>Carte zodiacale vivante</h1>
+        <h1>Carte Helios basée sur ton vrai modèle</h1>
         <p class="lead">
-          Cette version utilise ton modèle zodiacal comme base visuelle et positionne les planètes
-          à l’extérieur du cercle selon leur longitude.
+          Cette version n’utilise plus une roue générique. Elle affiche ton modèle graphique comme base,
+          puis place les planètes à l’extérieur selon leur longitude.
         </p>
       </div>
     </section>
 
     <section class="section">
-      <div class="container software-layout">
+      <div class="container helios-layout">
+        <div class="helios-panel">
+          <h2>Paramètres</h2>
 
-        <div class="software-stack">
-          <div class="software-card">
-            <h2>Paramètres</h2>
+          <label>
+            Date
+            <input type="date" id="astro-date">
+          </label>
 
-            <label>
-              Charger un modèle zodiacal
-              <input type="file" id="upload-model" accept="image/*">
-            </label>
+          <label>
+            Heure
+            <input type="time" id="astro-time" value="12:00">
+          </label>
 
-            <label>
-              Date
-              <input type="date" id="astro-date">
-            </label>
+          <label>
+            Ville
+            <input type="text" id="astro-city" placeholder="Paris">
+          </label>
 
-            <label>
-              Heure
-              <input type="time" id="astro-time" value="12:00">
-            </label>
+          <label>
+            Pays
+            <input type="text" id="astro-country" placeholder="France">
+          </label>
 
-            <label>
-              Ville
-              <input type="text" id="astro-city" placeholder="Paris">
-            </label>
-
-            <label>
-              Pays
-              <input type="text" id="astro-country" placeholder="France">
-            </label>
-
-            <div class="btn-row">
-              <button class="btn" type="button" id="generate-chart-btn">Générer la carte</button>
-              <button class="btn btn-outline" type="button" id="demo-chart-btn">Démo Helios</button>
-            </div>
-
-            <p class="mini-note">
-              Si ton backend Render répond, les positions viennent du serveur.
-              Sinon, une démo visuelle s’affiche automatiquement.
-            </p>
+          <div class="btn-row">
+            <button class="btn" type="button" id="generate-chart-btn">Générer la carte</button>
+            <button class="btn btn-outline" type="button" id="demo-chart-btn">Démo Helios</button>
           </div>
 
-          <div class="software-card">
-            <h3>Statut</h3>
-            <div class="software-status" id="astro-info-box">
-              Statut : prêt.
-            </div>
+          <div class="helios-info" id="astro-info-box">
+            Statut : prêt
           </div>
 
-          <div class="software-card">
-            <h3>Positions</h3>
-            <div class="software-legend" id="astro-legend-box">
-              Les positions planétaires s’afficheront ici.
-            </div>
+          <div class="helios-legend" id="astro-legend-box">
+            Les positions planétaires apparaîtront ici.
           </div>
         </div>
 
-        <div class="chart-shell">
-          <canvas id="helios-chart-canvas" width="1200" height="1200"></canvas>
+        <div class="helios-canvas-shell">
+          <canvas id="heliosCanvas" width="1200" height="1200"></canvas>
         </div>
       </div>
     </section>
@@ -216,402 +168,6 @@
   </footer>
 
   <script src="assets/app.js"></script>
-
-  <script>
-    (() => {
-      const API_BASE = "https://heliosastro-backend.onrender.com";
-
-      const canvas = document.getElementById("helios-chart-canvas");
-      const ctx = canvas.getContext("2d");
-      const size = canvas.width;
-      const cx = size / 2;
-      const cy = size / 2;
-
-      const uploadInput = document.getElementById("upload-model");
-      const generateBtn = document.getElementById("generate-chart-btn");
-      const demoBtn = document.getElementById("demo-chart-btn");
-      const dateInput = document.getElementById("astro-date");
-      const timeInput = document.getElementById("astro-time");
-      const cityInput = document.getElementById("astro-city");
-      const countryInput = document.getElementById("astro-country");
-      const infoBox = document.getElementById("astro-info-box");
-      const legendBox = document.getElementById("astro-legend-box");
-
-      let userImage = null;
-      let defaultImageLoaded = false;
-      let currentPlanets = [];
-
-      const defaultModel = new Image();
-      defaultModel.onload = function () {
-        defaultImageLoaded = true;
-        if (!userImage) {
-          drawChart(getDemoPlanets(), {
-            status: "ok",
-            mode: "modèle Helios chargé",
-            label: "modèle zodiacal par défaut"
-          });
-        }
-      };
-      defaultModel.onerror = function () {
-        defaultImageLoaded = false;
-        if (!userImage) {
-          drawChart(getDemoPlanets(), {
-            status: "ok",
-            mode: "fallback interne",
-            label: "modèle image non trouvé, roue de secours affichée"
-          });
-        }
-      };
-      defaultModel.src = "assets/modele-zodiacal-helios.png";
-
-      const zodiac = [
-        { name: "Bélier", glyph: "♈", start: 0 },
-        { name: "Taureau", glyph: "♉", start: 30 },
-        { name: "Gémeaux", glyph: "♊", start: 60 },
-        { name: "Cancer", glyph: "♋", start: 90 },
-        { name: "Lion", glyph: "♌", start: 120 },
-        { name: "Vierge", glyph: "♍", start: 150 },
-        { name: "Balance", glyph: "♎", start: 180 },
-        { name: "Scorpion", glyph: "♏", start: 210 },
-        { name: "Sagittaire", glyph: "♐", start: 240 },
-        { name: "Capricorne", glyph: "♑", start: 270 },
-        { name: "Verseau", glyph: "♒", start: 300 },
-        { name: "Poissons", glyph: "♓", start: 330 }
-      ];
-
-      const planetColors = {
-        "☉": "#ffb300",
-        "☽": "#4fc3ff",
-        "☿": "#bfbfbf",
-        "♀": "#ff66cc",
-        "♂": "#ff5252",
-        "♃": "#ff9800",
-        "♄": "#cda86a",
-        "♅": "#38d9d9",
-        "♆": "#4f6fff",
-        "♇": "#9c27b0"
-      };
-
-      function normalizeDeg(deg) {
-        return ((deg % 360) + 360) % 360;
-      }
-
-      function degToRad(deg) {
-        return (deg - 90) * Math.PI / 180;
-      }
-
-      function getSignInfo(longitude) {
-        const lon = normalizeDeg(longitude);
-        const index = Math.floor(lon / 30);
-        const sign = zodiac[index];
-        return {
-          sign: sign.name,
-          glyph: sign.glyph,
-          degreeInSign: lon - sign.start
-        };
-      }
-
-      function setStatus(html) {
-        infoBox.innerHTML = html;
-      }
-
-      function clearCanvas() {
-        ctx.clearRect(0, 0, size, size);
-        ctx.fillStyle = "#000000";
-        ctx.fillRect(0, 0, size, size);
-      }
-
-      function drawFallbackWheel() {
-        const outerR = 360;
-        const signOuter = 310;
-        const signInner = 245;
-
-        const glow = ctx.createRadialGradient(cx, cy, 20, cx, cy, 420);
-        glow.addColorStop(0, "rgba(0,180,255,0.08)");
-        glow.addColorStop(0.55, "rgba(70,100,255,0.04)");
-        glow.addColorStop(1, "rgba(0,0,0,0)");
-        ctx.fillStyle = glow;
-        ctx.beginPath();
-        ctx.arc(cx, cy, 420, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.strokeStyle = "#ffffff";
-        ctx.lineWidth = 2;
-
-        ctx.beginPath();
-        ctx.arc(cx, cy, outerR, 0, Math.PI * 2);
-        ctx.stroke();
-
-        ctx.beginPath();
-        ctx.arc(cx, cy, signOuter, 0, Math.PI * 2);
-        ctx.stroke();
-
-        ctx.beginPath();
-        ctx.arc(cx, cy, signInner, 0, Math.PI * 2);
-        ctx.stroke();
-
-        for (let i = 0; i < 12; i++) {
-          const deg = i * 30;
-          const rad = degToRad(deg);
-
-          ctx.beginPath();
-          ctx.moveTo(cx + Math.cos(rad) * signInner, cy + Math.sin(rad) * signInner);
-          ctx.lineTo(cx + Math.cos(rad) * outerR, cy + Math.sin(rad) * outerR);
-          ctx.strokeStyle = "rgba(255,255,255,0.75)";
-          ctx.lineWidth = 2;
-          ctx.stroke();
-        }
-
-        ctx.fillStyle = "#ffffff";
-        ctx.font = "56px Arial";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-
-        for (let i = 0; i < 12; i++) {
-          const midDeg = i * 30 + 15;
-          const rad = degToRad(midDeg);
-          ctx.fillText(zodiac[i].glyph, cx + Math.cos(rad) * 275, cy + Math.sin(rad) * 275);
-        }
-
-        const core = ctx.createRadialGradient(cx, cy, 10, cx, cy, 95);
-        core.addColorStop(0, "rgba(255,255,255,0.92)");
-        core.addColorStop(0.2, "rgba(255,215,80,0.75)");
-        core.addColorStop(0.5, "rgba(0,190,255,0.30)");
-        core.addColorStop(1, "rgba(0,0,0,0)");
-        ctx.fillStyle = core;
-        ctx.beginPath();
-        ctx.arc(cx, cy, 95, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      function drawBase() {
-        clearCanvas();
-
-        if (userImage) {
-          ctx.drawImage(userImage, 100, 100, size - 200, size - 200);
-          return;
-        }
-
-        if (defaultImageLoaded) {
-          ctx.drawImage(defaultModel, 100, 100, size - 200, size - 200);
-          return;
-        }
-
-        drawFallbackWheel();
-      }
-
-      function drawPlanetArc(longitude, color, radius) {
-        const start = longitude - 7;
-        const end = longitude + 7;
-
-        ctx.beginPath();
-        ctx.arc(cx, cy, radius, degToRad(start), degToRad(end));
-        ctx.strokeStyle = color;
-        ctx.lineWidth = 4;
-        ctx.shadowBlur = 10;
-        ctx.shadowColor = color;
-        ctx.stroke();
-        ctx.shadowBlur = 0;
-      }
-
-      function drawPlanetConnector(longitude, color, fromR, toR) {
-        const rad = degToRad(longitude);
-        const x1 = cx + Math.cos(rad) * fromR;
-        const y1 = cy + Math.sin(rad) * fromR;
-        const x2 = cx + Math.cos(rad) * toR;
-        const y2 = cy + Math.sin(rad) * toR;
-
-        ctx.beginPath();
-        ctx.moveTo(x1, y1);
-        ctx.lineTo(x2, y2);
-        ctx.strokeStyle = color;
-        ctx.lineWidth = 2.5;
-        ctx.shadowBlur = 8;
-        ctx.shadowColor = color;
-        ctx.stroke();
-        ctx.shadowBlur = 0;
-      }
-
-      function drawPlanet(longitude, glyph, color, radius, name) {
-        const rad = degToRad(longitude);
-        const x = cx + Math.cos(rad) * radius;
-        const y = cy + Math.sin(rad) * radius;
-
-        ctx.beginPath();
-        ctx.arc(x, y, 24, 0, Math.PI * 2);
-        ctx.fillStyle = color;
-        ctx.shadowBlur = 16;
-        ctx.shadowColor = color;
-        ctx.fill();
-        ctx.shadowBlur = 0;
-
-        ctx.beginPath();
-        ctx.arc(x - 6, y - 6, 7, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(255,255,255,0.55)";
-        ctx.fill();
-
-        ctx.fillStyle = "#ffffff";
-        ctx.font = "26px Arial";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText(glyph, x, y + 1);
-
-        const lx = cx + Math.cos(rad) * (radius + 40);
-        const ly = cy + Math.sin(rad) * (radius + 40);
-        ctx.font = "18px Arial";
-        ctx.fillText(name, lx, ly);
-      }
-
-      function drawChart(planets, meta) {
-        drawBase();
-
-        const connectorRadius = (userImage || defaultImageLoaded) ? 392 : 360;
-        const arcRadius = (userImage || defaultImageLoaded) ? 430 : 395;
-        const planetRadius = (userImage || defaultImageLoaded) ? 500 : 455;
-
-        planets.forEach((p, i) => {
-          const lon = normalizeDeg(p.longitude);
-          const stagger = (i % 2) * 18;
-          drawPlanetArc(lon, p.color, arcRadius + stagger);
-          drawPlanetConnector(lon, p.color, connectorRadius, planetRadius + stagger);
-        });
-
-        planets.forEach((p, i) => {
-          const lon = normalizeDeg(p.longitude);
-          const stagger = (i % 2) * 18;
-          drawPlanet(lon, p.glyph, p.color, planetRadius + stagger, p.name);
-        });
-
-        legendBox.innerHTML =
-          "<strong>Positions planétaires</strong><br>" +
-          planets.map((p) => {
-            const s = getSignInfo(p.longitude);
-            return `${p.glyph} ${p.name} — ${s.degreeInSign.toFixed(1)}° ${s.sign}`;
-          }).join("<br>");
-
-        setStatus(`
-          <p><strong>Statut :</strong> ${meta.status}</p>
-          <p><strong>Mode :</strong> ${meta.mode}</p>
-          <p><strong>Données :</strong> ${meta.label}</p>
-        `);
-
-        currentPlanets = planets;
-      }
-
-      function getDemoPlanets() {
-        return [
-          { name: "Soleil", glyph: "☉", longitude: 320, color: planetColors["☉"] },
-          { name: "Lune", glyph: "☽", longitude: 14, color: planetColors["☽"] },
-          { name: "Mercure", glyph: "☿", longitude: 301, color: planetColors["☿"] },
-          { name: "Vénus", glyph: "♀", longitude: 281, color: planetColors["♀"] },
-          { name: "Mars", glyph: "♂", longitude: 89, color: planetColors["♂"] },
-          { name: "Jupiter", glyph: "♃", longitude: 247, color: planetColors["♃"] },
-          { name: "Saturne", glyph: "♄", longitude: 155, color: planetColors["♄"] },
-          { name: "Uranus", glyph: "♅", longitude: 32, color: planetColors["♅"] },
-          { name: "Neptune", glyph: "♆", longitude: 18, color: planetColors["♆"] },
-          { name: "Pluton", glyph: "♇", longitude: 302, color: planetColors["♇"] }
-        ];
-      }
-
-      async function fetchHealth() {
-        const response = await fetch(`${API_BASE}/api/health`);
-        if (!response.ok) throw new Error("Backend indisponible");
-        return response.json();
-      }
-
-      async function fetchEphemeris(payload) {
-        const response = await fetch(`${API_BASE}/api/ephemeris`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(payload)
-        });
-
-        if (!response.ok) {
-          throw new Error("Erreur backend");
-        }
-
-        return response.json();
-      }
-
-      async function generateRealChart() {
-        const date = dateInput.value || "";
-        const time = timeInput.value || "12:00";
-        const city = cityInput.value || "Paris";
-        const country = countryInput.value || "France";
-
-        if (!date) {
-          setStatus(`
-            <p><strong>Statut :</strong> erreur</p>
-            <p><strong>Mode :</strong> attente</p>
-            <p><strong>Note :</strong> merci de renseigner une date.</p>
-          `);
-          return;
-        }
-
-        try {
-          setStatus(`
-            <p><strong>Statut :</strong> calcul en cours</p>
-            <p><strong>Mode :</strong> backend Render</p>
-            <p><strong>Note :</strong> récupération des positions planétaires…</p>
-          `);
-
-          await fetchHealth();
-          const data = await fetchEphemeris({ date, time, city, country });
-
-          const planets = (data.planets || []).map((p) => ({
-            name: p.name,
-            glyph: p.glyph,
-            longitude: p.longitude,
-            color: p.color || planetColors[p.glyph] || "#ffffff"
-          }));
-
-          drawChart(planets.length ? planets : getDemoPlanets(), {
-            status: "ok",
-            mode: "éphémérides réelles",
-            label: `${date} ${time} — ${city}, ${country}`
-          });
-        } catch (error) {
-          drawChart(getDemoPlanets(), {
-            status: "démo affichée",
-            mode: "secours local",
-            label: "backend inaccessible ou en réveil"
-          });
-        }
-      }
-
-      function drawDemo() {
-        drawChart(getDemoPlanets(), {
-          status: "ok",
-          mode: userImage
-            ? "modèle utilisateur"
-            : (defaultImageLoaded ? "modèle Helios par défaut" : "fallback interne"),
-          label: "visualisation de démonstration"
-        });
-      }
-
-      uploadInput.addEventListener("change", (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          const img = new Image();
-          img.onload = () => {
-            userImage = img;
-            drawDemo();
-          };
-          img.src = event.target.result;
-        };
-        reader.readAsDataURL(file);
-      });
-
-      generateBtn.addEventListener("click", generateRealChart);
-      demoBtn.addEventListener("click", drawDemo);
-
-      setTimeout(drawDemo, 900);
-    })();
-  </script>
+  <script src="assets/logiciel.js"></script>
 </body>
 </html>
