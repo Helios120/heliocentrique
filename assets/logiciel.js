@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
   const API_BASE = "https://heliosastro-backend.onrender.com";
+  const { jsPDF } = window.jspdf;
 
   const canvas = document.getElementById("heliosCanvas");
   if (!canvas) return;
@@ -9,12 +10,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const cx = size / 2;
   const cy = size / 2;
 
+  const nameInput = document.getElementById("astro-name");
   const dateInput = document.getElementById("astro-date");
   const timeInput = document.getElementById("astro-time");
   const cityInput = document.getElementById("astro-city");
   const countryInput = document.getElementById("astro-country");
   const generateBtn = document.getElementById("generate-chart-btn");
   const demoBtn = document.getElementById("demo-chart-btn");
+  const exportPdfBtn = document.getElementById("export-pdf-btn");
   const infoBox = document.getElementById("astro-info-box");
   const summaryBox = document.getElementById("astro-summary-box");
   const legendBox = document.getElementById("astro-legend-box");
@@ -133,20 +136,20 @@ document.addEventListener("DOMContentLoaded", () => {
   function drawFallbackBase() {
     clearCanvas();
 
-    const glow = ctx.createRadialGradient(cx, cy, 20, cx, cy, 420);
-    glow.addColorStop(0, "rgba(0,220,255,0.10)");
-    glow.addColorStop(0.5, "rgba(80,120,255,0.05)");
-    glow.addColorStop(1, "rgba(0,0,0,0)");
-    ctx.fillStyle = glow;
+    const bgGlow = ctx.createRadialGradient(cx, cy, 40, cx, cy, 470);
+    bgGlow.addColorStop(0, "rgba(0,220,255,0.08)");
+    bgGlow.addColorStop(0.45, "rgba(80,120,255,0.05)");
+    bgGlow.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = bgGlow;
     ctx.beginPath();
-    ctx.arc(cx, cy, 420, 0, Math.PI * 2);
+    ctx.arc(cx, cy, 470, 0, Math.PI * 2);
     ctx.fill();
 
     const outerR = 360;
     const signOuter = 305;
     const signInner = 240;
 
-    ctx.strokeStyle = "#ffffff";
+    ctx.strokeStyle = "rgba(255,255,255,0.95)";
     ctx.lineWidth = 2;
 
     ctx.beginPath();
@@ -183,6 +186,25 @@ document.addEventListener("DOMContentLoaded", () => {
       const y = cy + Math.sin(r) * 270;
       ctx.fillText(zodiac[i].glyph, x, y);
     }
+
+    const centerGlow = ctx.createRadialGradient(cx, cy, 5, cx, cy, 120);
+    centerGlow.addColorStop(0, "rgba(255,255,255,0.95)");
+    centerGlow.addColorStop(0.12, "rgba(255,226,120,0.85)");
+    centerGlow.addColorStop(0.28, "rgba(0,225,255,0.40)");
+    centerGlow.addColorStop(0.58, "rgba(140,0,255,0.12)");
+    centerGlow.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = centerGlow;
+    ctx.beginPath();
+    ctx.arc(cx, cy, 120, 0, Math.PI * 2);
+    ctx.fill();
+
+    const halo = ctx.createRadialGradient(cx, cy, 0, cx, cy, 220);
+    halo.addColorStop(0, "rgba(255,255,255,0.10)");
+    halo.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = halo;
+    ctx.beginPath();
+    ctx.arc(cx, cy, 220, 0, Math.PI * 2);
+    ctx.fill();
   }
 
   function drawModelIfAvailable() {
@@ -195,14 +217,24 @@ document.addEventListener("DOMContentLoaded", () => {
     const margin = 80;
     const drawSize = size - margin * 2;
     ctx.drawImage(modelImage, margin, margin, drawSize, drawSize);
+
+    const overlayGlow = ctx.createRadialGradient(cx, cy, 10, cx, cy, 150);
+    overlayGlow.addColorStop(0, "rgba(255,255,255,0.20)");
+    overlayGlow.addColorStop(0.18, "rgba(255,220,120,0.22)");
+    overlayGlow.addColorStop(0.42, "rgba(0,220,255,0.10)");
+    overlayGlow.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = overlayGlow;
+    ctx.beginPath();
+    ctx.arc(cx, cy, 150, 0, Math.PI * 2);
+    ctx.fill();
   }
 
   function drawPlanetArc(longitude, color, radius) {
     ctx.beginPath();
-    ctx.arc(cx, cy, radius, degToRad(longitude - 7), degToRad(longitude + 7));
+    ctx.arc(cx, cy, radius, degToRad(longitude - 5.5), degToRad(longitude + 5.5));
     ctx.strokeStyle = color;
-    ctx.lineWidth = 5;
-    ctx.shadowBlur = 10;
+    ctx.lineWidth = 3;
+    ctx.shadowBlur = 8;
     ctx.shadowColor = color;
     ctx.stroke();
     ctx.shadowBlur = 0;
@@ -219,8 +251,8 @@ document.addEventListener("DOMContentLoaded", () => {
     ctx.moveTo(x1, y1);
     ctx.lineTo(x2, y2);
     ctx.strokeStyle = color;
-    ctx.lineWidth = 3;
-    ctx.shadowBlur = 8;
+    ctx.lineWidth = 2;
+    ctx.shadowBlur = 6;
     ctx.shadowColor = color;
     ctx.stroke();
     ctx.shadowBlur = 0;
@@ -232,44 +264,47 @@ document.addEventListener("DOMContentLoaded", () => {
     const y = cy + Math.sin(r) * radius;
 
     ctx.beginPath();
-    ctx.arc(x, y, 24, 0, Math.PI * 2);
+    ctx.arc(x, y, 20, 0, Math.PI * 2);
     ctx.fillStyle = color;
-    ctx.shadowBlur = 16;
+    ctx.shadowBlur = 14;
     ctx.shadowColor = color;
     ctx.fill();
     ctx.shadowBlur = 0;
 
     ctx.beginPath();
-    ctx.arc(x - 6, y - 6, 7, 0, Math.PI * 2);
-    ctx.fillStyle = "rgba(255,255,255,0.55)";
+    ctx.arc(x - 5, y - 5, 6, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(255,255,255,0.50)";
     ctx.fill();
 
     ctx.fillStyle = "#ffffff";
-    ctx.font = "24px Arial";
+    ctx.font = "20px Arial";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillText(glyph, x, y + 1);
 
-    const labelRadius = radius + (index % 2 === 0 ? 40 : 58);
+    let labelRadius = radius + 42;
+    if (index % 3 === 1) labelRadius = radius + 58;
+    if (index % 3 === 2) labelRadius = radius + 74;
+
     const lx = cx + Math.cos(r) * labelRadius;
     const ly = cy + Math.sin(r) * labelRadius;
 
     ctx.fillStyle = "#ffffff";
-    ctx.font = "20px Arial";
+    ctx.font = "18px Arial";
     ctx.fillText(name, lx, ly);
   }
 
   function drawChart(planets, statusText) {
     drawModelIfAvailable();
 
-    const innerAnchorRadius = modelLoaded ? 340 : 360;
-    const arcRadius = modelLoaded ? 395 : 405;
-    const planetRadius = modelLoaded ? 460 : 470;
+    const innerAnchorRadius = modelLoaded ? 342 : 360;
+    const arcRadius = modelLoaded ? 392 : 405;
+    const planetRadius = modelLoaded ? 458 : 472;
 
     planets.forEach((p, i) => {
       const lon = normalizeDeg(p.longitude);
       const color = p.color || "#ffffff";
-      const stagger = (i % 2) * 14;
+      const stagger = (i % 2) * 10;
       drawPlanetArc(lon, color, arcRadius + stagger);
       drawPlanetConnector(lon, color, innerAnchorRadius, planetRadius + stagger);
     });
@@ -277,7 +312,7 @@ document.addEventListener("DOMContentLoaded", () => {
     planets.forEach((p, i) => {
       const lon = normalizeDeg(p.longitude);
       const color = p.color || "#ffffff";
-      const stagger = (i % 2) * 14;
+      const stagger = (i % 2) * 10;
       drawPlanet(lon, p.glyph, color, planetRadius + stagger, p.name, i);
     });
 
@@ -300,6 +335,61 @@ document.addEventListener("DOMContentLoaded", () => {
       { name: "Neptune", glyph: "♆", longitude: 18, color: planetColors["♆"] },
       { name: "Pluton", glyph: "♇", longitude: 302, color: planetColors["♇"] }
     ];
+  }
+
+  function exportPdf() {
+    const doc = new jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: "a4"
+    });
+
+    const clientName = (nameInput.value || "Client").trim();
+    const date = dateInput.value || "—";
+    const time = timeInput.value || "—";
+    const city = cityInput.value || "—";
+    const country = countryInput.value || "—";
+
+    const imageData = canvas.toDataURL("image/png", 1.0);
+
+    doc.setFillColor(8, 10, 18);
+    doc.rect(0, 0, 210, 297, "F");
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(20);
+    doc.text("HELIOS ASTRO", 105, 16, { align: "center" });
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(11);
+    doc.text(`Nom : ${clientName}`, 14, 28);
+    doc.text(`Date : ${date}`, 14, 35);
+    doc.text(`Heure : ${time}`, 14, 42);
+    doc.text(`Lieu : ${city}, ${country}`, 14, 49);
+
+    doc.addImage(imageData, "PNG", 15, 58, 180, 180, "", "FAST");
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.text("Synthèse du thème", 14, 248);
+
+    const summaryText = summaryBox.textContent.replace(/\s+/g, " ").trim();
+    const summaryLines = doc.splitTextToSize(summaryText, 180);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.text(summaryLines, 14, 255);
+
+    const legendText = legendBox.textContent.replace(/\s+/g, " ").trim();
+    const legendLines = doc.splitTextToSize(legendText, 180);
+    const legendStartY = Math.min(278, 255 + summaryLines.length * 5 + 8);
+
+    doc.setFont("helvetica", "bold");
+    doc.text("Repères planétaires", 14, legendStartY);
+    doc.setFont("helvetica", "normal");
+    doc.text(legendLines, 14, legendStartY + 6);
+
+    const filename = `${clientName.replace(/\s+/g, "-").toLowerCase()}-helios-astro.pdf`;
+    doc.save(filename);
   }
 
   async function generateRealChart() {
@@ -362,6 +452,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   generateBtn.addEventListener("click", generateRealChart);
   demoBtn.addEventListener("click", drawDemo);
+  exportPdfBtn.addEventListener("click", exportPdf);
 
   drawFallbackBase();
   setInfo(`
