@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Logiciel Helios Astro</title>
-  <meta name="description" content="Carte zodiacale vivante Helios Astro avec planètes extérieures, arcs colorés et animation fluide.">
+  <meta name="description" content="Logiciel Helios Astro avec modèle zodiacal personnalisé, planètes extérieures et calcul des éphémérides.">
   <link rel="canonical" href="https://heliosastro.com/logiciel.html">
   <link rel="stylesheet" href="assets/styles.css">
 </head>
@@ -36,10 +36,10 @@
     <section class="page-hero section">
       <div class="container">
         <p class="eyebrow">Logiciel Helios Astro</p>
-        <h1>Planètes extérieures et arcs dynamiques</h1>
+        <h1>Carte zodiacale vivante</h1>
         <p class="lead">
-          Cette version repose sur ton modèle zodiacal et place les planètes à l’extérieur du cercle,
-          avec anti-collision, arcs lumineux et animation fluide.
+          Cette interface affiche ton modèle zodiacal comme base visuelle et place les planètes à l’extérieur
+          du cercle selon leur position zodiacale.
         </p>
       </div>
     </section>
@@ -51,7 +51,7 @@
 
           <label class="inline-label">
             Date
-            <input type="date" id="astro-date" required>
+            <input type="date" id="astro-date">
           </label>
 
           <label class="inline-label">
@@ -70,18 +70,18 @@
           </label>
 
           <div class="btn-row">
-            <button class="btn" id="generate-chart-btn" type="button">Générer</button>
-            <button class="btn btn-outline" id="demo-chart-btn" type="button">Démo</button>
+            <button class="btn" id="generate-chart-btn" type="button">Générer la carte</button>
+            <button class="btn btn-outline" id="demo-chart-btn" type="button">Démo Helios</button>
           </div>
 
           <div class="result-box" id="astro-info-box">
             <p><strong>Statut :</strong> prêt</p>
-            <p><strong>Mode :</strong> Helios premium</p>
-            <p><strong>Affichage :</strong> arcs colorés + placement extérieur intelligent</p>
+            <p><strong>Mode :</strong> modèle Helios + backend</p>
+            <p><strong>Support :</strong> affichage sécurisé avec secours automatique</p>
           </div>
 
           <div class="summary-box" id="astro-legend-box">
-            Les positions planétaires s’afficheront ici.
+            Les positions planétaires s’afficheront ici après génération.
           </div>
         </div>
 
