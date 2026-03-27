@@ -4,9 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Logiciel Helios Astro</title>
-  <meta name="description" content="Visualisation astrologique Helios Astro avec carte céleste premium, synthèse du thème et répartition planétaire.">
+  <meta name="description" content="Visualisation astrologique Helios Astro avec carte céleste premium, synthèse du thème, répartition planétaire et export PDF.">
   <link rel="canonical" href="https://heliosastro.com/logiciel.html">
   <link rel="stylesheet" href="assets/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <style>
     .helios-layout{
       display:grid;
@@ -133,6 +134,11 @@
           <h2>Données de naissance</h2>
 
           <label>
+            Nom
+            <input type="text" id="astro-name" placeholder="Nom du client">
+          </label>
+
+          <label>
             Date
             <input type="date" id="astro-date">
           </label>
@@ -155,6 +161,10 @@
           <div class="btn-row">
             <button class="btn" type="button" id="generate-chart-btn">Générer la carte</button>
             <button class="btn btn-outline" type="button" id="demo-chart-btn">Démo Helios</button>
+          </div>
+
+          <div class="btn-row">
+            <button class="btn" type="button" id="export-pdf-btn">Exporter en PDF</button>
           </div>
 
           <div class="helios-info" id="astro-info-box">
