@@ -4,29 +4,29 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Logiciel Helios Astro</title>
-  <meta name="description" content="Visualisation astrologique Helios Astro avec rendu premium, positions planétaires et lecture graphique du thème.">
+  <meta name="description" content="Visualisation astrologique Helios Astro avec carte céleste premium, synthèse du thème et répartition planétaire.">
   <link rel="canonical" href="https://heliosastro.com/logiciel.html">
   <link rel="stylesheet" href="assets/styles.css">
   <style>
     .helios-layout{
       display:grid;
-      grid-template-columns:360px 1fr;
+      grid-template-columns:380px 1fr;
       gap:24px;
       align-items:start;
     }
 
     .helios-panel,
     .helios-canvas-shell{
-      background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.015));
+      background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.015));
       border:1px solid rgba(113,224,255,.16);
-      border-radius:24px;
+      border-radius:26px;
       box-shadow:0 20px 60px rgba(0,0,0,.35);
-      padding:20px;
+      padding:22px;
     }
 
     .helios-panel h2{
       margin:0 0 18px;
-      font-size:2rem;
+      font-size:1.9rem;
     }
 
     .helios-panel label{
@@ -58,10 +58,10 @@
     .helios-legend{
       border:1px solid rgba(113,224,255,.16);
       background:rgba(255,255,255,.03);
-      border-radius:16px;
-      padding:14px;
+      border-radius:18px;
+      padding:15px;
       color:#d7e7ff;
-      line-height:1.6;
+      line-height:1.65;
       margin-top:12px;
     }
 
@@ -72,11 +72,11 @@
     }
 
     .helios-summary{
-      color:#e7f4ff;
+      color:#eef7ff;
     }
 
     #heliosCanvas{
-      width:min(100%, 900px);
+      width:min(100%, 920px);
       height:auto;
       display:block;
       margin:auto;
@@ -84,7 +84,7 @@
       border-radius:22px;
     }
 
-    @media (max-width: 1000px){
+    @media (max-width: 1050px){
       .helios-layout{
         grid-template-columns:1fr;
       }
@@ -119,10 +119,10 @@
     <section class="page-hero section">
       <div class="container">
         <p class="eyebrow">Logiciel Helios Astro</p>
-        <h1>Visualisation astrologique Helios Astro</h1>
+        <h1>Carte céleste Helios</h1>
         <p class="lead">
-          Explorez une carte céleste élégante, pensée pour révéler l’équilibre du thème,
-          la dynamique planétaire et la signature visuelle propre à l’univers Helios Astro.
+          Une lecture visuelle premium pour faire apparaître la dynamique du thème,
+          la répartition des forces planétaires et la signature symbolique de la carte.
         </p>
       </div>
     </section>
@@ -158,18 +158,18 @@
           </div>
 
           <div class="helios-info" id="astro-info-box">
-            <strong>Statut :</strong> prêt à générer votre carte.<br>
-            Renseignez les données de naissance puis lancez le calcul.
+            <strong>État de la carte :</strong><br>
+            Prête à être générée à partir des données de naissance.
           </div>
 
           <div class="helios-summary" id="astro-summary-box">
-            <strong>Lecture du thème :</strong><br>
-            Une synthèse claire et élégante apparaîtra ici après génération.
+            <strong>Synthèse du thème :</strong><br>
+            Une lecture claire et élégante du thème apparaîtra ici après calcul.
           </div>
 
           <div class="helios-legend" id="astro-legend-box">
-            <strong>Détails astrologiques :</strong><br>
-            Les repères du thème s’afficheront ici après calcul.
+            <strong>Répartition planétaire :</strong><br>
+            Les principaux repères du thème s’afficheront ici après génération.
           </div>
         </div>
 
