@@ -143,3 +143,6 @@ app.post("/api/ephemeris", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Helios Astro ephemerides backend listening on http://localhost:${PORT}`);
 });
+app.get("/", (req, res) => {
+  res.send("Helios Astro backend opérationnel 🚀");
+});
