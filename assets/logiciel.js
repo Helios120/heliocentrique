@@ -344,7 +344,7 @@ document.addEventListener("DOMContentLoaded", () => {
       format: "a4"
     });
 
-    const clientName = (nameInput.value || "Client").trim();
+    const clientName = (nameInput.value || "client").trim();
     const date = dateInput.value || "—";
     const time = timeInput.value || "—";
     const city = cityInput.value || "—";
@@ -367,29 +367,29 @@ document.addEventListener("DOMContentLoaded", () => {
     doc.text(`Heure : ${time}`, 14, 42);
     doc.text(`Lieu : ${city}, ${country}`, 14, 49);
 
-    doc.addImage(imageData, "PNG", 15, 58, 180, 180, "", "FAST");
+    doc.addImage(imageData, "PNG", 15, 58, 180, 150, "", "FAST");
 
     doc.setFont("helvetica", "bold");
     doc.setFontSize(12);
-    doc.text("Synthèse du thème", 14, 248);
+    doc.text("Synthèse du thème", 14, 218);
 
     const summaryText = summaryBox.textContent.replace(/\s+/g, " ").trim();
     const summaryLines = doc.splitTextToSize(summaryText, 180);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
-    doc.text(summaryLines, 14, 255);
+    doc.text(summaryLines, 14, 225);
 
     const legendText = legendBox.textContent.replace(/\s+/g, " ").trim();
     const legendLines = doc.splitTextToSize(legendText, 180);
-    const legendStartY = Math.min(278, 255 + summaryLines.length * 5 + 8);
+    const legendStartY = Math.min(272, 225 + summaryLines.length * 5 + 8);
 
     doc.setFont("helvetica", "bold");
     doc.text("Repères planétaires", 14, legendStartY);
     doc.setFont("helvetica", "normal");
     doc.text(legendLines, 14, legendStartY + 6);
 
-    const filename = `${clientName.replace(/\s+/g, "-").toLowerCase()}-helios-astro.pdf`;
-    doc.save(filename);
+    const safeName = clientName ? clientName.replace(/\s+/g, "-").toLowerCase() : "helios-astro";
+    doc.save(`${safeName}-helios-astro.pdf`);
   }
 
   async function generateRealChart() {
