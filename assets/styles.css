@@ -654,3 +654,21 @@ textarea:focus{
   color: var(--blue);
   word-break: break-word;
 }
+.helios-chart-card{
+  padding:18px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:760px;
+}
+
+#helios-chart-canvas{
+  width:min(100%, 860px);
+  height:auto;
+  display:block;
+  margin:auto;
+  background:#000;
+  border:1px solid rgba(113,224,255,0.16);
+  border-radius:28px;
+  box-shadow:0 20px 70px rgba(0,0,0,0.45);
+}
