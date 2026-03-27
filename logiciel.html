@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Logiciel Helios Astro</title>
-  <meta name="description" content="Logiciel Helios Astro basé sur le modèle graphique original Helios avec planètes extérieures et calcul des éphémérides.">
+  <meta name="description" content="Visualisation astrologique Helios Astro avec rendu premium, positions planétaires et lecture graphique du thème.">
+  <link rel="canonical" href="https://heliosastro.com/logiciel.html">
   <link rel="stylesheet" href="assets/styles.css">
   <style>
     .helios-layout{
@@ -21,6 +22,11 @@
       border-radius:24px;
       box-shadow:0 20px 60px rgba(0,0,0,.35);
       padding:20px;
+    }
+
+    .helios-panel h2{
+      margin:0 0 18px;
+      font-size:2rem;
     }
 
     .helios-panel label{
@@ -56,6 +62,11 @@
       color:#d7e7ff;
       line-height:1.6;
       margin-top:12px;
+    }
+
+    .helios-info strong,
+    .helios-legend strong{
+      color:#fff;
     }
 
     #heliosCanvas{
@@ -102,10 +113,10 @@
     <section class="page-hero section">
       <div class="container">
         <p class="eyebrow">Logiciel Helios Astro</p>
-        <h1>Carte Helios basée sur ton vrai modèle</h1>
+        <h1>Visualisation astrologique Helios Astro</h1>
         <p class="lead">
-          Cette version n’utilise plus une roue générique. Elle affiche ton modèle graphique comme base,
-          puis place les planètes à l’extérieur selon leur longitude.
+          Explorez une carte céleste élégante, pensée pour révéler les positions planétaires,
+          l’équilibre symbolique du thème et la signature visuelle propre à l’univers Helios Astro.
         </p>
       </div>
     </section>
@@ -113,7 +124,7 @@
     <section class="section">
       <div class="container helios-layout">
         <div class="helios-panel">
-          <h2>Paramètres</h2>
+          <h2>Données de naissance</h2>
 
           <label>
             Date
@@ -127,7 +138,7 @@
 
           <label>
             Ville
-            <input type="text" id="astro-city" placeholder="Paris">
+            <input type="text" id="astro-city" placeholder="Marseille">
           </label>
 
           <label>
@@ -141,11 +152,13 @@
           </div>
 
           <div class="helios-info" id="astro-info-box">
-            Statut : prêt
+            <strong>Statut :</strong> prêt à générer votre carte.<br>
+            Renseignez les données de naissance puis lancez le calcul.
           </div>
 
           <div class="helios-legend" id="astro-legend-box">
-            Les positions planétaires apparaîtront ici.
+            <strong>Lecture planétaire :</strong><br>
+            Les positions du Soleil, de la Lune et des planètes s’afficheront ici après génération.
           </div>
         </div>
 
