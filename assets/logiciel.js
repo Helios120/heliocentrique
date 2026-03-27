@@ -18,10 +18,7 @@
 
   const API_BASE = "https://heliosastro-backend.onrender.com";
 
-  const modelImage = new Image();
-  modelImage.src = "assets/modele-zodiacal-helios.png";
-
-  const zodiacSigns = [
+  const zodiac = [
     { name: "Bélier", glyph: "♈", start: 0 },
     { name: "Taureau", glyph: "♉", start: 30 },
     { name: "Gémeaux", glyph: "♊", start: 60 },
@@ -39,17 +36,27 @@
   const planetColors = {
     "☉": "#ffb300",
     "☽": "#4fc3ff",
-    "☿": "#c0c0c0",
+    "☿": "#bfbfbf",
     "♀": "#ff66cc",
     "♂": "#ff5252",
     "♃": "#ff9800",
-    "♄": "#d2b48c",
-    "♅": "#3ddad7",
-    "♆": "#4b6cff",
+    "♄": "#cda86a",
+    "♅": "#38d9d9",
+    "♆": "#4f6fff",
     "♇": "#9c27b0"
   };
 
-  const planetOrder = ["☉", "☽", "☿", "♀", "♂", "♃", "♄", "♅", "♆", "♇"];
+  const modelImage = new Image();
+  let modelReady = false;
+  modelImage.onload = function () {
+    modelReady = true;
+    drawDemo();
+  };
+  modelImage.onerror = function () {
+    modelReady = false;
+    drawDemo();
+  };
+  modelImage.src = "assets/modele-zodiacal-helios.png";
 
   function normalizeDeg(deg) {
     return ((deg % 360) + 360) % 360;
@@ -61,11 +68,12 @@
 
   function getSignInfo(longitude) {
     const lon = normalizeDeg(longitude);
-    const signIndex = Math.floor(lon / 30);
-    const sign = zodiacSigns[signIndex];
+    const index = Math.floor(lon / 30);
+    const sign = zodiac[index];
     return {
-      ...sign,
-      within: lon - sign.start
+      sign: sign.name,
+      glyph: sign.glyph,
+      degreeInSign: lon - sign.start
     };
   }
 
@@ -75,192 +83,200 @@
     ctx.fillRect(0, 0, size, size);
   }
 
-  function drawModelBackground() {
-    const margin = 110;
-    const drawSize = size - margin * 2;
-    ctx.drawImage(modelImage, margin, margin, drawSize, drawSize);
-  }
+  function drawFallbackWheel() {
+    const outerR = 360;
+    const signOuter = 310;
+    const signInner = 245;
 
-  function drawCenterGlow() {
-    const grad = ctx.createRadialGradient(cx, cy, 10, cx, cy, 100);
-    grad.addColorStop(0, "rgba(255,255,255,0.95)");
-    grad.addColorStop(0.18, "rgba(255,214,102,0.72)");
-    grad.addColorStop(0.42, "rgba(0,195,255,0.30)");
-    grad.addColorStop(1, "rgba(0,0,0,0)");
-    ctx.fillStyle = grad;
+    // glow
+    const g = ctx.createRadialGradient(cx, cy, 20, cx, cy, 420);
+    g.addColorStop(0, "rgba(0,180,255,0.08)");
+    g.addColorStop(0.55, "rgba(70,100,255,0.04)");
+    g.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = g;
     ctx.beginPath();
-    ctx.arc(cx, cy, 100, 0, Math.PI * 2);
+    ctx.arc(cx, cy, 420, 0, Math.PI * 2);
+    ctx.fill();
+
+    // circles
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = 2;
+
+    ctx.beginPath();
+    ctx.arc(cx, cy, outerR, 0, Math.PI * 2);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(cx, cy, signOuter, 0, Math.PI * 2);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(cx, cy, signInner, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // divisions
+    for (let i = 0; i < 12; i++) {
+      const deg = i * 30;
+      const rad = degToRad(deg);
+      const x1 = cx + Math.cos(rad) * signInner;
+      const y1 = cy + Math.sin(rad) * signInner;
+      const x2 = cx + Math.cos(rad) * outerR;
+      const y2 = cy + Math.sin(rad) * outerR;
+
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.strokeStyle = "rgba(255,255,255,0.75)";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+
+    // ticks
+    for (let d = 0; d < 360; d++) {
+      const rad = degToRad(d);
+      const r1 = outerR;
+      const r2 = d % 10 === 0 ? outerR - 18 : outerR - 8;
+
+      const x1 = cx + Math.cos(rad) * r1;
+      const y1 = cy + Math.sin(rad) * r1;
+      const x2 = cx + Math.cos(rad) * r2;
+      const y2 = cy + Math.sin(rad) * r2;
+
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.strokeStyle = "rgba(255,255,255,0.85)";
+      ctx.lineWidth = d % 10 === 0 ? 2 : 1;
+      ctx.stroke();
+    }
+
+    // glyphs
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "56px Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    for (let i = 0; i < 12; i++) {
+      const midDeg = i * 30 + 15;
+      const rad = degToRad(midDeg);
+      const r = 275;
+      const x = cx + Math.cos(rad) * r;
+      const y = cy + Math.sin(rad) * r;
+      ctx.fillText(zodiac[i].glyph, x, y);
+    }
+
+    // center glow
+    const c = ctx.createRadialGradient(cx, cy, 10, cx, cy, 95);
+    c.addColorStop(0, "rgba(255,255,255,0.9)");
+    c.addColorStop(0.2, "rgba(255,215,80,0.75)");
+    c.addColorStop(0.5, "rgba(0,190,255,0.30)");
+    c.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = c;
+    ctx.beginPath();
+    ctx.arc(cx, cy, 95, 0, Math.PI * 2);
     ctx.fill();
   }
 
+  function drawModelOrFallback() {
+    if (modelReady) {
+      const margin = 100;
+      const drawSize = size - margin * 2;
+      ctx.drawImage(modelImage, margin, margin, drawSize, drawSize);
+    } else {
+      drawFallbackWheel();
+    }
+  }
+
   function drawPlanetArc(longitude, color, radius) {
-    const start = longitude - 8;
-    const end = longitude + 8;
+    const start = longitude - 7;
+    const end = longitude + 7;
 
     ctx.beginPath();
     ctx.arc(cx, cy, radius, degToRad(start), degToRad(end));
     ctx.strokeStyle = color;
     ctx.lineWidth = 4;
-    ctx.shadowBlur = 12;
-    ctx.shadowColor = color;
-    ctx.stroke();
-    ctx.shadowBlur = 0;
-  }
-
-  function drawPlanetConnector(longitude, color, fromRadius, toRadius) {
-    const rad = degToRad(longitude);
-    const x1 = cx + Math.cos(rad) * fromRadius;
-    const y1 = cy + Math.sin(rad) * fromRadius;
-    const x2 = cx + Math.cos(rad) * toRadius;
-    const y2 = cy + Math.sin(rad) * toRadius;
-
-    ctx.beginPath();
-    ctx.moveTo(x1, y1);
-    ctx.lineTo(x2, y2);
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 2.5;
     ctx.shadowBlur = 10;
     ctx.shadowColor = color;
     ctx.stroke();
     ctx.shadowBlur = 0;
   }
 
-  function drawPlanetBadge(longitude, glyph, color, radius, name) {
+  function drawPlanetConnector(longitude, color, fromR, toR) {
+    const rad = degToRad(longitude);
+    const x1 = cx + Math.cos(rad) * fromR;
+    const y1 = cy + Math.sin(rad) * fromR;
+    const x2 = cx + Math.cos(rad) * toR;
+    const y2 = cy + Math.sin(rad) * toR;
+
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2.5;
+    ctx.shadowBlur = 8;
+    ctx.shadowColor = color;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+  }
+
+  function drawPlanet(longitude, glyph, color, radius, name) {
     const rad = degToRad(longitude);
     const x = cx + Math.cos(rad) * radius;
     const y = cy + Math.sin(rad) * radius;
 
     ctx.beginPath();
-    ctx.arc(x, y, 26, 0, Math.PI * 2);
+    ctx.arc(x, y, 24, 0, Math.PI * 2);
     ctx.fillStyle = color;
-    ctx.shadowBlur = 18;
+    ctx.shadowBlur = 16;
     ctx.shadowColor = color;
     ctx.fill();
     ctx.shadowBlur = 0;
 
     ctx.beginPath();
-    ctx.arc(x - 7, y - 7, 8, 0, Math.PI * 2);
-    ctx.fillStyle = "rgba(255,255,255,0.58)";
+    ctx.arc(x - 6, y - 6, 7, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(255,255,255,0.55)";
     ctx.fill();
 
     ctx.fillStyle = "#ffffff";
-    ctx.font = "28px Arial";
+    ctx.font = "26px Arial";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillText(glyph, x, y + 1);
 
-    const labelRadius = radius + 44;
-    const lx = cx + Math.cos(rad) * labelRadius;
-    const ly = cy + Math.sin(rad) * labelRadius;
-
-    ctx.fillStyle = "#ffffff";
+    const lx = cx + Math.cos(rad) * (radius + 40);
+    const ly = cy + Math.sin(rad) * (radius + 40);
     ctx.font = "18px Arial";
     ctx.fillText(name, lx, ly);
   }
 
-  function easeOutCubic(t) {
-    return 1 - Math.pow(1 - t, 3);
-  }
+  function drawChart(planets, meta) {
+    clearCanvas();
+    drawModelOrFallback();
 
-  function preparePlanetLayout(planets) {
-    const sorted = planets
-      .map((planet) => ({
-        ...planet,
-        longitude: normalizeDeg(planet.longitude)
-      }))
-      .sort((a, b) => a.longitude - b.longitude);
+    const connectorRadius = modelReady ? 392 : 360;
+    const arcRadius = modelReady ? 430 : 395;
+    const planetRadius = modelReady ? 500 : 455;
 
-    const minGap = 8;
-    const adjusted = [];
-
-    for (let i = 0; i < sorted.length; i++) {
-      const current = { ...sorted[i] };
-
-      if (i > 0) {
-        const prev = adjusted[i - 1];
-        if (current.longitude - prev.longitude < minGap) {
-          current.longitude = prev.longitude + minGap;
-        }
-      }
-      adjusted.push(current);
-    }
-
-    for (let i = adjusted.length - 2; i >= 0; i--) {
-      if (adjusted[i + 1].longitude > 359.5) {
-        adjusted[i + 1].longitude = 359.5;
-      }
-      if (adjusted[i + 1].longitude - adjusted[i].longitude < minGap) {
-        adjusted[i].longitude = adjusted[i + 1].longitude - minGap;
-      }
-    }
-
-    return adjusted.map((planet, index) => {
-      const layer = index % 3;
-      return {
-        ...planet,
-        renderLongitude: normalizeDeg(planet.longitude),
-        arcRadius: 428 + layer * 18,
-        badgeRadius: 500 + layer * 22
-      };
+    planets.forEach((p, i) => {
+      const lon = normalizeDeg(p.longitude);
+      const stagger = (i % 2) * 18;
+      drawPlanetArc(lon, p.color, arcRadius + stagger);
+      drawPlanetConnector(lon, p.color, connectorRadius, planetRadius + stagger);
     });
-  }
 
-  function buildLegend(planets) {
-    return planets.map((planet) => {
-      const sign = getSignInfo(planet.longitude);
-      return `${planet.glyph} ${planet.name} — ${sign.within.toFixed(1)}° ${sign.name}`;
-    }).join("<br>");
-  }
-
-  function animateChart(planets, meta) {
-    const layout = preparePlanetLayout(planets);
-    const start = performance.now();
-    const duration = 1400;
-
-    function frame(now) {
-      const elapsed = now - start;
-      const t = Math.min(elapsed / duration, 1);
-      const eased = easeOutCubic(t);
-
-      clearCanvas();
-      drawModelBackground();
-      drawCenterGlow();
-
-      const connectorRadius = 392;
-
-      layout.forEach((planet) => {
-        const animatedArcRadius = 392 + (planet.arcRadius - 392) * eased;
-        const animatedBadgeRadius = 392 + (planet.badgeRadius - 392) * eased;
-
-        drawPlanetArc(planet.renderLongitude, planet.color, animatedArcRadius);
-        drawPlanetConnector(
-          planet.renderLongitude,
-          planet.color,
-          connectorRadius,
-          animatedBadgeRadius
-        );
-      });
-
-      layout.forEach((planet) => {
-        const animatedBadgeRadius = 392 + (planet.badgeRadius - 392) * eased;
-        drawPlanetBadge(
-          planet.renderLongitude,
-          planet.glyph,
-          planet.color,
-          animatedBadgeRadius,
-          planet.name
-        );
-      });
-
-      if (t < 1) {
-        requestAnimationFrame(frame);
-      }
-    }
-
-    requestAnimationFrame(frame);
+    planets.forEach((p, i) => {
+      const lon = normalizeDeg(p.longitude);
+      const stagger = (i % 2) * 18;
+      drawPlanet(lon, p.glyph, p.color, planetRadius + stagger, p.name);
+    });
 
     if (legendBox) {
-      legendBox.innerHTML = `<strong>Positions planétaires</strong><br>${buildLegend(layout)}`;
+      legendBox.innerHTML =
+        "<strong>Positions planétaires</strong><br>" +
+        planets.map((p) => {
+          const s = getSignInfo(p.longitude);
+          return `${p.glyph} ${p.name} — ${s.degreeInSign.toFixed(1)}° ${s.sign}`;
+        }).join("<br>");
     }
 
     if (infoBox) {
@@ -287,6 +303,14 @@
     ];
   }
 
+  async function fetchHealth() {
+    const response = await fetch(`${API_BASE}/api/health`);
+    if (!response.ok) {
+      throw new Error("Backend indisponible");
+    }
+    return response.json();
+  }
+
   async function fetchEphemeris(payload) {
     const response = await fetch(`${API_BASE}/api/ephemeris`, {
       method: "POST",
@@ -297,10 +321,8 @@
     });
 
     if (!response.ok) {
-      const text = await response.text();
-      throw new Error(text || "Erreur backend");
+      throw new Error("Erreur backend");
     }
-
     return response.json();
   }
 
@@ -325,32 +347,40 @@
       if (infoBox) {
         infoBox.innerHTML = `
           <p><strong>Statut :</strong> calcul en cours</p>
-          <p><strong>Mode :</strong> backend éphémérides</p>
+          <p><strong>Mode :</strong> backend Render</p>
           <p><strong>Note :</strong> récupération des positions planétaires…</p>
         `;
       }
 
+      await fetchHealth();
       const data = await fetchEphemeris({ date, time, city, country });
 
-      animateChart(data.planets, {
+      const planets = data.planets.map((p) => ({
+        name: p.name,
+        glyph: p.glyph,
+        longitude: p.longitude,
+        color: p.color || "#ffffff"
+      }));
+
+      drawChart(planets, {
         status: "ok",
         mode: "éphémérides réelles",
-        label: `${data.meta.isoUtc} — ${city}, ${country}`
+        label: `${date} ${time} — ${city}, ${country}`
       });
     } catch (error) {
-      animateChart(getDemoPlanets(), {
+      drawChart(getDemoPlanets(), {
         status: "démo affichée",
         mode: "secours local",
-        label: "backend indisponible — démonstration Helios"
+        label: "backend inaccessible ou en réveil"
       });
     }
   }
 
   function drawDemo() {
-    animateChart(getDemoPlanets(), {
+    drawChart(getDemoPlanets(), {
       status: "ok",
-      mode: "démo Helios",
-      label: "visualisation locale premium"
+      mode: modelReady ? "modèle Helios + démo" : "roue de secours + démo",
+      label: modelReady ? "modèle zodiacal personnalisé chargé" : "image modèle absente — fallback actif"
     });
   }
 
@@ -362,5 +392,6 @@
     demoBtn.addEventListener("click", drawDemo);
   }
 
-  modelImage.onload = drawDemo;
+  // Sécurité : si l’image ne charge pas, on dessine quand même après 1 seconde.
+  setTimeout(drawDemo, 1000);
 })();
