@@ -1,114 +1,366 @@
-const API = "https://heliosastro-backend.onrender.com/ephemerides";
+(function () {
+  const canvas = document.getElementById("helios-chart-canvas");
+  if (!canvas) return;
 
-const signs = [
-  "♈","♉","♊","♋","♌","♍",
-  "♎","♏","♐","♑","♒","♓"
-];
+  const ctx = canvas.getContext("2d");
+  const size = canvas.width;
+  const cx = size / 2;
+  const cy = size / 2;
 
-// Conversion degré → angle canvas
-function degToRad(deg) {
-  return (deg - 90) * Math.PI / 180;
-}
+  const dateInput = document.getElementById("astro-date");
+  const timeInput = document.getElementById("astro-time");
+  const cityInput = document.getElementById("astro-city");
+  const countryInput = document.getElementById("astro-country");
+  const generateBtn = document.getElementById("generate-chart-btn");
+  const demoBtn = document.getElementById("demo-chart-btn");
+  const infoBox = document.getElementById("astro-info-box");
+  const legendBox = document.getElementById("astro-legend-box");
 
-// Détermine signe
-function getSign(deg) {
-  return Math.floor(deg / 30);
-}
+  const API_BASE = "https://heliosastro-backend.onrender.com";
 
-// Dessin maisons
-function drawHouses(ctx, cx, cy, radius, houses) {
-  ctx.strokeStyle = "rgba(255,255,255,0.2)";
-  ctx.lineWidth = 1;
+  const modelImage = new Image();
+  modelImage.src = "assets/modele-zodiacal-helios.png";
 
-  houses.forEach(deg => {
-    const angle = degToRad(deg);
-    const x = cx + radius * Math.cos(angle);
-    const y = cy + radius * Math.sin(angle);
+  const zodiacSigns = [
+    { name: "Bélier", glyph: "♈", start: 0 },
+    { name: "Taureau", glyph: "♉", start: 30 },
+    { name: "Gémeaux", glyph: "♊", start: 60 },
+    { name: "Cancer", glyph: "♋", start: 90 },
+    { name: "Lion", glyph: "♌", start: 120 },
+    { name: "Vierge", glyph: "♍", start: 150 },
+    { name: "Balance", glyph: "♎", start: 180 },
+    { name: "Scorpion", glyph: "♏", start: 210 },
+    { name: "Sagittaire", glyph: "♐", start: 240 },
+    { name: "Capricorne", glyph: "♑", start: 270 },
+    { name: "Verseau", glyph: "♒", start: 300 },
+    { name: "Poissons", glyph: "♓", start: 330 }
+  ];
+
+  const planetColors = {
+    "☉": "#ffb300",
+    "☽": "#4fc3ff",
+    "☿": "#c0c0c0",
+    "♀": "#ff66cc",
+    "♂": "#ff5252",
+    "♃": "#ff9800",
+    "♄": "#d2b48c",
+    "♅": "#3ddad7",
+    "♆": "#4b6cff",
+    "♇": "#9c27b0"
+  };
+
+  const planetOrder = ["☉", "☽", "☿", "♀", "♂", "♃", "♄", "♅", "♆", "♇"];
+
+  function normalizeDeg(deg) {
+    return ((deg % 360) + 360) % 360;
+  }
+
+  function degToRad(deg) {
+    return (deg - 90) * Math.PI / 180;
+  }
+
+  function getSignInfo(longitude) {
+    const lon = normalizeDeg(longitude);
+    const signIndex = Math.floor(lon / 30);
+    const sign = zodiacSigns[signIndex];
+    return {
+      ...sign,
+      within: lon - sign.start
+    };
+  }
+
+  function clearCanvas() {
+    ctx.clearRect(0, 0, size, size);
+    ctx.fillStyle = "#000000";
+    ctx.fillRect(0, 0, size, size);
+  }
+
+  function drawModelBackground() {
+    const margin = 110;
+    const drawSize = size - margin * 2;
+    ctx.drawImage(modelImage, margin, margin, drawSize, drawSize);
+  }
+
+  function drawCenterGlow() {
+    const grad = ctx.createRadialGradient(cx, cy, 10, cx, cy, 100);
+    grad.addColorStop(0, "rgba(255,255,255,0.95)");
+    grad.addColorStop(0.18, "rgba(255,214,102,0.72)");
+    grad.addColorStop(0.42, "rgba(0,195,255,0.30)");
+    grad.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(cx, cy, 100, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  function drawPlanetArc(longitude, color, radius) {
+    const start = longitude - 8;
+    const end = longitude + 8;
 
     ctx.beginPath();
-    ctx.moveTo(cx, cy);
-    ctx.lineTo(x, y);
+    ctx.arc(cx, cy, radius, degToRad(start), degToRad(end));
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 4;
+    ctx.shadowBlur = 12;
+    ctx.shadowColor = color;
     ctx.stroke();
-  });
-}
+    ctx.shadowBlur = 0;
+  }
 
-// Ascendant highlight
-function drawAscendant(ctx, cx, cy, radius, asc) {
-  const angle = degToRad(asc);
+  function drawPlanetConnector(longitude, color, fromRadius, toRadius) {
+    const rad = degToRad(longitude);
+    const x1 = cx + Math.cos(rad) * fromRadius;
+    const y1 = cy + Math.sin(rad) * fromRadius;
+    const x2 = cx + Math.cos(rad) * toRadius;
+    const y2 = cy + Math.sin(rad) * toRadius;
 
-  ctx.strokeStyle = "#00eaff";
-  ctx.lineWidth = 3;
-
-  const x = cx + radius * Math.cos(angle);
-  const y = cy + radius * Math.sin(angle);
-
-  ctx.beginPath();
-  ctx.moveTo(cx, cy);
-  ctx.lineTo(x, y);
-  ctx.stroke();
-
-  ctx.fillStyle = "#00eaff";
-  ctx.beginPath();
-  ctx.arc(x, y, 5, 0, Math.PI * 2);
-  ctx.fill();
-}
-
-// Planètes extérieures
-function drawPlanets(ctx, cx, cy, radius, planets) {
-  Object.entries(planets).forEach(([name, deg]) => {
-
-    const angle = degToRad(deg);
-    const r = radius + 30;
-
-    const x = cx + r * Math.cos(angle);
-    const y = cy + r * Math.sin(angle);
-
-    ctx.fillStyle = "#ffffff";
     ctx.beginPath();
-    ctx.arc(x, y, 4, 0, Math.PI * 2);
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2.5;
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = color;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+  }
+
+  function drawPlanetBadge(longitude, glyph, color, radius, name) {
+    const rad = degToRad(longitude);
+    const x = cx + Math.cos(rad) * radius;
+    const y = cy + Math.sin(rad) * radius;
+
+    ctx.beginPath();
+    ctx.arc(x, y, 26, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.shadowBlur = 18;
+    ctx.shadowColor = color;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    ctx.beginPath();
+    ctx.arc(x - 7, y - 7, 8, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(255,255,255,0.58)";
     ctx.fill();
 
-    // ligne vers centre
-    ctx.strokeStyle = "rgba(255,255,255,0.2)";
-    ctx.beginPath();
-    ctx.moveTo(cx, cy);
-    ctx.lineTo(x, y);
-    ctx.stroke();
-  });
-}
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "28px Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(glyph, x, y + 1);
 
-// DRAW GLOBAL
-function drawChart(data) {
-  const canvas = document.getElementById("canvas");
-  const ctx = canvas.getContext("2d");
+    const labelRadius = radius + 44;
+    const lx = cx + Math.cos(rad) * labelRadius;
+    const ly = cy + Math.sin(rad) * labelRadius;
 
-  const cx = canvas.width / 2;
-  const cy = canvas.height / 2;
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "18px Arial";
+    ctx.fillText(name, lx, ly);
+  }
 
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  function easeOutCubic(t) {
+    return 1 - Math.pow(1 - t, 3);
+  }
 
-  const radius = 180;
+  function preparePlanetLayout(planets) {
+    const sorted = planets
+      .map((planet) => ({
+        ...planet,
+        longitude: normalizeDeg(planet.longitude)
+      }))
+      .sort((a, b) => a.longitude - b.longitude);
 
-  // Cercle
-  ctx.strokeStyle = "#00eaff";
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-  ctx.stroke();
+    const minGap = 8;
+    const adjusted = [];
 
-  drawHouses(ctx, cx, cy, radius, data.houses);
-  drawAscendant(ctx, cx, cy, radius, data.ascendant);
-  drawPlanets(ctx, cx, cy, radius, data.planets);
-}
+    for (let i = 0; i < sorted.length; i++) {
+      const current = { ...sorted[i] };
 
-// FETCH DATA
-async function loadChart() {
-  const date = document.getElementById("date").value;
-  const lat = document.getElementById("lat").value;
-  const lon = document.getElementById("lon").value;
+      if (i > 0) {
+        const prev = adjusted[i - 1];
+        if (current.longitude - prev.longitude < minGap) {
+          current.longitude = prev.longitude + minGap;
+        }
+      }
+      adjusted.push(current);
+    }
 
-  const res = await fetch(`${API}?date=${date}&lat=${lat}&lon=${lon}`);
-  const data = await res.json();
+    for (let i = adjusted.length - 2; i >= 0; i--) {
+      if (adjusted[i + 1].longitude > 359.5) {
+        adjusted[i + 1].longitude = 359.5;
+      }
+      if (adjusted[i + 1].longitude - adjusted[i].longitude < minGap) {
+        adjusted[i].longitude = adjusted[i + 1].longitude - minGap;
+      }
+    }
 
-  drawChart(data);
-}
+    return adjusted.map((planet, index) => {
+      const layer = index % 3;
+      return {
+        ...planet,
+        renderLongitude: normalizeDeg(planet.longitude),
+        arcRadius: 428 + layer * 18,
+        badgeRadius: 500 + layer * 22
+      };
+    });
+  }
+
+  function buildLegend(planets) {
+    return planets.map((planet) => {
+      const sign = getSignInfo(planet.longitude);
+      return `${planet.glyph} ${planet.name} — ${sign.within.toFixed(1)}° ${sign.name}`;
+    }).join("<br>");
+  }
+
+  function animateChart(planets, meta) {
+    const layout = preparePlanetLayout(planets);
+    const start = performance.now();
+    const duration = 1400;
+
+    function frame(now) {
+      const elapsed = now - start;
+      const t = Math.min(elapsed / duration, 1);
+      const eased = easeOutCubic(t);
+
+      clearCanvas();
+      drawModelBackground();
+      drawCenterGlow();
+
+      const connectorRadius = 392;
+
+      layout.forEach((planet) => {
+        const animatedArcRadius = 392 + (planet.arcRadius - 392) * eased;
+        const animatedBadgeRadius = 392 + (planet.badgeRadius - 392) * eased;
+
+        drawPlanetArc(planet.renderLongitude, planet.color, animatedArcRadius);
+        drawPlanetConnector(
+          planet.renderLongitude,
+          planet.color,
+          connectorRadius,
+          animatedBadgeRadius
+        );
+      });
+
+      layout.forEach((planet) => {
+        const animatedBadgeRadius = 392 + (planet.badgeRadius - 392) * eased;
+        drawPlanetBadge(
+          planet.renderLongitude,
+          planet.glyph,
+          planet.color,
+          animatedBadgeRadius,
+          planet.name
+        );
+      });
+
+      if (t < 1) {
+        requestAnimationFrame(frame);
+      }
+    }
+
+    requestAnimationFrame(frame);
+
+    if (legendBox) {
+      legendBox.innerHTML = `<strong>Positions planétaires</strong><br>${buildLegend(layout)}`;
+    }
+
+    if (infoBox) {
+      infoBox.innerHTML = `
+        <p><strong>Statut :</strong> ${meta.status}</p>
+        <p><strong>Mode :</strong> ${meta.mode}</p>
+        <p><strong>Données :</strong> ${meta.label}</p>
+      `;
+    }
+  }
+
+  function getDemoPlanets() {
+    return [
+      { name: "Soleil", glyph: "☉", longitude: 320, color: planetColors["☉"] },
+      { name: "Lune", glyph: "☽", longitude: 14, color: planetColors["☽"] },
+      { name: "Mercure", glyph: "☿", longitude: 301, color: planetColors["☿"] },
+      { name: "Vénus", glyph: "♀", longitude: 281, color: planetColors["♀"] },
+      { name: "Mars", glyph: "♂", longitude: 89, color: planetColors["♂"] },
+      { name: "Jupiter", glyph: "♃", longitude: 247, color: planetColors["♃"] },
+      { name: "Saturne", glyph: "♄", longitude: 155, color: planetColors["♄"] },
+      { name: "Uranus", glyph: "♅", longitude: 32, color: planetColors["♅"] },
+      { name: "Neptune", glyph: "♆", longitude: 18, color: planetColors["♆"] },
+      { name: "Pluton", glyph: "♇", longitude: 302, color: planetColors["♇"] }
+    ];
+  }
+
+  async function fetchEphemeris(payload) {
+    const response = await fetch(`${API_BASE}/api/ephemeris`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(text || "Erreur backend");
+    }
+
+    return response.json();
+  }
+
+  async function generateRealChart() {
+    const date = dateInput?.value || "";
+    const time = timeInput?.value || "12:00";
+    const city = cityInput?.value || "Paris";
+    const country = countryInput?.value || "France";
+
+    if (!date) {
+      if (infoBox) {
+        infoBox.innerHTML = `
+          <p><strong>Statut :</strong> erreur</p>
+          <p><strong>Mode :</strong> attente</p>
+          <p><strong>Note :</strong> merci de renseigner une date.</p>
+        `;
+      }
+      return;
+    }
+
+    try {
+      if (infoBox) {
+        infoBox.innerHTML = `
+          <p><strong>Statut :</strong> calcul en cours</p>
+          <p><strong>Mode :</strong> backend éphémérides</p>
+          <p><strong>Note :</strong> récupération des positions planétaires…</p>
+        `;
+      }
+
+      const data = await fetchEphemeris({ date, time, city, country });
+
+      animateChart(data.planets, {
+        status: "ok",
+        mode: "éphémérides réelles",
+        label: `${data.meta.isoUtc} — ${city}, ${country}`
+      });
+    } catch (error) {
+      animateChart(getDemoPlanets(), {
+        status: "démo affichée",
+        mode: "secours local",
+        label: "backend indisponible — démonstration Helios"
+      });
+    }
+  }
+
+  function drawDemo() {
+    animateChart(getDemoPlanets(), {
+      status: "ok",
+      mode: "démo Helios",
+      label: "visualisation locale premium"
+    });
+  }
+
+  if (generateBtn) {
+    generateBtn.addEventListener("click", generateRealChart);
+  }
+
+  if (demoBtn) {
+    demoBtn.addEventListener("click", drawDemo);
+  }
+
+  modelImage.onload = drawDemo;
+})();
