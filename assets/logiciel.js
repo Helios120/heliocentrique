@@ -2,10 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const API_BASE = "https://heliosastro-backend.onrender.com";
 
   const canvas = document.getElementById("heliosCanvas");
-  if (!canvas) {
-    console.error("Canvas #heliosCanvas introuvable");
-    return;
-  }
+  if (!canvas) return;
 
   const ctx = canvas.getContext("2d");
   const size = canvas.width;
@@ -55,11 +52,11 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   function setInfo(html) {
-    if (infoBox) infoBox.innerHTML = html;
+    infoBox.innerHTML = html;
   }
 
   function setSummary(html) {
-    if (summaryBox) summaryBox.innerHTML = html;
+    summaryBox.innerHTML = html;
   }
 
   function normalizeDeg(deg) {
@@ -76,24 +73,21 @@ document.addEventListener("DOMContentLoaded", () => {
     const sign = zodiac[idx];
     return {
       sign: sign.name,
-      glyph: sign.glyph,
       degreeInSign: lon - sign.start
     };
   }
 
   function setLegend(planets) {
-    if (!legendBox) return;
-
-    if (!planets || !planets.length) {
+    if (!planets.length) {
       legendBox.innerHTML = `
-        <strong>Détails astrologiques :</strong><br>
+        <strong>Répartition planétaire :</strong><br>
         Aucun repère disponible pour le moment.
       `;
       return;
     }
 
     legendBox.innerHTML =
-      "<strong>Détails astrologiques :</strong><br>" +
+      "<strong>Répartition planétaire :</strong><br>" +
       planets.map((p) => {
         const s = getSignInfo(p.longitude);
         return `${p.name} en ${s.sign} à ${s.degreeInSign.toFixed(1)}°`;
@@ -101,10 +95,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function buildSummary(planets) {
-    if (!planets || !planets.length) {
+    if (!planets.length) {
       setSummary(`
-        <strong>Lecture du thème :</strong><br>
-        Une synthèse claire et élégante apparaîtra ici après génération.
+        <strong>Synthèse du thème :</strong><br>
+        Une lecture claire et élégante du thème apparaîtra ici après calcul.
       `);
       return;
     }
@@ -115,18 +109,18 @@ document.addEventListener("DOMContentLoaded", () => {
     const venus = planets.find(p => p.glyph === "♀");
     const mars = planets.find(p => p.glyph === "♂");
 
-    const sunSign = sun ? getSignInfo(sun.longitude).sign : "";
-    const moonSign = moon ? getSignInfo(moon.longitude).sign : "";
-    const mercurySign = mercury ? getSignInfo(mercury.longitude).sign : "";
-    const venusSign = venus ? getSignInfo(venus.longitude).sign : "";
-    const marsSign = mars ? getSignInfo(mars.longitude).sign : "";
+    const sunSign = sun ? getSignInfo(sun.longitude).sign : "—";
+    const moonSign = moon ? getSignInfo(moon.longitude).sign : "—";
+    const mercurySign = mercury ? getSignInfo(mercury.longitude).sign : "—";
+    const venusSign = venus ? getSignInfo(venus.longitude).sign : "—";
+    const marsSign = mars ? getSignInfo(mars.longitude).sign : "—";
 
     setSummary(`
-      <strong>Lecture du thème :</strong><br>
-      Soleil en <strong>${sunSign || "—"}</strong>, Lune en <strong>${moonSign || "—"}</strong>.<br>
-      Expression mentale marquée par <strong>${mercurySign || "—"}</strong>,
-      dynamique affective portée par <strong>${venusSign || "—"}</strong>,
-      impulsion d’action liée à <strong>${marsSign || "—"}</strong>.
+      <strong>Synthèse du thème :</strong><br>
+      Soleil en <strong>${sunSign}</strong>, Lune en <strong>${moonSign}</strong>.<br>
+      La pensée s’exprime à travers <strong>${mercurySign}</strong>,
+      l’affectif s’oriente vers <strong>${venusSign}</strong>,
+      et l’élan d’action se concentre dans <strong>${marsSign}</strong>.
     `);
   }
 
@@ -136,7 +130,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ctx.fillRect(0, 0, size, size);
   }
 
-  function drawVisibleFallbackBase() {
+  function drawFallbackBase() {
     clearCanvas();
 
     const glow = ctx.createRadialGradient(cx, cy, 20, cx, cy, 420);
@@ -170,7 +164,6 @@ document.addEventListener("DOMContentLoaded", () => {
     for (let i = 0; i < 12; i++) {
       const deg = i * 30;
       const r = degToRad(deg);
-
       ctx.beginPath();
       ctx.moveTo(cx + Math.cos(r) * signInner, cy + Math.sin(r) * signInner);
       ctx.lineTo(cx + Math.cos(r) * outerR, cy + Math.sin(r) * outerR);
@@ -190,21 +183,11 @@ document.addEventListener("DOMContentLoaded", () => {
       const y = cy + Math.sin(r) * 270;
       ctx.fillText(zodiac[i].glyph, x, y);
     }
-
-    const centerGlow = ctx.createRadialGradient(cx, cy, 5, cx, cy, 100);
-    centerGlow.addColorStop(0, "rgba(255,255,255,0.9)");
-    centerGlow.addColorStop(0.18, "rgba(255,210,80,0.7)");
-    centerGlow.addColorStop(0.45, "rgba(0,200,255,0.25)");
-    centerGlow.addColorStop(1, "rgba(0,0,0,0)");
-    ctx.fillStyle = centerGlow;
-    ctx.beginPath();
-    ctx.arc(cx, cy, 100, 0, Math.PI * 2);
-    ctx.fill();
   }
 
   function drawModelIfAvailable() {
     if (!modelLoaded) {
-      drawVisibleFallbackBase();
+      drawFallbackBase();
       return;
     }
 
@@ -215,11 +198,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function drawPlanetArc(longitude, color, radius) {
-    const start = longitude - 7;
-    const end = longitude + 7;
-
     ctx.beginPath();
-    ctx.arc(cx, cy, radius, degToRad(start), degToRad(end));
+    ctx.arc(cx, cy, radius, degToRad(longitude - 7), degToRad(longitude + 7));
     ctx.strokeStyle = color;
     ctx.lineWidth = 5;
     ctx.shadowBlur = 10;
@@ -303,8 +283,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     currentPlanets = planets;
     setInfo(statusText);
-    setLegend(planets);
     buildSummary(planets);
+    setLegend(planets);
   }
 
   function demoPlanets() {
@@ -323,22 +303,18 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   async function generateRealChart() {
-    const date = dateInput?.value || "";
-    const time = timeInput?.value || "12:00";
-    const city = cityInput?.value || "Paris";
-    const country = countryInput?.value || "France";
+    const date = dateInput.value || "";
+    const time = timeInput.value || "12:00";
+    const city = cityInput.value || "Paris";
+    const country = countryInput.value || "France";
 
     if (!date) {
-      setInfo(`
-        <strong>Statut :</strong> merci de renseigner une date de naissance.
-      `);
+      setInfo(`<strong>État de la carte :</strong><br>Merci de renseigner une date de naissance.`);
       return;
     }
 
     try {
-      setInfo(`
-        <strong>Statut :</strong> calcul en cours de la carte planétaire…
-      `);
+      setInfo(`<strong>État de la carte :</strong><br>Calcul en cours de la carte céleste…`);
 
       const response = await fetch(`${API_BASE}/api/ephemeris`, {
         method: "POST",
@@ -363,14 +339,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
       drawChart(
         planets,
-        `<strong>Statut :</strong> carte générée avec succès.<br>
-         <strong>Données :</strong> ${date} ${time} — ${city}, ${country}`
+        `<strong>État de la carte :</strong><br>
+         Carte générée avec succès pour ${date} à ${time}, ${city}, ${country}.`
       );
     } catch (error) {
       drawChart(
         demoPlanets(),
-        `<strong>Statut :</strong> affichage de démonstration.<br>
-         <strong>Motif :</strong> ${error.message}`
+        `<strong>État de la carte :</strong><br>
+         Affichage de démonstration activé. Motif : ${error.message}`
       );
     }
   }
@@ -379,23 +355,18 @@ document.addEventListener("DOMContentLoaded", () => {
     drawChart(
       demoPlanets(),
       modelLoaded
-        ? `<strong>Statut :</strong> démonstration visuelle Helios prête.`
-        : `<strong>Statut :</strong> démonstration affichée sur base de secours.`
+        ? `<strong>État de la carte :</strong><br>Démonstration visuelle Helios prête.`
+        : `<strong>État de la carte :</strong><br>Démonstration affichée sur base de secours.`
     );
   }
 
-  if (generateBtn) {
-    generateBtn.addEventListener("click", generateRealChart);
-  }
+  generateBtn.addEventListener("click", generateRealChart);
+  demoBtn.addEventListener("click", drawDemo);
 
-  if (demoBtn) {
-    demoBtn.addEventListener("click", drawDemo);
-  }
-
-  drawVisibleFallbackBase();
+  drawFallbackBase();
   setInfo(`
-    <strong>Statut :</strong> prêt à générer votre carte.<br>
-    Renseignez les données de naissance puis lancez le calcul.
+    <strong>État de la carte :</strong><br>
+    Prête à être générée à partir des données de naissance.
   `);
   buildSummary(demoPlanets());
   setLegend(demoPlanets());
