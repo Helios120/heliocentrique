@@ -322,21 +322,6 @@ document.addEventListener("DOMContentLoaded", () => {
     setLegend(planets);
   }
 
-  function demoPlanets() {
-    return [
-      { name: "Soleil", glyph: "☉", longitude: 320, color: planetColors["☉"] },
-      { name: "Lune", glyph: "☽", longitude: 14, color: planetColors["☽"] },
-      { name: "Mercure", glyph: "☿", longitude: 301, color: planetColors["☿"] },
-      { name: "Vénus", glyph: "♀", longitude: 281, color: planetColors["♀"] },
-      { name: "Mars", glyph: "♂", longitude: 89, color: planetColors["♂"] },
-      { name: "Jupiter", glyph: "♃", longitude: 247, color: planetColors["♃"] },
-      { name: "Saturne", glyph: "♄", longitude: 155, color: planetColors["♄"] },
-      { name: "Uranus", glyph: "♅", longitude: 32, color: planetColors["♅"] },
-      { name: "Neptune", glyph: "♆", longitude: 18, color: planetColors["♆"] },
-      { name: "Pluton", glyph: "♇", longitude: 302, color: planetColors["♇"] }
-    ];
-  }
-
   function exportPdf() {
     const doc = new jsPDF({
       orientation: "portrait",
@@ -414,16 +399,23 @@ document.addEventListener("DOMContentLoaded", () => {
         body: JSON.stringify({ date, time, city, country })
       });
 
-      const data = await response.json();
+      const rawText = await response.text();
+      let data;
+
+      try {
+        data = JSON.parse(rawText);
+      } catch {
+        throw new Error("La réponse du serveur n'est pas du JSON valide.");
+      }
 
       if (!response.ok) {
-        throw new Error(data.error || "Erreur backend");
+        throw new Error(data.error || data.detail || "Erreur backend");
       }
 
       const planets = (data.planets || []).map((p) => ({
         name: p.name,
         glyph: p.glyph,
-        longitude: p.longitude,
+        longitude: Number(p.longitude),
         color: p.color || planetColors[p.glyph] || "#ffffff"
       }));
 
@@ -439,6 +431,21 @@ document.addEventListener("DOMContentLoaded", () => {
          Affichage de démonstration activé. Motif : ${error.message}`
       );
     }
+  }
+
+  function demoPlanets() {
+    return [
+      { name: "Soleil", glyph: "☉", longitude: 320, color: planetColors["☉"] },
+      { name: "Lune", glyph: "☽", longitude: 14, color: planetColors["☽"] },
+      { name: "Mercure", glyph: "☿", longitude: 301, color: planetColors["☿"] },
+      { name: "Vénus", glyph: "♀", longitude: 281, color: planetColors["♀"] },
+      { name: "Mars", glyph: "♂", longitude: 89, color: planetColors["♂"] },
+      { name: "Jupiter", glyph: "♃", longitude: 247, color: planetColors["♃"] },
+      { name: "Saturne", glyph: "♄", longitude: 155, color: planetColors["♄"] },
+      { name: "Uranus", glyph: "♅", longitude: 32, color: planetColors["♅"] },
+      { name: "Neptune", glyph: "♆", longitude: 18, color: planetColors["♆"] },
+      { name: "Pluton", glyph: "♇", longitude: 302, color: planetColors["♇"] }
+    ];
   }
 
   function drawDemo() {
