@@ -51,8 +51,6 @@ function getSignInfo(longitude) {
 }
 
 function buildUtcDate(dateStr, timeStr) {
-  // dateStr: YYYY-MM-DD
-  // timeStr: HH:mm
   const [year, month, day] = dateStr.split("-").map(Number);
   const [hour, minute] = (timeStr || "12:00").split(":").map(Number);
 
@@ -70,19 +68,16 @@ function buildUtcDate(dateStr, timeStr) {
 }
 
 function eclipticLongitudeOf(body, dateUtc) {
-  // 1) vecteur géocentrique en coordonnées équatoriales J2000
   const geoVec = Astronomy.GeoVector(body, dateUtc, true);
-
-  // 2) rotation vers l'écliptique vraie de la date
   const rotation = Astronomy.Rotation_EQJ_ECT(dateUtc);
   const eclVec = Astronomy.RotateVector(rotation, geoVec);
-
-  // 3) conversion vectorielle -> sphérique
   const sphere = Astronomy.SphereFromVector(eclVec);
-
-  // sphere.lon est la longitude écliptique en degrés
   return normalizeDeg(sphere.lon);
 }
+
+app.get("/", (req, res) => {
+  res.send("Helios Astro backend opérationnel");
+});
 
 app.get("/api/health", (req, res) => {
   res.json({
@@ -142,7 +137,4 @@ app.post("/api/ephemeris", (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Helios Astro ephemerides backend listening on http://localhost:${PORT}`);
-});
-app.get("/", (req, res) => {
-  res.send("Helios Astro backend opérationnel 🚀");
 });
