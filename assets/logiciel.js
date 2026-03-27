@@ -19,6 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const generateBtn = document.getElementById("generate-chart-btn");
   const demoBtn = document.getElementById("demo-chart-btn");
   const infoBox = document.getElementById("astro-info-box");
+  const summaryBox = document.getElementById("astro-summary-box");
   const legendBox = document.getElementById("astro-legend-box");
 
   const modelImage = new Image();
@@ -57,6 +58,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (infoBox) infoBox.innerHTML = html;
   }
 
+  function setSummary(html) {
+    if (summaryBox) summaryBox.innerHTML = html;
+  }
+
   function normalizeDeg(deg) {
     return ((deg % 360) + 360) % 360;
   }
@@ -71,6 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const sign = zodiac[idx];
     return {
       sign: sign.name,
+      glyph: sign.glyph,
       degreeInSign: lon - sign.start
     };
   }
@@ -80,18 +86,48 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!planets || !planets.length) {
       legendBox.innerHTML = `
-        <strong>Lecture planétaire :</strong><br>
-        Aucune position disponible pour le moment.
+        <strong>Détails astrologiques :</strong><br>
+        Aucun repère disponible pour le moment.
       `;
       return;
     }
 
     legendBox.innerHTML =
-      "<strong>Lecture planétaire :</strong><br>" +
+      "<strong>Détails astrologiques :</strong><br>" +
       planets.map((p) => {
         const s = getSignInfo(p.longitude);
-        return `${p.glyph} ${p.name} — ${s.degreeInSign.toFixed(1)}° ${s.sign}`;
+        return `${p.name} en ${s.sign} à ${s.degreeInSign.toFixed(1)}°`;
       }).join("<br>");
+  }
+
+  function buildSummary(planets) {
+    if (!planets || !planets.length) {
+      setSummary(`
+        <strong>Lecture du thème :</strong><br>
+        Une synthèse claire et élégante apparaîtra ici après génération.
+      `);
+      return;
+    }
+
+    const sun = planets.find(p => p.glyph === "☉");
+    const moon = planets.find(p => p.glyph === "☽");
+    const mercury = planets.find(p => p.glyph === "☿");
+    const venus = planets.find(p => p.glyph === "♀");
+    const mars = planets.find(p => p.glyph === "♂");
+
+    const sunSign = sun ? getSignInfo(sun.longitude).sign : "";
+    const moonSign = moon ? getSignInfo(moon.longitude).sign : "";
+    const mercurySign = mercury ? getSignInfo(mercury.longitude).sign : "";
+    const venusSign = venus ? getSignInfo(venus.longitude).sign : "";
+    const marsSign = mars ? getSignInfo(mars.longitude).sign : "";
+
+    setSummary(`
+      <strong>Lecture du thème :</strong><br>
+      Soleil en <strong>${sunSign || "—"}</strong>, Lune en <strong>${moonSign || "—"}</strong>.<br>
+      Expression mentale marquée par <strong>${mercurySign || "—"}</strong>,
+      dynamique affective portée par <strong>${venusSign || "—"}</strong>,
+      impulsion d’action liée à <strong>${marsSign || "—"}</strong>.
+    `);
   }
 
   function clearCanvas() {
@@ -268,6 +304,7 @@ document.addEventListener("DOMContentLoaded", () => {
     currentPlanets = planets;
     setInfo(statusText);
     setLegend(planets);
+    buildSummary(planets);
   }
 
   function demoPlanets() {
@@ -360,6 +397,7 @@ document.addEventListener("DOMContentLoaded", () => {
     <strong>Statut :</strong> prêt à générer votre carte.<br>
     Renseignez les données de naissance puis lancez le calcul.
   `);
+  buildSummary(demoPlanets());
   setLegend(demoPlanets());
 
   modelImage.onload = function () {
