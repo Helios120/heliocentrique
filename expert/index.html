@@ -3,14 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HeliosAstro Expert</title>
-  <meta name="description" content="Logiciel expert HeliosAstro avec calcul planétaire réel, paiement PayPal, PDF premium et installation mobile.">
+  <title>HeliosAstro Premium</title>
+  <meta name="description" content="HeliosAstro Premium — carte astrologique visuelle, géométrique et vibratoire.">
   <meta name="theme-color" content="#060913">
-  <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="apple-touch-icon" href="./assets/icon-192.png">
   <link rel="stylesheet" href="assets/expert.css">
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-  <script src="https://www.paypal.com/sdk/js?client-id=REPLACE_WITH_PAYPAL_CLIENT_ID&currency=EUR&intent=capture"></script>
 </head>
 <body>
   <main class="app-shell">
@@ -18,8 +15,8 @@
       <div class="brand-box">
         <img src="assets/logo-heliosastro.png" alt="Logo HeliosAstro" class="brand-logo">
         <div>
-          <h1>HeliosAstro Expert</h1>
-          <p class="subtitle">Calcul réel • PDF premium • PWA</p>
+          <h1>HeliosAstro Premium</h1>
+          <p class="subtitle">Carte énergétique • rendu premium • export client</p>
         </div>
       </div>
 
@@ -36,7 +33,7 @@
       </label>
 
       <label>Ville
-        <input type="text" id="expert-city" placeholder="Paris">
+        <input type="text" id="expert-city" placeholder="Marseille">
       </label>
 
       <label>Pays
@@ -45,48 +42,54 @@
 
       <div class="button-stack">
         <button id="health-btn">Tester le backend</button>
-        <button id="generate-btn">Calculer la carte</button>
-        <button id="demo-btn" class="secondary">Démo</button>
+        <button id="generate-btn">Générer la carte</button>
+        <button id="demo-btn" class="secondary">Démo Helios</button>
         <button id="save-btn" class="secondary">Sauvegarder</button>
         <button id="load-btn" class="secondary">Recharger</button>
         <button id="export-json-btn" class="secondary">Exporter JSON</button>
-        <button id="export-pdf-btn" class="secondary">Exporter PDF premium</button>
-        <button id="install-btn" class="secondary hidden">Installer l’app</button>
+        <button id="export-pdf-btn">Exporter PDF premium</button>
       </div>
 
       <div class="panel" id="status-box">En attente.</div>
 
       <div class="panel">
-        <h2>Déverrouillage PDF</h2>
-        <p class="muted">Le PDF premium peut être verrouillé derrière PayPal.</p>
-        <div id="paypal-button-container"></div>
+        <h2>Lecture premium</h2>
+        <div id="premium-summary-box"></div>
       </div>
     </aside>
 
     <section class="content">
-      <div class="panel">
-        <h2>Carte HeliosAstro</h2>
-        <canvas id="expert-canvas" width="1400" height="1400"></canvas>
+      <div class="panel chart-panel">
+        <div class="panel-head">
+          <h2>Carte HeliosAstro</h2>
+          <span class="badge" id="live-badge">MODE PRÊT</span>
+        </div>
+
+        <div class="canvas-wrap">
+          <canvas id="expert-canvas" width="1600" height="1600"></canvas>
+        </div>
+      </div>
+
+      <div class="grid-two">
+        <div class="panel">
+          <h2>Synthèse</h2>
+          <div id="summary-box"></div>
+        </div>
+
+        <div class="panel">
+          <h2>Aspects</h2>
+          <div id="aspects-box"></div>
+        </div>
       </div>
 
       <div class="panel">
-        <h2>Synthèse</h2>
-        <div id="summary-box"></div>
-      </div>
-
-      <div class="panel">
-        <h2>Planètes</h2>
+        <h2>Positions planétaires</h2>
         <div id="planets-box"></div>
       </div>
 
       <div class="panel">
-        <h2>Aspects</h2>
-        <div id="aspects-box"></div>
-      </div>
-
-      <div class="panel">
-        <h2>Notes</h2>
-        <textarea id="private-notes" rows="8" placeholder="Notes privées..."></textarea>
+        <h2>Notes privées</h2>
+        <textarea id="private-notes" rows="8" placeholder="Observations, axes d’interprétation, ressenti du thème..."></textarea>
       </div>
     </section>
   </main>
@@ -94,3 +97,16 @@
   <script src="assets/expert.js"></script>
 </body>
 </html>
+2) expert/assets/expert.css
+:root{
+  --bg:#060913;
+  --panel:#101725;
+  --panel-2:#0c1320;
+  --line:rgba(113,224,255,.16);
+  --text:#f3f7ff;
+  --muted:#b7c8e6;
+  --accent:#3fd9ff;
+  --gold:#ffd369;
+  --ok:#6dff9c;
+  --warn:#ff8d8d;
+}
