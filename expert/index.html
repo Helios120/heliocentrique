@@ -1,62 +1,96 @@
-const express = require('express');
-const cors = require('cors');
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HeliosAstro Expert</title>
+  <meta name="description" content="Logiciel expert HeliosAstro avec calcul planétaire réel, paiement PayPal, PDF premium et installation mobile.">
+  <meta name="theme-color" content="#060913">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="apple-touch-icon" href="./assets/icon-192.png">
+  <link rel="stylesheet" href="assets/expert.css">
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://www.paypal.com/sdk/js?client-id=REPLACE_WITH_PAYPAL_CLIENT_ID&currency=EUR&intent=capture"></script>
+</head>
+<body>
+  <main class="app-shell">
+    <aside class="sidebar">
+      <div class="brand-box">
+        <img src="assets/logo-heliosastro.png" alt="Logo HeliosAstro" class="brand-logo">
+        <div>
+          <h1>HeliosAstro Expert</h1>
+          <p class="subtitle">Calcul réel • PDF premium • PWA</p>
+        </div>
+      </div>
 
-const app = express();
+      <label>Nom
+        <input type="text" id="expert-name" placeholder="Nom du consultant">
+      </label>
 
-app.use(cors());
-app.use(express.json());
+      <label>Date
+        <input type="date" id="expert-date">
+      </label>
 
-// ✅ PAGE D'ACCUEIL (IMPORTANT)
-app.get('/', (req, res) => {
-  res.send(`
-    <h1>HeliosAstro Backend</h1>
-    <p>Serveur actif</p>
-    <p>API disponible :</p>
-    <ul>
-      <li>/api/health</li>
-      <li>/api/calc</li>
-    </ul>
-  `);
-});
+      <label>Heure
+        <input type="time" id="expert-time" value="12:00">
+      </label>
 
-// ✅ TEST
-app.get('/api/health', (req, res) => {
-  res.json({ ok: true });
-});
+      <label>Ville
+        <input type="text" id="expert-city" placeholder="Paris">
+      </label>
 
-// ✅ CALCUL PLANÈTES
-app.post('/api/calc', (req, res) => {
-  const { date, time } = req.body;
+      <label>Pays
+        <input type="text" id="expert-country" placeholder="France">
+      </label>
 
-  const base = new Date(date + 'T' + time).getTime();
+      <div class="button-stack">
+        <button id="health-btn">Tester le backend</button>
+        <button id="generate-btn">Calculer la carte</button>
+        <button id="demo-btn" class="secondary">Démo</button>
+        <button id="save-btn" class="secondary">Sauvegarder</button>
+        <button id="load-btn" class="secondary">Recharger</button>
+        <button id="export-json-btn" class="secondary">Exporter JSON</button>
+        <button id="export-pdf-btn" class="secondary">Exporter PDF premium</button>
+        <button id="install-btn" class="secondary hidden">Installer l’app</button>
+      </div>
 
-  const planets = [
-    { name: "Soleil", speed: 0.01 },
-    { name: "Lune", speed: 0.13 },
-    { name: "Mercure", speed: 0.04 },
-    { name: "Vénus", speed: 0.03 },
-    { name: "Mars", speed: 0.02 },
-    { name: "Jupiter", speed: 0.008 },
-    { name: "Saturne", speed: 0.003 },
-    { name: "Uranus", speed: 0.001 },
-    { name: "Neptune", speed: 0.0006 },
-    { name: "Pluton", speed: 0.0004 }
-  ];
+      <div class="panel" id="status-box">En attente.</div>
 
-  const result = planets.map((p, i) => {
-    const deg = ((base / 10000000) * p.speed * 360 + i * 36) % 360;
-    return {
-      name: p.name,
-      degree: parseFloat(deg.toFixed(2))
-    };
-  });
+      <div class="panel">
+        <h2>Déverrouillage PDF</h2>
+        <p class="muted">Le PDF premium peut être verrouillé derrière PayPal.</p>
+        <div id="paypal-button-container"></div>
+      </div>
+    </aside>
 
-  res.json({ planets: result });
-});
+    <section class="content">
+      <div class="panel">
+        <h2>Carte HeliosAstro</h2>
+        <canvas id="expert-canvas" width="1400" height="1400"></canvas>
+      </div>
 
-// ✅ PORT
-const PORT = process.env.PORT || 10000;
+      <div class="panel">
+        <h2>Synthèse</h2>
+        <div id="summary-box"></div>
+      </div>
 
-app.listen(PORT, () => {
-  console.log("HeliosAstro backend running on port " + PORT);
-});
+      <div class="panel">
+        <h2>Planètes</h2>
+        <div id="planets-box"></div>
+      </div>
+
+      <div class="panel">
+        <h2>Aspects</h2>
+        <div id="aspects-box"></div>
+      </div>
+
+      <div class="panel">
+        <h2>Notes</h2>
+        <textarea id="private-notes" rows="8" placeholder="Notes privées..."></textarea>
+      </div>
+    </section>
+  </main>
+
+  <script src="assets/expert.js"></script>
+</body>
+</html>
