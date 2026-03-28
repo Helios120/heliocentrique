@@ -27,12 +27,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const canvas = document.getElementById("expert-canvas");
   const ctx = canvas.getContext("2d");
 
-  const CANVAS_SIZE = 1600;
-  const cx = CANVAS_SIZE / 2;
-  const cy = CANVAS_SIZE / 2;
+  const SIZE = 1600;
+  const cx = SIZE / 2;
+  const cy = SIZE / 2;
 
-  const wheelImage = new Image();
-  let wheelLoaded = false;
   let currentChart = null;
 
   const zodiac = [
@@ -90,8 +88,12 @@ document.addEventListener("DOMContentLoaded", () => {
     ]
   };
 
-  function setStatus(html) {
-    statusBox.innerHTML = html;
+  function setStatus(text) {
+    statusBox.innerHTML = text;
+  }
+
+  function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   function normalizeDeg(deg) {
@@ -142,6 +144,40 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  async function wakeBackend(maxAttempts = 8) {
+    for (let i = 1; i <= maxAttempts; i++) {
+      try {
+        setStatus(`Réveil du backend… tentative ${i}/${maxAttempts}`);
+        const response = await fetch(`${API_BASE}/api/health`, {
+          method: "GET",
+          cache: "no-store"
+        });
+
+        const text = await response.text();
+
+        if (text.trim().startsWith("<")) {
+          await sleep(4000);
+          continue;
+        }
+
+        const data = JSON.parse(text);
+        if (response.ok && data.ok) {
+          liveBadge.textContent = "BACKEND OK";
+          setStatus(`Backend actif : ${JSON.stringify(data)}`);
+          return true;
+        }
+      } catch (error) {
+        // on réessaie
+      }
+
+      await sleep(4000);
+    }
+
+    liveBadge.textContent = "MODE DÉMO";
+    setStatus("Backend encore en veille ou non joignable. Mode démo conservé.");
+    return false;
+  }
+
   function renderPremiumSummary(planets, aspects) {
     const sun = planets.find(p => p.name === "Soleil");
     const moon = planets.find(p => p.name === "Lune");
@@ -150,9 +186,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     premiumSummaryBox.innerHTML = `
       <div class="table-like">
-        <div class="row"><strong>Axe central</strong><br>Soleil en ${sun.sign} : rayonnement, cap, expression principale du thème.</div>
-        <div class="row"><strong>Vie intérieure</strong><br>Lune en ${moon.sign} : mémoire émotionnelle, sécurité, réponse instinctive.</div>
-        <div class="row"><strong>Affectif / désir</strong><br>Vénus en ${venus.sign}, Mars en ${mars.sign} : dynamique relationnelle et énergie d’incarnation.</div>
+        <div class="row"><strong>Axe central</strong><br>Soleil en ${sun.sign} : rayonnement, cap, expression principale.</div>
+        <div class="row"><strong>Vie intérieure</strong><br>Lune en ${moon.sign} : mémoire émotionnelle, sécurité, instinct.</div>
+        <div class="row"><strong>Affectif / désir</strong><br>Vénus en ${venus.sign}, Mars en ${mars.sign} : dynamique relationnelle et impulsion.</div>
         <div class="row"><strong>Aspects clés</strong><br>${aspects.length ? aspects.slice(0, 3).map(a => `${a.p1} ${a.aspect} ${a.p2}`).join(" • ") : "Aucun aspect majeur retenu."}</div>
       </div>
     `;
@@ -211,47 +247,61 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function clearCanvas() {
-    ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+    ctx.clearRect(0, 0, SIZE, SIZE);
     ctx.fillStyle = "#000";
-    ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+    ctx.fillRect(0, 0, SIZE, SIZE);
   }
 
-  function drawFallbackWheel() {
-    clearCanvas();
-
-    const degreeOuter = 500;
-    const zodiacOuter = 410;
-    const zodiacInner = 330;
-
-    const glow = ctx.createRadialGradient(cx, cy, 10, cx, cy, 520);
-    glow.addColorStop(0, "rgba(255,255,255,0.10)");
-    glow.addColorStop(0.16, "rgba(255,210,90,0.16)");
-    glow.addColorStop(0.36, "rgba(0,220,255,0.08)");
+  function drawBackgroundGlow() {
+    const glow = ctx.createRadialGradient(cx, cy, 30, cx, cy, 640);
+    glow.addColorStop(0, "rgba(255,240,180,0.20)");
+    glow.addColorStop(0.12, "rgba(0,220,255,0.12)");
+    glow.addColorStop(0.45, "rgba(255,170,80,0.06)");
     glow.addColorStop(1, "rgba(0,0,0,0)");
     ctx.fillStyle = glow;
     ctx.beginPath();
-    ctx.arc(cx, cy, 520, 0, Math.PI * 2);
+    ctx.arc(cx, cy, 640, 0, Math.PI * 2);
     ctx.fill();
+  }
 
-    [degreeOuter, zodiacOuter, zodiacInner].forEach((r) => {
+  function drawPerfectWheel() {
+    const degreeOuter = 560;
+    const degreeInner = 500;
+    const zodiacOuter = 470;
+    const zodiacInner = 355;
+    const innerRing = 265;
+
+    clearCanvas();
+    drawBackgroundGlow();
+
+    [degreeOuter, degreeInner, zodiacOuter, zodiacInner, innerRing].forEach((r, index) => {
       ctx.beginPath();
-      ctx.strokeStyle = "rgba(255,255,255,0.95)";
-      ctx.lineWidth = 2;
       ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.lineWidth = index < 2 ? 3 : 2;
+      ctx.strokeStyle = index < 2 ? "rgba(255,210,120,0.92)" : "rgba(255,255,255,0.88)";
       ctx.stroke();
     });
 
     for (let i = 0; i < 360; i += 2) {
       const r = degToRad(i);
       let tickInner = degreeOuter - 8;
-      if (i % 10 === 0) tickInner = degreeOuter - 18;
-      if (i % 30 === 0) tickInner = degreeOuter - 34;
+      let width = 1;
+
+      if (i % 10 === 0) {
+        tickInner = degreeOuter - 18;
+        width = 1.4;
+      }
+
+      if (i % 30 === 0) {
+        tickInner = degreeOuter - 34;
+        width = 2.2;
+      }
 
       ctx.beginPath();
       ctx.moveTo(cx + Math.cos(r) * tickInner, cy + Math.sin(r) * tickInner);
       ctx.lineTo(cx + Math.cos(r) * degreeOuter, cy + Math.sin(r) * degreeOuter);
       ctx.strokeStyle = "rgba(255,255,255,0.85)";
-      ctx.lineWidth = i % 30 === 0 ? 2.2 : 1;
+      ctx.lineWidth = width;
       ctx.stroke();
     }
 
@@ -260,42 +310,59 @@ document.addEventListener("DOMContentLoaded", () => {
       ctx.beginPath();
       ctx.moveTo(cx + Math.cos(r) * zodiacInner, cy + Math.sin(r) * zodiacInner);
       ctx.lineTo(cx + Math.cos(r) * zodiacOuter, cy + Math.sin(r) * zodiacOuter);
-      ctx.strokeStyle = "rgba(255,255,255,0.9)";
-      ctx.lineWidth = 2;
+      ctx.strokeStyle = "rgba(255,255,255,0.92)";
+      ctx.lineWidth = 2.2;
       ctx.stroke();
     }
 
     for (let i = 0; i < 12; i++) {
       const mid = i * 30 + 15;
-      const p = planetPoint(mid, 370);
+      const p = planetPoint(mid, 410);
       ctx.fillStyle = "#ffffff";
-      ctx.font = "56px Arial";
+      ctx.font = "68px Arial";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillText(zodiac[i].glyph, p.x, p.y);
     }
-  }
 
-  function drawWheelBase() {
-    if (!wheelLoaded || !wheelImage.naturalWidth || !wheelImage.naturalHeight) {
-      drawFallbackWheel();
-      return;
+    // vortex central premium
+    for (let i = 0; i < 44; i++) {
+      const ratio = i / 44;
+      const radius = 230 - i * 3.4;
+      ctx.beginPath();
+      ctx.arc(
+        cx + Math.cos(ratio * Math.PI * 7) * 10,
+        cy + Math.sin(ratio * Math.PI * 7) * 10,
+        radius,
+        ratio * Math.PI * 2.8,
+        ratio * Math.PI * 2.8 + Math.PI * 1.55
+      );
+      ctx.strokeStyle = `hsla(${ratio * 320 + 20}, 100%, 65%, ${0.95 - ratio * 0.45})`;
+      ctx.lineWidth = 5;
+      ctx.stroke();
     }
 
-    clearCanvas();
+    const coreGlow = ctx.createRadialGradient(cx, cy, 0, cx, cy, 90);
+    coreGlow.addColorStop(0, "rgba(255,255,255,0.95)");
+    coreGlow.addColorStop(0.22, "rgba(255,220,120,0.95)");
+    coreGlow.addColorStop(0.65, "rgba(0,210,255,0.35)");
+    coreGlow.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = coreGlow;
+    ctx.beginPath();
+    ctx.arc(cx, cy, 95, 0, Math.PI * 2);
+    ctx.fill();
+  }
 
-    const sourceSize = Math.min(wheelImage.naturalWidth, wheelImage.naturalHeight);
-    const sx = (wheelImage.naturalWidth - sourceSize) / 2;
-    const sy = (wheelImage.naturalHeight - sourceSize) / 2;
+  function drawAspectLine(p1, p2, color) {
+    const a = planetPoint(p1.longitude, 210);
+    const b = planetPoint(p2.longitude, 210);
 
-    const margin = 110;
-    const drawSize = CANVAS_SIZE - margin * 2;
-
-    ctx.drawImage(
-      wheelImage,
-      sx, sy, sourceSize, sourceSize,
-      margin, margin, drawSize, drawSize
-    );
+    ctx.beginPath();
+    ctx.moveTo(a.x, a.y);
+    ctx.lineTo(b.x, b.y);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    ctx.stroke();
   }
 
   function drawCurvedFlow(longitude, color, index) {
@@ -337,18 +404,6 @@ document.addEventListener("DOMContentLoaded", () => {
     ctx.shadowBlur = 0;
   }
 
-  function drawAspectLine(p1, p2, color) {
-    const a = planetPoint(p1.longitude, 210);
-    const b = planetPoint(p2.longitude, 210);
-
-    ctx.beginPath();
-    ctx.moveTo(a.x, a.y);
-    ctx.lineTo(b.x, b.y);
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 2;
-    ctx.stroke();
-  }
-
   function drawPlanet(longitude, glyph, color, radius, name, degreeText, index) {
     const p = planetPoint(longitude, radius);
 
@@ -366,21 +421,21 @@ document.addEventListener("DOMContentLoaded", () => {
     ctx.textBaseline = "middle";
     ctx.fillText(glyph, p.x, p.y + 1);
 
-    const labelRadius = 625 + (index % 3) * 28;
+    const labelRadius = 640 + (index % 3) * 24;
     const label = planetPoint(longitude, labelRadius);
 
     ctx.fillStyle = "#ffffff";
     ctx.font = "18px Arial";
     ctx.fillText(name, label.x, label.y);
 
-    const sub = planetPoint(longitude, labelRadius + 24);
+    const sub = planetPoint(longitude, labelRadius + 22);
     ctx.fillStyle = "rgba(255,255,255,0.88)";
     ctx.font = "14px Arial";
     ctx.fillText(degreeText, sub.x, sub.y);
   }
 
   function renderWheel(planets, aspects) {
-    drawWheelBase();
+    drawPerfectWheel();
 
     if (aspects && aspects.length) {
       aspects.forEach((a) => {
@@ -395,12 +450,12 @@ document.addEventListener("DOMContentLoaded", () => {
     planets.forEach((p, i) => {
       const stagger = (i % 2) * 12;
       drawCurvedFlow(p.longitude, p.color, i);
-      drawPlanetArc(p.longitude, p.color, 470 + stagger);
+      drawPlanetArc(p.longitude, p.color, 500 + stagger);
     });
 
     planets.forEach((p, i) => {
       const degreeText = `${p.degreeInSign.toFixed(1)}° ${p.sign}`;
-      drawPlanet(p.longitude, p.glyph, p.color, 575 + (i % 2) * 12, p.name, degreeText, i);
+      drawPlanet(p.longitude, p.glyph, p.color, 595 + (i % 2) * 10, p.name, degreeText, i);
     });
   }
 
@@ -417,21 +472,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   async function testHealth() {
-    try {
-      setStatus("Test backend en cours…");
-      const response = await fetch(`${API_BASE}/api/health`);
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error("Réponse backend invalide");
-      }
-
-      liveBadge.textContent = "BACKEND OK";
-      setStatus(`Backend OK : ${JSON.stringify(data)}`);
-    } catch (error) {
-      liveBadge.textContent = "MODE DÉMO";
-      setStatus(`Erreur backend : ${error.message}`);
-    }
+    await wakeBackend();
   }
 
   async function generateChart() {
@@ -439,6 +480,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const time = timeInput.value || "12:00";
     const city = cityInput.value || "Marseille";
     const country = countryInput.value || "France";
+
+    const awake = await wakeBackend();
+    if (!awake) {
+      liveBadge.textContent = "MODE DÉMO";
+      renderChart({
+        planets: adaptPlanets(demoPayload.planets),
+        aspects: demoPayload.aspects
+      });
+      return;
+    }
 
     try {
       setStatus("Calcul réel en cours…");
@@ -457,12 +508,7 @@ document.addEventListener("DOMContentLoaded", () => {
         throw new Error("Le backend renvoie du HTML au lieu de JSON.");
       }
 
-      let data;
-      try {
-        data = JSON.parse(text);
-      } catch {
-        throw new Error("JSON invalide.");
-      }
+      const data = JSON.parse(text);
 
       if (!response.ok || !data.planets) {
         throw new Error("Réponse backend invalide.");
@@ -470,12 +516,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
       liveBadge.textContent = "CARTE LIVE";
 
-      const payload = {
+      renderChart({
         planets: adaptPlanets(data.planets),
         aspects: data.aspects || []
-      };
+      });
 
-      renderChart(payload);
       setStatus(`Carte générée pour ${date} à ${time}, ${city}, ${country}.`);
     } catch (error) {
       liveBadge.textContent = "MODE DÉMO";
@@ -577,7 +622,6 @@ document.addEventListener("DOMContentLoaded", () => {
     doc.text(`Heure : ${timeInput.value || "—"}`, 14, 40);
     doc.text(`Lieu : ${cityInput.value || "—"}, ${countryInput.value || "—"}`, 14, 46);
 
-    // zone carrée pour éviter tout ovale dans le PDF
     doc.addImage(imageData, "PNG", 15, 55, 180, 180, "", "FAST");
 
     doc.setFont("helvetica", "bold");
@@ -646,26 +690,10 @@ document.addEventListener("DOMContentLoaded", () => {
   exportJsonBtn.addEventListener("click", exportJson);
   exportPdfBtn.addEventListener("click", exportPdfPremium);
 
-  wheelImage.onload = function () {
-    wheelLoaded = true;
-    if (currentChart) {
-      renderChart(currentChart);
-    }
-  };
-
-  wheelImage.onerror = function () {
-    wheelLoaded = false;
-    if (currentChart) {
-      renderChart(currentChart);
-    }
-  };
-
-  wheelImage.src = "assets/roue-heliosastro.png";
-
   renderChart({
     planets: adaptPlanets(demoPayload.planets),
     aspects: demoPayload.aspects
   });
 
-  setStatus("Frontend premium prêt. Tu peux tester le backend, générer une carte et exporter le PDF.");
+  setStatus("Frontend premium prêt. Le backend est réveillé avec retry automatique, et la roue est maintenant dessinée en cercle parfait.");
 });
