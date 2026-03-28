@@ -1,32 +1,37 @@
 :root{
-  --bg:#070a12;
-  --panel:#111826;
-  --panel-2:#0e1522;
+  --bg:#060913;
+  --panel:#101725;
+  --panel-2:#0c1320;
   --line:rgba(113,224,255,.16);
-  --text:#f2f7ff;
+  --text:#f3f7ff;
   --muted:#b7c8e6;
   --accent:#3fd9ff;
 }
 
-*{box-sizing:border-box}
+*{
+  box-sizing:border-box;
+}
 
 body{
   margin:0;
   font-family:Arial, Helvetica, sans-serif;
-  background:var(--bg);
+  background:
+    radial-gradient(circle at top, rgba(61,217,255,0.08), transparent 35%),
+    radial-gradient(circle at center, rgba(255,211,105,0.05), transparent 25%),
+    var(--bg);
   color:var(--text);
 }
 
 .app-shell{
   display:grid;
-  grid-template-columns:360px 1fr;
+  grid-template-columns:380px 1fr;
   min-height:100vh;
 }
 
 .sidebar{
   padding:24px;
   border-right:1px solid var(--line);
-  background:linear-gradient(180deg,#0b1220,#09111d);
+  background:linear-gradient(180deg,#0b1220,#08111c);
 }
 
 .content{
@@ -35,12 +40,29 @@ body{
   gap:20px;
 }
 
+.brand-box{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  margin-bottom:18px;
+}
+
+.brand-logo{
+  width:74px;
+  height:74px;
+  object-fit:contain;
+  border-radius:18px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.08);
+  padding:8px;
+}
+
 h1,h2{
   margin:0 0 10px;
 }
 
 .subtitle{
-  margin:0 0 20px;
+  margin:0;
   color:var(--muted);
 }
 
@@ -51,11 +73,11 @@ label{
   font-weight:700;
 }
 
-input,select,textarea,button{
+input,textarea,button{
   font:inherit;
 }
 
-input,select,textarea{
+input,textarea{
   width:100%;
   background:#0b1320;
   color:var(--text);
@@ -69,7 +91,7 @@ textarea{
 }
 
 button{
-  background:var(--accent);
+  background:linear-gradient(135deg, var(--accent), #74ecff);
   color:#001018;
   border:none;
   border-radius:14px;
@@ -95,12 +117,7 @@ button.secondary{
   border:1px solid var(--line);
   border-radius:20px;
   padding:18px;
-}
-
-.grid-two{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:20px;
+  box-shadow:0 16px 30px rgba(0,0,0,0.24);
 }
 
 .table-like{
@@ -119,12 +136,17 @@ button.secondary{
   color:var(--muted);
 }
 
+#expert-canvas{
+  width:min(100%, 980px);
+  height:auto;
+  display:block;
+  margin:auto;
+  background:#000;
+  border-radius:18px;
+}
+
 @media (max-width: 1100px){
   .app-shell{
-    grid-template-columns:1fr;
-  }
-
-  .grid-two{
     grid-template-columns:1fr;
   }
 
