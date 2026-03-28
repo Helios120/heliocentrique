@@ -6,11 +6,11 @@
   --text:#f3f7ff;
   --muted:#b7c8e6;
   --accent:#3fd9ff;
+  --danger:#ff6b6b;
+  --ok:#6dff9c;
 }
 
-*{
-  box-sizing:border-box;
-}
+*{ box-sizing:border-box; }
 
 body{
   margin:0;
@@ -134,6 +134,29 @@ button.secondary{
 
 .muted{
   color:var(--muted);
+}
+
+.hidden{
+  display:none !important;
+}
+
+.badge{
+  display:inline-block;
+  padding:6px 10px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:700;
+  border:1px solid rgba(255,255,255,.12);
+}
+
+.badge.ok{
+  background:rgba(109,255,156,.10);
+  color:var(--ok);
+}
+
+.badge.warn{
+  background:rgba(255,107,107,.10);
+  color:var(--danger);
 }
 
 #expert-canvas{
