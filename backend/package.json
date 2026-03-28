@@ -1,14 +1,14 @@
 {
   "name": "heliosastro-backend",
-  "version": "1.0.0",
-  "description": "Backend Helios Astro avec éphémérides réelles",
+  "version": "2.0.0",
+  "description": "Backend Helios Astro avec éphémérides, ascendant, maisons et vérification PayPal",
   "main": "server.js",
-  "type": "commonjs",
+  "type": "module",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "astronomy-engine": "^2.1.19",
+    "@swisseph/node": "^0.2.0",
     "cors": "^2.8.5",
     "express": "^4.21.2"
   }
