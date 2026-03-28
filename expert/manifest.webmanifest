@@ -1,0 +1,22 @@
+{
+  "name": "HeliosAstro Expert",
+  "short_name": "HeliosAstro",
+  "description": "Logiciel expert HeliosAstro installable sur mobile et desktop.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#060913",
+  "theme_color": "#060913",
+  "icons": [
+    {
+      "src": "./assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "./assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
