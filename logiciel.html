@@ -17,7 +17,7 @@
   <style>
     .helios-layout{
       display:grid;
-      grid-template-columns:400px 1fr;
+      grid-template-columns:420px 1fr;
       gap:24px;
       align-items:start;
     }
@@ -113,7 +113,7 @@
     }
 
     #heliosCanvas{
-      width:min(100%, 920px);
+      width:min(100%, 980px);
       height:auto;
       display:block;
       margin:auto;
@@ -121,7 +121,7 @@
       border-radius:22px;
     }
 
-    @media (max-width: 1050px){
+    @media (max-width: 1150px){
       .helios-layout{
         grid-template-columns:1fr;
       }
@@ -186,7 +186,7 @@
 
           <label>
             Ville
-            <input type="text" id="astro-city" placeholder="Marseille">
+            <input type="text" id="astro-city" placeholder="Paris">
           </label>
 
           <label>
@@ -230,7 +230,7 @@
 
             <div class="paypal-block">
               <h4>Transit pour 3 mois</h4>
-              <p>Lecture de période pour mieux anticiper les dynamiques à venir.</p>
+              <p>Lecture de période pour anticiper les dynamiques à venir.</p>
               <div id="paypal-transit"></div>
             </div>
 
@@ -243,7 +243,7 @@
         </div>
 
         <div class="helios-canvas-shell">
-          <canvas id="heliosCanvas" width="1200" height="1200"></canvas>
+          <canvas id="heliosCanvas" width="1400" height="1400"></canvas>
         </div>
       </div>
     </section>
