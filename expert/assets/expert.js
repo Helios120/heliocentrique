@@ -15,10 +15,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const loadBtn = document.getElementById("load-btn");
   const exportJsonBtn = document.getElementById("export-json-btn");
   const exportPdfBtn = document.getElementById("export-pdf-btn");
+  const installBtn = document.getElementById("install-btn");
 
   const statusBox = document.getElementById("status-box");
   const summaryBox = document.getElementById("summary-box");
   const planetsBox = document.getElementById("planets-box");
+  const aspectsBox = document.getElementById("aspects-box");
   const privateNotes = document.getElementById("private-notes");
 
   const canvas = document.getElementById("expert-canvas");
@@ -30,6 +32,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const wheelImage = new Image();
   let wheelLoaded = false;
   let currentChart = null;
+  let deferredPrompt = null;
+  let pdfUnlocked = false;
 
   const zodiac = [
     { name: "Bélier", glyph: "♈", start: 0 },
@@ -59,21 +63,35 @@ document.addEventListener("DOMContentLoaded", () => {
     "Pluton":   { glyph: "♇", color: "#c66bff" }
   };
 
-  const demoPlanets = [
-    { name: "Soleil", degree: 71.8 },
-    { name: "Lune", degree: 172.2 },
-    { name: "Mercure", degree: 251.8 },
-    { name: "Vénus", degree: 208.3 },
-    { name: "Mars", degree: 197.3 },
-    { name: "Jupiter", degree: 289.5 },
-    { name: "Saturne", degree: 217.2 },
-    { name: "Uranus", degree: 352.9 },
-    { name: "Neptune", degree: 139.5 },
-    { name: "Pluton", degree: 300.1 }
-  ];
+  const aspectColors = {
+    "Conjonction": "#ffffff",
+    "Sextile": "#78e8ff",
+    "Carré": "#ff6b6b",
+    "Trigone": "#6dff9c",
+    "Opposition": "#ffd369"
+  };
 
-  function setStatus(text) {
-    statusBox.innerHTML = text;
+  const demoPayload = {
+    planets: [
+      { name: "Soleil", longitude: 71.8, sign: "Gémeaux", degreeInSign: 11.8 },
+      { name: "Lune", longitude: 172.2, sign: "Vierge", degreeInSign: 22.2 },
+      { name: "Mercure", longitude: 251.8, sign: "Sagittaire", degreeInSign: 11.8 },
+      { name: "Vénus", longitude: 208.3, sign: "Balance", degreeInSign: 28.3 },
+      { name: "Mars", longitude: 197.3, sign: "Balance", degreeInSign: 17.3 },
+      { name: "Jupiter", longitude: 289.5, sign: "Capricorne", degreeInSign: 19.5 },
+      { name: "Saturne", longitude: 217.2, sign: "Scorpion", degreeInSign: 7.2 },
+      { name: "Uranus", longitude: 352.9, sign: "Poissons", degreeInSign: 22.9 },
+      { name: "Neptune", longitude: 139.5, sign: "Lion", degreeInSign: 19.5 },
+      { name: "Pluton", longitude: 300.1, sign: "Verseau", degreeInSign: 0.1 }
+    ],
+    aspects: [
+      { p1: "Soleil", p2: "Mercure", aspect: "Opposition", exactAngle: 180.0, orb: 0.0 },
+      { p1: "Vénus", p2: "Mars", aspect: "Conjonction", exactAngle: 11.0, orb: 11.0 }
+    ]
+  };
+
+  function setStatus(html) {
+    statusBox.innerHTML = html;
   }
 
   function normalizeDeg(deg) {
@@ -104,9 +122,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function adaptPlanets(rawPlanets) {
     return rawPlanets.map((p) => {
-      const lon = normalizeDeg(Number(p.degree));
+      let lon = p.longitude;
+      if (typeof lon !== "number") lon = Number(p.degree);
+      lon = normalizeDeg(lon);
+
       const meta = planetMeta[p.name] || { glyph: "•", color: "#ffffff" };
-      const s = signInfo(lon);
+      const s = typeof p.sign === "string" && typeof p.degreeInSign === "number"
+        ? { sign: p.sign, degreeInSign: p.degreeInSign }
+        : signInfo(lon);
 
       return {
         name: p.name,
@@ -119,7 +142,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  function renderSummary(planets) {
+  function renderSummary(planets, aspects) {
     const sun = planets.find(p => p.name === "Soleil");
     const moon = planets.find(p => p.name === "Lune");
     const mercury = planets.find(p => p.name === "Mercure");
@@ -130,7 +153,8 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="row"><strong>Soleil :</strong> ${sun.degreeInSign.toFixed(2)}° ${sun.sign}</div>
         <div class="row"><strong>Lune :</strong> ${moon.degreeInSign.toFixed(2)}° ${moon.sign}</div>
         <div class="row"><strong>Mercure :</strong> ${mercury.degreeInSign.toFixed(2)}° ${mercury.sign}</div>
-        <div class="row"><strong>Lecture :</strong> Backend connecté, positions dynamiques reçues.</div>
+        <div class="row"><strong>PDF premium :</strong> ${pdfUnlocked ? '<span class="badge ok">déverrouillé</span>' : '<span class="badge warn">verrouillé</span>'}</div>
+        <div class="row"><strong>Aspects retenus :</strong> ${aspects.length}</div>
       </div>
     `;
   }
@@ -143,6 +167,25 @@ document.addEventListener("DOMContentLoaded", () => {
             <strong>${p.glyph} ${p.name}</strong><br>
             ${p.degreeInSign.toFixed(2)}° ${p.sign}<br>
             <span class="muted">Longitude : ${p.longitude.toFixed(2)}°</span>
+          </div>
+        `).join("")}
+      </div>
+    `;
+  }
+
+  function renderAspects(aspects) {
+    if (!aspects || !aspects.length) {
+      aspectsBox.innerHTML = `<div class="row">Aucun aspect retenu.</div>`;
+      return;
+    }
+
+    aspectsBox.innerHTML = `
+      <div class="table-like">
+        ${aspects.map(a => `
+          <div class="row">
+            <strong>${a.p1} – ${a.p2}</strong><br>
+            ${a.aspect}<br>
+            <span class="muted">Angle : ${Number(a.exactAngle).toFixed(2)}° | Orbe : ${Number(a.orb).toFixed(2)}°</span>
           </div>
         `).join("")}
       </div>
@@ -229,7 +272,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function drawCurvedFlow(longitude, color, index) {
     const r = degToRad(longitude);
-
     const startRadius = 120;
     const endRadius = 520;
     const bendRadius1 = 210 + (index % 4) * 12;
@@ -266,6 +308,18 @@ document.addEventListener("DOMContentLoaded", () => {
     ctx.shadowBlur = 0;
   }
 
+  function drawAspectLine(p1, p2, color) {
+    const a = planetPoint(p1.longitude, 210);
+    const b = planetPoint(p2.longitude, 210);
+
+    ctx.beginPath();
+    ctx.moveTo(a.x, a.y);
+    ctx.lineTo(b.x, b.y);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+
   function drawPlanet(longitude, glyph, color, radius, name, degreeText, index) {
     const p = planetPoint(longitude, radius);
 
@@ -296,8 +350,18 @@ document.addEventListener("DOMContentLoaded", () => {
     ctx.fillText(degreeText, sub.x, sub.y);
   }
 
-  function renderWheel(planets) {
+  function renderWheel(planets, aspects) {
     drawWheelBase();
+
+    if (aspects && aspects.length) {
+      aspects.forEach((a) => {
+        const p1 = planets.find(p => p.name === a.p1);
+        const p2 = planets.find(p => p.name === a.p2);
+        if (p1 && p2) {
+          drawAspectLine(p1, p2, aspectColors[a.aspect] || "rgba(255,255,255,0.5)");
+        }
+      });
+    }
 
     planets.forEach((p, i) => {
       const stagger = (i % 2) * 12;
@@ -311,11 +375,15 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  function renderChart(planets) {
-    currentChart = planets;
-    renderSummary(planets);
+  function renderChart(payload) {
+    const planets = payload.planets;
+    const aspects = payload.aspects || [];
+    currentChart = { planets, aspects };
+
+    renderSummary(planets, aspects);
     renderPlanetsList(planets);
-    renderWheel(planets);
+    renderAspects(aspects);
+    renderWheel(planets, aspects);
   }
 
   async function testHealth() {
@@ -328,39 +396,34 @@ document.addEventListener("DOMContentLoaded", () => {
         throw new Error("Réponse backend invalide");
       }
 
-      setStatus(`Backend OK : ${JSON.stringify(data)}`);
+      setStatus(`<span class="badge ok">Backend OK</span> ${JSON.stringify(data)}`);
     } catch (error) {
-      setStatus(`Erreur backend : ${error.message}`);
+      setStatus(`<span class="badge warn">Erreur backend</span> ${error.message}`);
     }
   }
 
-  async function generatePlanets() {
+  async function generateChart() {
     const date = dateInput.value || "2026-03-28";
     const time = timeInput.value || "12:00";
     const city = cityInput.value || "Paris";
     const country = countryInput.value || "France";
 
     try {
-      setStatus("Calcul des positions planétaires…");
+      setStatus("Calcul réel en cours…");
 
       const response = await fetch(`${API_BASE}/api/calc`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({
-          date,
-          time,
-          city,
-          country
-        })
+        body: JSON.stringify({ date, time, city, country })
       });
 
-      const rawText = await response.text();
+      const text = await response.text();
       let data;
 
       try {
-        data = JSON.parse(rawText);
+        data = JSON.parse(text);
       } catch {
         throw new Error("Le backend ne renvoie pas un JSON valide.");
       }
@@ -369,14 +432,19 @@ document.addEventListener("DOMContentLoaded", () => {
         throw new Error("Réponse backend invalide.");
       }
 
-      const planets = adaptPlanets(data.planets);
-      renderChart(planets);
+      const payload = {
+        planets: adaptPlanets(data.planets),
+        aspects: data.aspects || []
+      };
 
-      setStatus(`Carte générée pour ${date} à ${time}, ${city}, ${country}.`);
+      renderChart(payload);
+      setStatus(`<span class="badge ok">Carte générée</span> ${date} à ${time}, ${city}, ${country}.`);
     } catch (error) {
-      const planets = adaptPlanets(demoPlanets);
-      renderChart(planets);
-      setStatus(`Mode démo activé. Motif : ${error.message}`);
+      renderChart({
+        planets: adaptPlanets(demoPayload.planets),
+        aspects: demoPayload.aspects
+      });
+      setStatus(`<span class="badge warn">Mode démo</span> ${error.message}`);
     }
   }
 
@@ -388,7 +456,8 @@ document.addEventListener("DOMContentLoaded", () => {
       city: cityInput.value || "",
       country: countryInput.value || "",
       notes: privateNotes.value || "",
-      planets: currentChart || []
+      pdfUnlocked,
+      chart: currentChart
     };
 
     localStorage.setItem("heliosastro_expert_frontend", JSON.stringify(payload));
@@ -409,9 +478,10 @@ document.addEventListener("DOMContentLoaded", () => {
     cityInput.value = saved.city || "";
     countryInput.value = saved.country || "";
     privateNotes.value = saved.notes || "";
+    pdfUnlocked = Boolean(saved.pdfUnlocked);
 
-    if (saved.planets?.length) {
-      renderChart(saved.planets);
+    if (saved.chart && saved.chart.planets?.length) {
+      renderChart(saved.chart);
       setStatus("Dernière sauvegarde rechargée.");
     } else {
       setStatus("Sauvegarde rechargée, sans carte.");
@@ -419,7 +489,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function exportJson() {
-    if (!currentChart || !currentChart.length) {
+    if (!currentChart || !currentChart.planets?.length) {
       setStatus("Aucune carte à exporter.");
       return;
     }
@@ -432,7 +502,7 @@ document.addEventListener("DOMContentLoaded", () => {
         city: cityInput.value || "",
         country: countryInput.value || "",
         notes: privateNotes.value || "",
-        planets: currentChart
+        chart: currentChart
       }, null, 2)],
       { type: "application/json" }
     );
@@ -440,14 +510,19 @@ document.addEventListener("DOMContentLoaded", () => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${(nameInput.value || "heliosastro").replace(/\s+/g, "-").toLowerCase()}-planetes.json`;
+    a.download = `${(nameInput.value || "heliosastro").replace(/\s+/g, "-").toLowerCase()}-chart.json`;
     a.click();
     URL.revokeObjectURL(url);
   }
 
-  function exportPdf() {
-    if (!currentChart || !currentChart.length) {
+  function exportPdfPremium() {
+    if (!currentChart || !currentChart.planets?.length) {
       setStatus("Aucune carte à exporter en PDF.");
+      return;
+    }
+
+    if (!pdfUnlocked) {
+      setStatus(`<span class="badge warn">PDF verrouillé</span> Règle d’abord le paiement PayPal.`);
       return;
     }
 
@@ -455,67 +530,195 @@ document.addEventListener("DOMContentLoaded", () => {
     const imageData = canvas.toDataURL("image/png", 1.0);
     const clientName = nameInput.value || "Consultant";
 
-    doc.setFillColor(8, 10, 18);
+    doc.setFillColor(6, 9, 19);
+    doc.rect(0, 0, 210, 297, "F");
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(22);
+    doc.text("HELIOSASTRO", 105, 18, { align: "center" });
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(11);
+    doc.text(`Consultant : ${clientName}`, 14, 30);
+    doc.text(`Date : ${dateInput.value || "—"}   Heure : ${timeInput.value || "—"}`, 14, 37);
+    doc.text(`Lieu : ${cityInput.value || "—"}, ${countryInput.value || "—"}`, 14, 44);
+
+    doc.addImage(imageData, "PNG", 10, 52, 190, 150, "", "FAST");
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(13);
+    doc.text("Synthèse premium", 14, 214);
+
+    const synth = currentChart.planets.map(p =>
+      `${p.name} : ${p.degreeInSign.toFixed(2)}° ${p.sign}`
+    ).join(" • ");
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.text(doc.splitTextToSize(synth, 180), 14, 222);
+
+    doc.setFont("helvetica", "bold");
+    doc.text("Aspects", 14, 246);
+    doc.setFont("helvetica", "normal");
+    const aspectsText = currentChart.aspects.length
+      ? currentChart.aspects.map(a =>
+          `${a.p1} ${a.aspect} ${a.p2} (orbe ${Number(a.orb).toFixed(2)}°)`
+        ).join(" • ")
+      : "Aucun aspect retenu.";
+    doc.text(doc.splitTextToSize(aspectsText, 180), 14, 254);
+
+    doc.addPage();
+    doc.setFillColor(6, 9, 19);
     doc.rect(0, 0, 210, 297, "F");
     doc.setTextColor(255, 255, 255);
 
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(20);
-    doc.text("HELIOSASTRO EXPERT", 105, 15, { align: "center" });
+    doc.setFontSize(14);
+    doc.text("Positions détaillées", 14, 20);
 
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
-    doc.text(`Consultant : ${clientName}`, 14, 28);
-    doc.text(`Date : ${dateInput.value || "—"}  Heure : ${timeInput.value || "—"}`, 14, 34);
-    doc.text(`Lieu : ${cityInput.value || "—"}, ${countryInput.value || "—"}`, 14, 40);
-
-    doc.addImage(imageData, "PNG", 10, 50, 190, 150, "", "FAST");
-
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(12);
-    doc.text("Positions planétaires", 14, 212);
-
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(9);
-    const lines = currentChart.map(p =>
+    const lines = currentChart.planets.map(p =>
       `${p.name} ${p.glyph} — ${p.degreeInSign.toFixed(2)}° ${p.sign} — longitude ${p.longitude.toFixed(2)}°`
     );
-    doc.text(doc.splitTextToSize(lines.join("\n"), 180), 14, 220);
+    doc.text(doc.splitTextToSize(lines.join("\n"), 180), 14, 30);
 
     doc.setFont("helvetica", "bold");
-    doc.text("Notes", 14, 265);
+    doc.text("Notes privées", 14, 220);
     doc.setFont("helvetica", "normal");
-    doc.text(doc.splitTextToSize(privateNotes.value || "Aucune note.", 180), 14, 272);
+    doc.text(doc.splitTextToSize(privateNotes.value || "Aucune note.", 180), 14, 230);
 
-    doc.save(`${clientName.replace(/\s+/g, "-").toLowerCase()}-heliosastro.pdf`);
+    doc.save(`${clientName.replace(/\s+/g, "-").toLowerCase()}-heliosastro-premium.pdf`);
   }
 
-  healthBtn.addEventListener("click", testHealth);
-  generateBtn.addEventListener("click", generatePlanets);
+  async function renderPayPalButtons() {
+    if (!window.paypal) return;
+
+    window.paypal.Buttons({
+      style: {
+        layout: "vertical",
+        color: "gold",
+        shape: "pill",
+        label: "pay"
+      },
+
+      createOrder: async () => {
+        const response = await fetch(`${API_BASE}/api/paypal/create-order`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            amount: "30.00",
+            currency: "EUR",
+            description: "Lecture HeliosAstro premium"
+          })
+        });
+
+        const order = await response.json();
+        if (!order.id) {
+          throw new Error("Création PayPal impossible.");
+        }
+        return order.id;
+      },
+
+      onApprove: async (data) => {
+        const response = await fetch(`${API_BASE}/api/paypal/capture-order`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ orderID: data.orderID })
+        });
+
+        const capture = await response.json();
+
+        if (capture.status === "COMPLETED" || capture.status === "APPROVED") {
+          pdfUnlocked = true;
+          localStorage.setItem("heliosastro_pdf_unlocked", "1");
+          setStatus(`<span class="badge ok">Paiement validé</span> PDF premium déverrouillé.`);
+          if (currentChart) {
+            renderSummary(currentChart.planets, currentChart.aspects || []);
+          }
+        } else {
+          throw new Error("Paiement non validé.");
+        }
+      },
+
+      onError: (err) => {
+        setStatus(`<span class="badge warn">PayPal</span> ${err.message || err}`);
+      }
+    }).render("#paypal-button-container");
+  }
+
+  function registerPWA() {
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("./sw.js").catch(() => {});
+    }
+
+    window.addEventListener("beforeinstallprompt", (event) => {
+      event.preventDefault();
+      deferredPrompt = event;
+      installBtn.classList.remove("hidden");
+    });
+
+    installBtn.addEventListener("click", async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      installBtn.classList.add("hidden");
+    });
+  }
+
+  healthBtn.addEventListener("click", async () => {
+    try {
+      setStatus("Test backend en cours…");
+      const response = await fetch(`${API_BASE}/api/health`);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error("Réponse backend invalide");
+      }
+
+      setStatus(`<span class="badge ok">Backend OK</span> ${JSON.stringify(data)}`);
+    } catch (error) {
+      setStatus(`<span class="badge warn">Erreur backend</span> ${error.message}`);
+    }
+  });
+
+  generateBtn.addEventListener("click", generateChart);
+
   demoBtn.addEventListener("click", () => {
-    const planets = adaptPlanets(demoPlanets);
-    renderChart(planets);
+    renderChart({
+      planets: adaptPlanets(demoPayload.planets),
+      aspects: demoPayload.aspects
+    });
     setStatus("Mode démo affiché.");
   });
+
   saveBtn.addEventListener("click", saveLocal);
   loadBtn.addEventListener("click", loadLocal);
   exportJsonBtn.addEventListener("click", exportJson);
-  exportPdfBtn.addEventListener("click", exportPdf);
+  exportPdfBtn.addEventListener("click", exportPdfPremium);
 
   wheelImage.onload = function () {
     wheelLoaded = true;
-    const planets = currentChart && currentChart.length ? currentChart : adaptPlanets(demoPlanets);
-    renderChart(planets);
+    if (currentChart) renderChart(currentChart);
   };
 
   wheelImage.onerror = function () {
     wheelLoaded = false;
-    const planets = currentChart && currentChart.length ? currentChart : adaptPlanets(demoPlanets);
-    renderChart(planets);
+    if (currentChart) renderChart(currentChart);
   };
 
   wheelImage.src = "assets/roue-heliosastro.png";
 
-  renderChart(adaptPlanets(demoPlanets));
-  setStatus("Frontend prêt. Tu peux tester le backend ou générer une carte.");
+  pdfUnlocked = localStorage.getItem("heliosastro_pdf_unlocked") === "1";
+
+  renderChart({
+    planets: adaptPlanets(demoPayload.planets),
+    aspects: demoPayload.aspects
+  });
+
+  registerPWA();
+  renderPayPalButtons();
+  setStatus("Frontend prêt. Tu peux tester le backend, calculer la carte, payer et exporter le PDF premium.");
 });
