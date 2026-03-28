@@ -1,0 +1,15 @@
+{
+  "name": "heliosastro-expert-backend",
+  "version": "1.0.0",
+  "description": "Backend expert Helios Astro avec planètes, ascendant, maisons et aspects",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@swisseph/node": "^0.2.0",
+    "cors": "^2.8.5",
+    "express": "^4.21.2"
+  }
+}
