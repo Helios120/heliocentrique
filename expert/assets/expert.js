@@ -15,25 +15,25 @@ document.addEventListener("DOMContentLoaded", () => {
   const loadBtn = document.getElementById("load-btn");
   const exportJsonBtn = document.getElementById("export-json-btn");
   const exportPdfBtn = document.getElementById("export-pdf-btn");
-  const installBtn = document.getElementById("install-btn");
 
   const statusBox = document.getElementById("status-box");
+  const premiumSummaryBox = document.getElementById("premium-summary-box");
   const summaryBox = document.getElementById("summary-box");
   const planetsBox = document.getElementById("planets-box");
   const aspectsBox = document.getElementById("aspects-box");
   const privateNotes = document.getElementById("private-notes");
+  const liveBadge = document.getElementById("live-badge");
 
   const canvas = document.getElementById("expert-canvas");
   const ctx = canvas.getContext("2d");
-  const size = canvas.width;
-  const cx = size / 2;
-  const cy = size / 2;
+
+  const CANVAS_SIZE = 1600;
+  const cx = CANVAS_SIZE / 2;
+  const cy = CANVAS_SIZE / 2;
 
   const wheelImage = new Image();
   let wheelLoaded = false;
   let currentChart = null;
-  let deferredPrompt = null;
-  let pdfUnlocked = false;
 
   const zodiac = [
     { name: "Bélier", glyph: "♈", start: 0 },
@@ -142,6 +142,22 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  function renderPremiumSummary(planets, aspects) {
+    const sun = planets.find(p => p.name === "Soleil");
+    const moon = planets.find(p => p.name === "Lune");
+    const venus = planets.find(p => p.name === "Vénus");
+    const mars = planets.find(p => p.name === "Mars");
+
+    premiumSummaryBox.innerHTML = `
+      <div class="table-like">
+        <div class="row"><strong>Axe central</strong><br>Soleil en ${sun.sign} : rayonnement, cap, expression principale du thème.</div>
+        <div class="row"><strong>Vie intérieure</strong><br>Lune en ${moon.sign} : mémoire émotionnelle, sécurité, réponse instinctive.</div>
+        <div class="row"><strong>Affectif / désir</strong><br>Vénus en ${venus.sign}, Mars en ${mars.sign} : dynamique relationnelle et énergie d’incarnation.</div>
+        <div class="row"><strong>Aspects clés</strong><br>${aspects.length ? aspects.slice(0, 3).map(a => `${a.p1} ${a.aspect} ${a.p2}`).join(" • ") : "Aucun aspect majeur retenu."}</div>
+      </div>
+    `;
+  }
+
   function renderSummary(planets, aspects) {
     const sun = planets.find(p => p.name === "Soleil");
     const moon = planets.find(p => p.name === "Lune");
@@ -153,7 +169,6 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="row"><strong>Soleil :</strong> ${sun.degreeInSign.toFixed(2)}° ${sun.sign}</div>
         <div class="row"><strong>Lune :</strong> ${moon.degreeInSign.toFixed(2)}° ${moon.sign}</div>
         <div class="row"><strong>Mercure :</strong> ${mercury.degreeInSign.toFixed(2)}° ${mercury.sign}</div>
-        <div class="row"><strong>PDF premium :</strong> ${pdfUnlocked ? '<span class="badge ok">déverrouillé</span>' : '<span class="badge warn">verrouillé</span>'}</div>
         <div class="row"><strong>Aspects retenus :</strong> ${aspects.length}</div>
       </div>
     `;
@@ -189,13 +204,16 @@ document.addEventListener("DOMContentLoaded", () => {
           </div>
         `).join("")}
       </div>
+      <div style="margin-top:10px;">
+        ${aspects.map(a => `<span class="aspect-chip">${a.p1} ${a.aspect} ${a.p2}</span>`).join("")}
+      </div>
     `;
   }
 
   function clearCanvas() {
-    ctx.clearRect(0, 0, size, size);
+    ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
     ctx.fillStyle = "#000";
-    ctx.fillRect(0, 0, size, size);
+    ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
   }
 
   function drawFallbackWheel() {
@@ -259,19 +277,30 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function drawWheelBase() {
-    if (!wheelLoaded) {
+    if (!wheelLoaded || !wheelImage.naturalWidth || !wheelImage.naturalHeight) {
       drawFallbackWheel();
       return;
     }
 
     clearCanvas();
-    const margin = 80;
-    const drawSize = size - margin * 2;
-    ctx.drawImage(wheelImage, margin, margin, drawSize, drawSize);
+
+    const sourceSize = Math.min(wheelImage.naturalWidth, wheelImage.naturalHeight);
+    const sx = (wheelImage.naturalWidth - sourceSize) / 2;
+    const sy = (wheelImage.naturalHeight - sourceSize) / 2;
+
+    const margin = 110;
+    const drawSize = CANVAS_SIZE - margin * 2;
+
+    ctx.drawImage(
+      wheelImage,
+      sx, sy, sourceSize, sourceSize,
+      margin, margin, drawSize, drawSize
+    );
   }
 
   function drawCurvedFlow(longitude, color, index) {
     const r = degToRad(longitude);
+
     const startRadius = 120;
     const endRadius = 520;
     const bendRadius1 = 210 + (index % 4) * 12;
@@ -380,6 +409,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const aspects = payload.aspects || [];
     currentChart = { planets, aspects };
 
+    renderPremiumSummary(planets, aspects);
     renderSummary(planets, aspects);
     renderPlanetsList(planets);
     renderAspects(aspects);
@@ -396,16 +426,18 @@ document.addEventListener("DOMContentLoaded", () => {
         throw new Error("Réponse backend invalide");
       }
 
-      setStatus(`<span class="badge ok">Backend OK</span> ${JSON.stringify(data)}`);
+      liveBadge.textContent = "BACKEND OK";
+      setStatus(`Backend OK : ${JSON.stringify(data)}`);
     } catch (error) {
-      setStatus(`<span class="badge warn">Erreur backend</span> ${error.message}`);
+      liveBadge.textContent = "MODE DÉMO";
+      setStatus(`Erreur backend : ${error.message}`);
     }
   }
 
   async function generateChart() {
-    const date = dateInput.value || "2026-03-28";
+    const date = dateInput.value || "1967-12-04";
     const time = timeInput.value || "12:00";
-    const city = cityInput.value || "Paris";
+    const city = cityInput.value || "Marseille";
     const country = countryInput.value || "France";
 
     try {
@@ -420,17 +452,23 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       const text = await response.text();
-      let data;
 
+      if (text.trim().startsWith("<")) {
+        throw new Error("Le backend renvoie du HTML au lieu de JSON.");
+      }
+
+      let data;
       try {
         data = JSON.parse(text);
       } catch {
-        throw new Error("Le backend ne renvoie pas un JSON valide.");
+        throw new Error("JSON invalide.");
       }
 
       if (!response.ok || !data.planets) {
         throw new Error("Réponse backend invalide.");
       }
+
+      liveBadge.textContent = "CARTE LIVE";
 
       const payload = {
         planets: adaptPlanets(data.planets),
@@ -438,13 +476,14 @@ document.addEventListener("DOMContentLoaded", () => {
       };
 
       renderChart(payload);
-      setStatus(`<span class="badge ok">Carte générée</span> ${date} à ${time}, ${city}, ${country}.`);
+      setStatus(`Carte générée pour ${date} à ${time}, ${city}, ${country}.`);
     } catch (error) {
+      liveBadge.textContent = "MODE DÉMO";
       renderChart({
         planets: adaptPlanets(demoPayload.planets),
         aspects: demoPayload.aspects
       });
-      setStatus(`<span class="badge warn">Mode démo</span> ${error.message}`);
+      setStatus(`Mode démo activé. Motif : ${error.message}`);
     }
   }
 
@@ -456,16 +495,15 @@ document.addEventListener("DOMContentLoaded", () => {
       city: cityInput.value || "",
       country: countryInput.value || "",
       notes: privateNotes.value || "",
-      pdfUnlocked,
       chart: currentChart
     };
 
-    localStorage.setItem("heliosastro_expert_frontend", JSON.stringify(payload));
+    localStorage.setItem("heliosastro_premium_chart", JSON.stringify(payload));
     setStatus("Sauvegarde locale effectuée.");
   }
 
   function loadLocal() {
-    const raw = localStorage.getItem("heliosastro_expert_frontend");
+    const raw = localStorage.getItem("heliosastro_premium_chart");
     if (!raw) {
       setStatus("Aucune sauvegarde locale.");
       return;
@@ -478,7 +516,6 @@ document.addEventListener("DOMContentLoaded", () => {
     cityInput.value = saved.city || "";
     countryInput.value = saved.country || "";
     privateNotes.value = saved.notes || "";
-    pdfUnlocked = Boolean(saved.pdfUnlocked);
 
     if (saved.chart && saved.chart.planets?.length) {
       renderChart(saved.chart);
@@ -510,7 +547,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${(nameInput.value || "heliosastro").replace(/\s+/g, "-").toLowerCase()}-chart.json`;
+    a.download = `${(nameInput.value || "heliosastro").replace(/\s+/g, "-").toLowerCase()}-premium.json`;
     a.click();
     URL.revokeObjectURL(url);
   }
@@ -521,34 +558,31 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    if (!pdfUnlocked) {
-      setStatus(`<span class="badge warn">PDF verrouillé</span> Règle d’abord le paiement PayPal.`);
-      return;
-    }
-
     const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
     const imageData = canvas.toDataURL("image/png", 1.0);
     const clientName = nameInput.value || "Consultant";
 
     doc.setFillColor(6, 9, 19);
     doc.rect(0, 0, 210, 297, "F");
-
     doc.setTextColor(255, 255, 255);
+
     doc.setFont("helvetica", "bold");
     doc.setFontSize(22);
-    doc.text("HELIOSASTRO", 105, 18, { align: "center" });
+    doc.text("HELIOSASTRO PREMIUM", 105, 16, { align: "center" });
 
     doc.setFont("helvetica", "normal");
-    doc.setFontSize(11);
-    doc.text(`Consultant : ${clientName}`, 14, 30);
-    doc.text(`Date : ${dateInput.value || "—"}   Heure : ${timeInput.value || "—"}`, 14, 37);
-    doc.text(`Lieu : ${cityInput.value || "—"}, ${countryInput.value || "—"}`, 14, 44);
+    doc.setFontSize(10);
+    doc.text(`Nom : ${clientName}`, 14, 28);
+    doc.text(`Date : ${dateInput.value || "—"}`, 14, 34);
+    doc.text(`Heure : ${timeInput.value || "—"}`, 14, 40);
+    doc.text(`Lieu : ${cityInput.value || "—"}, ${countryInput.value || "—"}`, 14, 46);
 
-    doc.addImage(imageData, "PNG", 10, 52, 190, 150, "", "FAST");
+    // zone carrée pour éviter tout ovale dans le PDF
+    doc.addImage(imageData, "PNG", 15, 55, 180, 180, "", "FAST");
 
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(13);
-    doc.text("Synthèse premium", 14, 214);
+    doc.setFontSize(12);
+    doc.text("Lecture premium", 14, 245);
 
     const synth = currentChart.planets.map(p =>
       `${p.name} : ${p.degreeInSign.toFixed(2)}° ${p.sign}`
@@ -556,17 +590,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     doc.setFont("helvetica", "normal");
     doc.setFontSize(9);
-    doc.text(doc.splitTextToSize(synth, 180), 14, 222);
-
-    doc.setFont("helvetica", "bold");
-    doc.text("Aspects", 14, 246);
-    doc.setFont("helvetica", "normal");
-    const aspectsText = currentChart.aspects.length
-      ? currentChart.aspects.map(a =>
-          `${a.p1} ${a.aspect} ${a.p2} (orbe ${Number(a.orb).toFixed(2)}°)`
-        ).join(" • ")
-      : "Aucun aspect retenu.";
-    doc.text(doc.splitTextToSize(aspectsText, 180), 14, 254);
+    doc.text(doc.splitTextToSize(synth, 180), 14, 252);
 
     doc.addPage();
     doc.setFillColor(6, 9, 19);
@@ -575,118 +599,41 @@ document.addEventListener("DOMContentLoaded", () => {
 
     doc.setFont("helvetica", "bold");
     doc.setFontSize(14);
-    doc.text("Positions détaillées", 14, 20);
+    doc.text("Aspects et positions détaillées", 14, 18);
 
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(10);
     const lines = currentChart.planets.map(p =>
       `${p.name} ${p.glyph} — ${p.degreeInSign.toFixed(2)}° ${p.sign} — longitude ${p.longitude.toFixed(2)}°`
     );
-    doc.text(doc.splitTextToSize(lines.join("\n"), 180), 14, 30);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.text(doc.splitTextToSize(lines.join("\n"), 180), 14, 28);
 
     doc.setFont("helvetica", "bold");
-    doc.text("Notes privées", 14, 220);
+    doc.text("Aspects", 14, 170);
+
+    const aspectsText = currentChart.aspects.length
+      ? currentChart.aspects.map(a =>
+          `${a.p1} ${a.aspect} ${a.p2} (orbe ${Number(a.orb).toFixed(2)}°)`
+        ).join(" • ")
+      : "Aucun aspect retenu.";
+
     doc.setFont("helvetica", "normal");
-    doc.text(doc.splitTextToSize(privateNotes.value || "Aucune note.", 180), 14, 230);
+    doc.text(doc.splitTextToSize(aspectsText, 180), 14, 180);
+
+    doc.setFont("helvetica", "bold");
+    doc.text("Notes privées", 14, 235);
+    doc.setFont("helvetica", "normal");
+    doc.text(doc.splitTextToSize(privateNotes.value || "Aucune note.", 180), 14, 245);
 
     doc.save(`${clientName.replace(/\s+/g, "-").toLowerCase()}-heliosastro-premium.pdf`);
   }
 
-  async function renderPayPalButtons() {
-    if (!window.paypal) return;
-
-    window.paypal.Buttons({
-      style: {
-        layout: "vertical",
-        color: "gold",
-        shape: "pill",
-        label: "pay"
-      },
-
-      createOrder: async () => {
-        const response = await fetch(`${API_BASE}/api/paypal/create-order`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            amount: "30.00",
-            currency: "EUR",
-            description: "Lecture HeliosAstro premium"
-          })
-        });
-
-        const order = await response.json();
-        if (!order.id) {
-          throw new Error("Création PayPal impossible.");
-        }
-        return order.id;
-      },
-
-      onApprove: async (data) => {
-        const response = await fetch(`${API_BASE}/api/paypal/capture-order`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ orderID: data.orderID })
-        });
-
-        const capture = await response.json();
-
-        if (capture.status === "COMPLETED" || capture.status === "APPROVED") {
-          pdfUnlocked = true;
-          localStorage.setItem("heliosastro_pdf_unlocked", "1");
-          setStatus(`<span class="badge ok">Paiement validé</span> PDF premium déverrouillé.`);
-          if (currentChart) {
-            renderSummary(currentChart.planets, currentChart.aspects || []);
-          }
-        } else {
-          throw new Error("Paiement non validé.");
-        }
-      },
-
-      onError: (err) => {
-        setStatus(`<span class="badge warn">PayPal</span> ${err.message || err}`);
-      }
-    }).render("#paypal-button-container");
-  }
-
-  function registerPWA() {
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("./sw.js").catch(() => {});
-    }
-
-    window.addEventListener("beforeinstallprompt", (event) => {
-      event.preventDefault();
-      deferredPrompt = event;
-      installBtn.classList.remove("hidden");
-    });
-
-    installBtn.addEventListener("click", async () => {
-      if (!deferredPrompt) return;
-      deferredPrompt.prompt();
-      await deferredPrompt.userChoice;
-      deferredPrompt = null;
-      installBtn.classList.add("hidden");
-    });
-  }
-
-  healthBtn.addEventListener("click", async () => {
-    try {
-      setStatus("Test backend en cours…");
-      const response = await fetch(`${API_BASE}/api/health`);
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error("Réponse backend invalide");
-      }
-
-      setStatus(`<span class="badge ok">Backend OK</span> ${JSON.stringify(data)}`);
-    } catch (error) {
-      setStatus(`<span class="badge warn">Erreur backend</span> ${error.message}`);
-    }
-  });
-
+  healthBtn.addEventListener("click", testHealth);
   generateBtn.addEventListener("click", generateChart);
 
   demoBtn.addEventListener("click", () => {
+    liveBadge.textContent = "MODE DÉMO";
     renderChart({
       planets: adaptPlanets(demoPayload.planets),
       aspects: demoPayload.aspects
@@ -701,24 +648,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
   wheelImage.onload = function () {
     wheelLoaded = true;
-    if (currentChart) renderChart(currentChart);
+    if (currentChart) {
+      renderChart(currentChart);
+    }
   };
 
   wheelImage.onerror = function () {
     wheelLoaded = false;
-    if (currentChart) renderChart(currentChart);
+    if (currentChart) {
+      renderChart(currentChart);
+    }
   };
 
   wheelImage.src = "assets/roue-heliosastro.png";
-
-  pdfUnlocked = localStorage.getItem("heliosastro_pdf_unlocked") === "1";
 
   renderChart({
     planets: adaptPlanets(demoPayload.planets),
     aspects: demoPayload.aspects
   });
 
-  registerPWA();
-  renderPayPalButtons();
-  setStatus("Frontend prêt. Tu peux tester le backend, calculer la carte, payer et exporter le PDF premium.");
+  setStatus("Frontend premium prêt. Tu peux tester le backend, générer une carte et exporter le PDF.");
 });
