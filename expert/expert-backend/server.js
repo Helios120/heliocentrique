@@ -1,13 +1,6 @@
 import express from "express";
 import cors from "cors";
-import {
-  julianDay,
-  calculatePosition,
-  calculateHouses,
-  Planet,
-  HouseSystem,
-  CalculationFlag
-} from "@swisseph/node";
+import Astronomy from "astronomy-engine";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -16,16 +9,16 @@ app.use(cors());
 app.use(express.json());
 
 const PLANETS = [
-  { name: "Soleil", key: Planet.Sun, glyph: "☉", color: "#ffb300" },
-  { name: "Lune", key: Planet.Moon, glyph: "☽", color: "#f4f2d0" },
-  { name: "Mercure", key: Planet.Mercury, glyph: "☿", color: "#ff9c3a" },
-  { name: "Vénus", key: Planet.Venus, glyph: "♀", color: "#ff86cb" },
-  { name: "Mars", key: Planet.Mars, glyph: "♂", color: "#ff5d47" },
-  { name: "Jupiter", key: Planet.Jupiter, glyph: "♃", color: "#9bb8ff" },
-  { name: "Saturne", key: Planet.Saturn, glyph: "♄", color: "#00b8ff" },
-  { name: "Uranus", key: Planet.Uranus, glyph: "♅", color: "#7dff6f" },
-  { name: "Neptune", key: Planet.Neptune, glyph: "♆", color: "#00d9ff" },
-  { name: "Pluton", key: Planet.Pluto, glyph: "♇", color: "#c66bff" }
+  { name: "Soleil", body: Astronomy.Body.Sun, glyph: "☉", color: "#ffb300" },
+  { name: "Lune", body: Astronomy.Body.Moon, glyph: "☽", color: "#f4f2d0" },
+  { name: "Mercure", body: Astronomy.Body.Mercury, glyph: "☿", color: "#ff9c3a" },
+  { name: "Vénus", body: Astronomy.Body.Venus, glyph: "♀", color: "#ff86cb" },
+  { name: "Mars", body: Astronomy.Body.Mars, glyph: "♂", color: "#ff5d47" },
+  { name: "Jupiter", body: Astronomy.Body.Jupiter, glyph: "♃", color: "#9bb8ff" },
+  { name: "Saturne", body: Astronomy.Body.Saturn, glyph: "♄", color: "#00b8ff" },
+  { name: "Uranus", body: Astronomy.Body.Uranus, glyph: "♅", color: "#7dff6f" },
+  { name: "Neptune", body: Astronomy.Body.Neptune, glyph: "♆", color: "#00d9ff" },
+  { name: "Pluton", body: Astronomy.Body.Pluto, glyph: "♇", color: "#c66bff" }
 ];
 
 const ZODIAC = [
@@ -71,7 +64,7 @@ function getSignInfo(longitude) {
   };
 }
 
-function parseDateTime(dateStr, timeStr) {
+function buildUtcDate(dateStr, timeStr) {
   const [year, month, day] = dateStr.split("-").map(Number);
   const [hour, minute] = (timeStr || "12:00").split(":").map(Number);
 
@@ -85,34 +78,31 @@ function parseDateTime(dateStr, timeStr) {
     throw new Error("Date ou heure invalide.");
   }
 
-  return { year, month, day, hour, minute };
+  return new Date(Date.UTC(year, month - 1, day, hour, minute, 0, 0));
 }
 
-function buildJulianDay(dateStr, timeStr) {
-  const { year, month, day, hour, minute } = parseDateTime(dateStr, timeStr);
-  return julianDay(year, month, day, hour + minute / 60);
+function eclipticLongitudeOf(body, dateUtc) {
+  const geoVec = Astronomy.GeoVector(body, dateUtc, true);
+  const rotation = Astronomy.Rotation_EQJ_ECT(dateUtc);
+  const eclVec = Astronomy.RotateVector(rotation, geoVec);
+  const sphere = Astronomy.SphereFromVector(eclVec);
+  return normalizeDeg(sphere.lon);
 }
 
-function positionToPayload(planet, jd) {
-  const pos = calculatePosition(
-    jd,
-    planet.key,
-    CalculationFlag.SwissEphemeris | CalculationFlag.Speed
-  );
+function computePlanets(dateUtc) {
+  return PLANETS.map((planet) => {
+    const longitude = eclipticLongitudeOf(planet.body, dateUtc);
+    const signInfo = getSignInfo(longitude);
 
-  const longitude = normalizeDeg(pos.longitude);
-  const signInfo = getSignInfo(longitude);
-
-  return {
-    name: planet.name,
-    glyph: planet.glyph,
-    color: planet.color,
-    longitude: Number(longitude.toFixed(6)),
-    latitude: Number(pos.latitude.toFixed(6)),
-    speed: Number(pos.longitudeSpeed.toFixed(6)),
-    sign: signInfo.sign,
-    degreeInSign: signInfo.degreeInSign
-  };
+    return {
+      name: planet.name,
+      glyph: planet.glyph,
+      color: planet.color,
+      longitude: Number(longitude.toFixed(6)),
+      sign: signInfo.sign,
+      degreeInSign: signInfo.degreeInSign
+    };
+  });
 }
 
 function buildAspects(planets) {
@@ -143,6 +133,19 @@ function buildAspects(planets) {
   return aspects.sort((a, b) => a.orb - b.orb);
 }
 
+function buildEqualHousesFromAries() {
+  return Array.from({ length: 12 }, (_, i) => {
+    const longitude = i * 30;
+    const signInfo = getSignInfo(longitude);
+    return {
+      house: i + 1,
+      longitude,
+      sign: signInfo.sign,
+      degreeInSign: signInfo.degreeInSign
+    };
+  });
+}
+
 app.get("/", (req, res) => {
   res.send("HeliosAstro expert backend OK");
 });
@@ -151,7 +154,7 @@ app.get("/api/health", (req, res) => {
   res.json({
     ok: true,
     service: "heliosastro-expert-backend",
-    engine: "swisseph-node"
+    engine: "astronomy-engine"
   });
 });
 
@@ -162,8 +165,8 @@ app.post("/api/expert-chart", (req, res) => {
       time = "12:00",
       city = "",
       country = "",
-      latitude,
-      longitude,
+      latitude = null,
+      longitude = null,
       houseSystem = "P"
     } = req.body || {};
 
@@ -173,41 +176,17 @@ app.post("/api/expert-chart", (req, res) => {
       });
     }
 
-    if (!Number.isFinite(Number(latitude)) || !Number.isFinite(Number(longitude))) {
-      return res.status(400).json({
-        error: "Latitude et longitude obligatoires."
-      });
-    }
-
-    const jd = buildJulianDay(date, time);
-    const lat = Number(latitude);
-    const lon = Number(longitude);
-
-    const planets = PLANETS.map((planet) => positionToPayload(planet, jd));
-
-    const houses = calculateHouses(
-      jd,
-      lat,
-      lon,
-      houseSystem === "W" ? HouseSystem.WholeSign : HouseSystem.Placidus
-    );
-
-    const houseCusps = [];
-    for (let i = 1; i <= 12; i++) {
-      const cusp = normalizeDeg(houses.cusps[i]);
-      const signInfo = getSignInfo(cusp);
-      houseCusps.push({
-        house: i,
-        longitude: Number(cusp.toFixed(6)),
-        sign: signInfo.sign,
-        degreeInSign: signInfo.degreeInSign
-      });
-    }
-
-    const asc = normalizeDeg(houses.ascendant);
-    const mc = normalizeDeg(houses.mc);
-
+    const dateUtc = buildUtcDate(date, time);
+    const planets = computePlanets(dateUtc);
     const aspects = buildAspects(planets);
+
+    const ascendantLongitude = 0;
+    const mcLongitude = 90;
+
+    const ascInfo = getSignInfo(ascendantLongitude);
+    const mcInfo = getSignInfo(mcLongitude);
+
+    const houses = buildEqualHousesFromAries();
 
     return res.json({
       ok: true,
@@ -216,20 +195,22 @@ app.post("/api/expert-chart", (req, res) => {
         time,
         city,
         country,
-        latitude: lat,
-        longitude: lon,
-        jd,
-        houseSystem: houseSystem === "W" ? "Whole Sign" : "Placidus"
+        latitude,
+        longitude,
+        houseSystem,
+        note: "Version expert déployable immédiatement. Planètes et aspects réels, maisons/ASC provisoires."
       },
       ascendant: {
-        longitude: Number(asc.toFixed(6)),
-        ...getSignInfo(asc)
+        longitude: ascendantLongitude,
+        sign: ascInfo.sign,
+        degreeInSign: ascInfo.degreeInSign
       },
       mc: {
-        longitude: Number(mc.toFixed(6)),
-        ...getSignInfo(mc)
+        longitude: mcLongitude,
+        sign: mcInfo.sign,
+        degreeInSign: mcInfo.degreeInSign
       },
-      houses: houseCusps,
+      houses,
       planets,
       aspects
     });
