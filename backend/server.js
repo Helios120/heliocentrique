@@ -1,24 +1,40 @@
-const express = require("express");
-const cors = require("cors");
-const Astronomy = require("astronomy-engine");
+import express from "express";
+import cors from "cors";
+import {
+  julianDay,
+  calculatePosition,
+  calculateHouses,
+  Planet,
+  HouseSystem,
+  CalculationFlag
+} from "@swisseph/node";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID || "";
+const PAYPAL_CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET || "";
+const PAYPAL_ENV = (process.env.PAYPAL_ENV || "sandbox").toLowerCase();
+
+const PAYPAL_API_BASE =
+  PAYPAL_ENV === "live"
+    ? "https://api-m.paypal.com"
+    : "https://api-m.sandbox.paypal.com";
 
 app.use(cors());
 app.use(express.json());
 
 const PLANETS = [
-  { name: "Soleil", key: Astronomy.Body.Sun, glyph: "☉", color: "#ffb300" },
-  { name: "Lune", key: Astronomy.Body.Moon, glyph: "☽", color: "#4fc3ff" },
-  { name: "Mercure", key: Astronomy.Body.Mercury, glyph: "☿", color: "#c8c8c8" },
-  { name: "Vénus", key: Astronomy.Body.Venus, glyph: "♀", color: "#ff66cc" },
-  { name: "Mars", key: Astronomy.Body.Mars, glyph: "♂", color: "#ff6b57" },
-  { name: "Jupiter", key: Astronomy.Body.Jupiter, glyph: "♃", color: "#ff9800" },
-  { name: "Saturne", key: Astronomy.Body.Saturn, glyph: "♄", color: "#d4af72" },
-  { name: "Uranus", key: Astronomy.Body.Uranus, glyph: "♅", color: "#37d7d7" },
-  { name: "Neptune", key: Astronomy.Body.Neptune, glyph: "♆", color: "#4c6fff" },
-  { name: "Pluton", key: Astronomy.Body.Pluto, glyph: "♇", color: "#b06bff" }
+  { name: "Soleil", key: Planet.Sun, glyph: "☉", color: "#ffb300" },
+  { name: "Lune", key: Planet.Moon, glyph: "☽", color: "#f4f2d0" },
+  { name: "Mercure", key: Planet.Mercury, glyph: "☿", color: "#ff9c3a" },
+  { name: "Vénus", key: Planet.Venus, glyph: "♀", color: "#ff86cb" },
+  { name: "Mars", key: Planet.Mars, glyph: "♂", color: "#ff5d47" },
+  { name: "Jupiter", key: Planet.Jupiter, glyph: "♃", color: "#9bb8ff" },
+  { name: "Saturne", key: Planet.Saturn, glyph: "♄", color: "#00b8ff" },
+  { name: "Uranus", key: Planet.Uranus, glyph: "♅", color: "#7dff6f" },
+  { name: "Neptune", key: Planet.Neptune, glyph: "♆", color: "#00d9ff" },
+  { name: "Pluton", key: Planet.Pluto, glyph: "♇", color: "#c66bff" }
 ];
 
 const ZODIAC = [
@@ -50,7 +66,7 @@ function getSignInfo(longitude) {
   };
 }
 
-function buildUtcDate(dateStr, timeStr) {
+function parseDateTime(dateStr, timeStr) {
   const [year, month, day] = dateStr.split("-").map(Number);
   const [hour, minute] = (timeStr || "12:00").split(":").map(Number);
 
@@ -64,15 +80,91 @@ function buildUtcDate(dateStr, timeStr) {
     throw new Error("Date ou heure invalide.");
   }
 
-  return new Date(Date.UTC(year, month - 1, day, hour, minute, 0, 0));
+  return { year, month, day, hour, minute };
 }
 
-function eclipticLongitudeOf(body, dateUtc) {
-  const geoVec = Astronomy.GeoVector(body, dateUtc, true);
-  const rotation = Astronomy.Rotation_EQJ_ECT(dateUtc);
-  const eclVec = Astronomy.RotateVector(rotation, geoVec);
-  const sphere = Astronomy.SphereFromVector(eclVec);
-  return normalizeDeg(sphere.lon);
+function buildJulianDay(dateStr, timeStr) {
+  const { year, month, day, hour, minute } = parseDateTime(dateStr, timeStr);
+  return julianDay(year, month, day, hour + minute / 60);
+}
+
+function positionToPayload(planet, jd) {
+  const pos = calculatePosition(
+    jd,
+    planet.key,
+    CalculationFlag.SwissEphemeris | CalculationFlag.Speed
+  );
+
+  const longitude = normalizeDeg(pos.longitude);
+  const signInfo = getSignInfo(longitude);
+
+  return {
+    name: planet.name,
+    glyph: planet.glyph,
+    color: planet.color,
+    longitude: Number(longitude.toFixed(6)),
+    sign: signInfo.sign,
+    degreeInSign: signInfo.degreeInSign
+  };
+}
+
+async function getPayPalAccessToken() {
+  if (!PAYPAL_CLIENT_ID || !PAYPAL_CLIENT_SECRET) {
+    throw new Error("PAYPAL_CLIENT_ID ou PAYPAL_CLIENT_SECRET manquant.");
+  }
+
+  const auth = Buffer.from(`${PAYPAL_CLIENT_ID}:${PAYPAL_CLIENT_SECRET}`).toString("base64");
+
+  const response = await fetch(`${PAYPAL_API_BASE}/v1/oauth2/token`, {
+    method: "POST",
+    headers: {
+      "Authorization": `Basic ${auth}`,
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    body: "grant_type=client_credentials"
+  });
+
+  const rawText = await response.text();
+  let data;
+
+  try {
+    data = JSON.parse(rawText);
+  } catch {
+    throw new Error("Réponse PayPal invalide au token OAuth.");
+  }
+
+  if (!response.ok) {
+    throw new Error(data.error_description || data.error || "Token PayPal impossible.");
+  }
+
+  return data.access_token;
+}
+
+async function getPayPalOrder(orderId) {
+  const accessToken = await getPayPalAccessToken();
+
+  const response = await fetch(`${PAYPAL_API_BASE}/v2/checkout/orders/${orderId}`, {
+    method: "GET",
+    headers: {
+      "Authorization": `Bearer ${accessToken}`,
+      "Content-Type": "application/json"
+    }
+  });
+
+  const rawText = await response.text();
+  let data;
+
+  try {
+    data = JSON.parse(rawText);
+  } catch {
+    throw new Error("Réponse PayPal invalide lors de la lecture de l'ordre.");
+  }
+
+  if (!response.ok) {
+    throw new Error(data.message || "Lecture ordre PayPal impossible.");
+  }
+
+  return data;
 }
 
 app.get("/", (req, res) => {
@@ -83,17 +175,21 @@ app.get("/api/health", (req, res) => {
   res.json({
     ok: true,
     service: "heliosastro-backend",
-    engine: "astronomy-engine"
+    engine: "swisseph-node",
+    paypalEnv: PAYPAL_ENV
   });
 });
 
-app.post("/api/ephemeris", (req, res) => {
+app.post("/api/chart", (req, res) => {
   try {
     const {
       date,
       time = "12:00",
       city = "",
-      country = ""
+      country = "",
+      latitude,
+      longitude,
+      houseSystem = "P"
     } = req.body || {};
 
     if (!date) {
@@ -102,35 +198,92 @@ app.post("/api/ephemeris", (req, res) => {
       });
     }
 
-    const dateUtc = buildUtcDate(date, time);
+    if (!Number.isFinite(Number(latitude)) || !Number.isFinite(Number(longitude))) {
+      return res.status(400).json({
+        error: "Latitude et longitude sont obligatoires pour calculer Ascendant et maisons."
+      });
+    }
 
-    const planets = PLANETS.map((planet) => {
-      const longitude = eclipticLongitudeOf(planet.key, dateUtc);
-      const signInfo = getSignInfo(longitude);
+    const jd = buildJulianDay(date, time);
+    const lat = Number(latitude);
+    const lon = Number(longitude);
 
-      return {
-        name: planet.name,
-        glyph: planet.glyph,
-        color: planet.color,
-        longitude: Number(longitude.toFixed(6)),
+    const planets = PLANETS.map((planet) => positionToPayload(planet, jd));
+
+    const houses = calculateHouses(
+      jd,
+      lat,
+      lon,
+      houseSystem === "W" ? HouseSystem.WholeSign : HouseSystem.Placidus
+    );
+
+    const houseCusps = [];
+    for (let i = 1; i <= 12; i++) {
+      const cusp = normalizeDeg(houses.cusps[i]);
+      const signInfo = getSignInfo(cusp);
+      houseCusps.push({
+        house: i,
+        longitude: Number(cusp.toFixed(6)),
         sign: signInfo.sign,
         degreeInSign: signInfo.degreeInSign
-      };
-    });
+      });
+    }
+
+    const asc = normalizeDeg(houses.ascendant);
+    const mc = normalizeDeg(houses.mc);
 
     return res.json({
       ok: true,
       meta: {
-        isoUtc: dateUtc.toISOString(),
+        date,
+        time,
         city,
         country,
-        engine: "astronomy-engine"
+        latitude: lat,
+        longitude: lon,
+        jd,
+        houseSystem: houseSystem === "W" ? "Whole Sign" : "Placidus"
       },
+      ascendant: {
+        longitude: Number(asc.toFixed(6)),
+        ...getSignInfo(asc)
+      },
+      mc: {
+        longitude: Number(mc.toFixed(6)),
+        ...getSignInfo(mc)
+      },
+      houses: houseCusps,
       planets
     });
   } catch (error) {
     return res.status(500).json({
-      error: "Impossible de calculer les éphémérides.",
+      error: "Impossible de calculer le thème.",
+      detail: error.message
+    });
+  }
+});
+
+app.get("/api/paypal/verify/:orderId", async (req, res) => {
+  try {
+    const { orderId } = req.params;
+
+    if (!orderId) {
+      return res.status(400).json({
+        error: "orderId obligatoire."
+      });
+    }
+
+    const order = await getPayPalOrder(orderId);
+
+    return res.json({
+      ok: true,
+      verified: order.status === "COMPLETED" || order.status === "APPROVED",
+      status: order.status,
+      order
+    });
+  } catch (error) {
+    return res.status(500).json({
+      error: "Vérification PayPal impossible.",
       detail: error.message
     });
   }
