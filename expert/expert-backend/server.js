@@ -5,40 +5,31 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// PORT Render obligatoire
-const PORT = process.env.PORT || 10000;
-
-// TEST
 app.get('/api/health', (req, res) => {
   res.json({ ok: true });
 });
 
-// CALCUL PLANETES (simulation propre)
 app.post('/api/calc', (req, res) => {
+  const { date, time, lat, lon } = req.body;
 
-  const { date, time } = req.body;
-
-  // simulation réaliste (remplacera swiss ephemeris plus tard)
-  const planets = [
-    { name: "Soleil", lon: Math.random() * 360 },
-    { name: "Lune", lon: Math.random() * 360 },
-    { name: "Mercure", lon: Math.random() * 360 },
-    { name: "Vénus", lon: Math.random() * 360 },
-    { name: "Mars", lon: Math.random() * 360 },
-    { name: "Jupiter", lon: Math.random() * 360 },
-    { name: "Saturne", lon: Math.random() * 360 },
-    { name: "Uranus", lon: Math.random() * 360 },
-    { name: "Neptune", lon: Math.random() * 360 },
-    { name: "Pluton", lon: Math.random() * 360 }
+  const fakePlanets = [
+    { name: "Soleil", degree: 71.8 },
+    { name: "Lune", degree: 172.2 },
+    { name: "Mercure", degree: 251.8 },
+    { name: "Vénus", degree: 208.3 },
+    { name: "Mars", degree: 197.3 },
+    { name: "Jupiter", degree: 289.5 },
+    { name: "Saturne", degree: 217.2 },
+    { name: "Uranus", degree: 352.9 },
+    { name: "Neptune", degree: 139.5 },
+    { name: "Pluton", degree: 300.1 }
   ];
 
-  res.json({
-    success: true,
-    planets
-  });
+  res.json({ planets: fakePlanets });
 });
 
-// LANCEMENT
+const PORT = process.env.PORT || 10000;
+
 app.listen(PORT, () => {
-  console.log("✅ HeliosAstro backend running on port " + PORT);
+  console.log("HeliosAstro backend running on port " + PORT);
 });
