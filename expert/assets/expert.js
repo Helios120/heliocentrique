@@ -148,7 +148,7 @@ document.addEventListener("DOMContentLoaded", () => {
     for (let i = 1; i <= maxAttempts; i++) {
       try {
         setStatus(`Réveil du backend… tentative ${i}/${maxAttempts}`);
-        const response = await fetch(`${API_BASE}/api/health`, {
+        const response = await fetch(`${API_BASE}/api/health?ts=${Date.now()}`, {
           method: "GET",
           cache: "no-store"
         });
@@ -161,13 +161,14 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const data = JSON.parse(text);
+
         if (response.ok && data.ok) {
           liveBadge.textContent = "BACKEND OK";
           setStatus(`Backend actif : ${JSON.stringify(data)}`);
           return true;
         }
       } catch (error) {
-        // on réessaie
+        // retry
       }
 
       await sleep(4000);
@@ -325,7 +326,6 @@ document.addEventListener("DOMContentLoaded", () => {
       ctx.fillText(zodiac[i].glyph, p.x, p.y);
     }
 
-    // vortex central premium
     for (let i = 0; i < 44; i++) {
       const ratio = i / 44;
       const radius = 230 - i * 3.4;
@@ -695,5 +695,5 @@ document.addEventListener("DOMContentLoaded", () => {
     aspects: demoPayload.aspects
   });
 
-  setStatus("Frontend premium prêt. Le backend est réveillé avec retry automatique, et la roue est maintenant dessinée en cercle parfait.");
+  setStatus("Frontend premium prêt. Le backend est réveillé avec retry automatique, et la roue est dessinée en cercle parfait.");
 });
