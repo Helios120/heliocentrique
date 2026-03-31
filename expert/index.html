@@ -4,9 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HeliosAstro Premium</title>
-  <meta name="description" content="HeliosAstro Premium — carte astrologique visuelle, géométrique et vibratoire.">
   <meta name="theme-color" content="#060913">
-  <link rel="stylesheet" href="assets/expert.css?v=9">
+  <link rel="stylesheet" href="assets/expert.css?v=11">
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 </head>
 <body>
@@ -33,11 +32,11 @@
       </label>
 
       <label>Ville
-        <input type="text" id="expert-city" placeholder="Marseille">
+        <input type="text" id="expert-city" value="Marseille">
       </label>
 
       <label>Pays
-        <input type="text" id="expert-country" placeholder="France">
+        <input type="text" id="expert-country" value="France">
       </label>
 
       <label>Latitude
@@ -49,7 +48,7 @@
       </label>
 
       <label>Fuseau horaire
-        <input type="text" id="expert-offset" value="+01:00" placeholder="+01:00">
+        <input type="text" id="expert-offset" value="+01:00">
       </label>
 
       <div class="button-stack">
@@ -77,8 +76,10 @@
           <span class="badge" id="live-badge">MODE PRÊT</span>
         </div>
 
-        <div class="canvas-wrap">
-          <canvas id="expert-canvas" width="1600" height="1600"></canvas>
+        <div class="canvas-stage">
+          <div class="canvas-square">
+            <canvas id="expert-canvas" width="1600" height="1600"></canvas>
+          </div>
         </div>
       </div>
 
@@ -118,7 +119,7 @@
     </section>
   </main>
 
-  <script src="assets/expert.js?v=9"></script>
+  <script src="assets/expert.js?v=11"></script>
 </body>
 </html>
 
