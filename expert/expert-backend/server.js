@@ -8,15 +8,6 @@ const PORT = process.env.PORT || 10000;
 app.use(cors());
 app.use(express.json());
 
-const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID || "";
-const PAYPAL_CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET || "";
-const PAYPAL_ENV = (process.env.PAYPAL_ENV || "sandbox").toLowerCase();
-
-const PAYPAL_API_BASE =
-  PAYPAL_ENV === "live"
-    ? "https://api-m.paypal.com"
-    : "https://api-m.sandbox.paypal.com";
-
 const PLANETS = [
   { name: "Soleil", body: Astronomy.Body.Sun, glyph: "☉", color: "#ffb300" },
   { name: "Lune", body: Astronomy.Body.Moon, glyph: "☽", color: "#f4f2d0" },
@@ -63,17 +54,27 @@ function shortestAngle(a, b) {
   return d;
 }
 
-function getSignInfo(longitude) {
+function zodiacInfo(longitude) {
   const lon = normalizeDeg(longitude);
-  const signIndex = Math.floor(lon / 30);
-  const sign = ZODIAC[signIndex];
+  const index = Math.floor(lon / 30);
+  const sign = ZODIAC[index];
   return {
     sign: sign.name,
     degreeInSign: Number((lon - sign.start).toFixed(4))
   };
 }
 
-function buildUtcDate(dateStr, timeStr) {
+function parseOffsetToMinutes(offsetText) {
+  const match = /^([+-])(\d{2}):(\d{2})$/.exec(offsetText || "");
+  if (!match) return 0;
+
+  const sign = match[1] === "-" ? -1 : 1;
+  const hours = Number(match[2]);
+  const minutes = Number(match[3]);
+  return sign * (hours * 60 + minutes);
+}
+
+function buildUtcDate(dateStr, timeStr, offsetText) {
   const [year, month, day] = dateStr.split("-").map(Number);
   const [hour, minute] = (timeStr || "12:00").split(":").map(Number);
 
@@ -87,7 +88,74 @@ function buildUtcDate(dateStr, timeStr) {
     throw new Error("Date ou heure invalide.");
   }
 
-  return new Date(Date.UTC(year, month - 1, day, hour, minute, 0, 0));
+  const offsetMinutes = parseOffsetToMinutes(offsetText);
+  const localMillis = Date.UTC(year, month - 1, day, hour, minute, 0, 0);
+  const utcMillis = localMillis - offsetMinutes * 60000;
+
+  return new Date(utcMillis);
+}
+
+function toJulianDate(dateUtc) {
+  return dateUtc.getTime() / 86400000 + 2440587.5;
+}
+
+function meanObliquityDegrees(jd) {
+  const T = (jd - 2451545.0) / 36525.0;
+  return 23.4392911111
+    - 0.0130041667 * T
+    - 0.0000001639 * T * T
+    + 0.0000005036 * T * T * T;
+}
+
+function localSiderealDegrees(jd, longitudeDeg) {
+  const T = (jd - 2451545.0) / 36525.0;
+  const gmst =
+    280.46061837 +
+    360.98564736629 * (jd - 2451545.0) +
+    0.000387933 * T * T -
+    (T * T * T) / 38710000.0;
+
+  return normalizeDeg(gmst + longitudeDeg);
+}
+
+function calculateAscendant(jd, latitudeDeg, longitudeDeg) {
+  const eps = meanObliquityDegrees(jd) * Math.PI / 180;
+  const lat = latitudeDeg * Math.PI / 180;
+  const lst = localSiderealDegrees(jd, longitudeDeg) * Math.PI / 180;
+
+  const y = -Math.cos(lst);
+  const x = Math.sin(lst) * Math.cos(eps) + Math.tan(lat) * Math.sin(eps);
+
+  return normalizeDeg(Math.atan2(y, x) * 180 / Math.PI);
+}
+
+function calculateMC(jd, longitudeDeg) {
+  const eps = meanObliquityDegrees(jd) * Math.PI / 180;
+  const lst = localSiderealDegrees(jd, longitudeDeg) * Math.PI / 180;
+
+  let mc = Math.atan2(Math.sin(lst), Math.cos(lst) / Math.cos(eps)) * 180 / Math.PI;
+  mc = normalizeDeg(mc);
+
+  if (Math.cos(lst) < 0) {
+    mc = normalizeDeg(mc + 180);
+  }
+
+  return mc;
+}
+
+function calculateEqualHouses(ascendantLongitude) {
+  const houses = [];
+  for (let i = 0; i < 12; i++) {
+    const longitude = normalizeDeg(ascendantLongitude + i * 30);
+    const info = zodiacInfo(longitude);
+    houses.push({
+      house: i + 1,
+      longitude: Number(longitude.toFixed(6)),
+      sign: info.sign,
+      degreeInSign: info.degreeInSign
+    });
+  }
+  return houses;
 }
 
 function getEclipticLongitude(body, dateUtc) {
@@ -101,15 +169,15 @@ function getEclipticLongitude(body, dateUtc) {
 function computePlanets(dateUtc) {
   return PLANETS.map((planet) => {
     const longitude = getEclipticLongitude(planet.body, dateUtc);
-    const signInfo = getSignInfo(longitude);
+    const info = zodiacInfo(longitude);
 
     return {
       name: planet.name,
       glyph: planet.glyph,
       color: planet.color,
       longitude: Number(longitude.toFixed(6)),
-      sign: signInfo.sign,
-      degreeInSign: signInfo.degreeInSign
+      sign: info.sign,
+      degreeInSign: info.degreeInSign
     };
   });
 }
@@ -142,144 +210,13 @@ function computeAspects(planets) {
   return result.sort((a, b) => a.orb - b.orb);
 }
 
-async function getPayPalAccessToken() {
-  if (!PAYPAL_CLIENT_ID || !PAYPAL_CLIENT_SECRET) {
-    throw new Error("PAYPAL_CLIENT_ID ou PAYPAL_CLIENT_SECRET manquant.");
-  }
-
-  const basicAuth = Buffer.from(
-    `${PAYPAL_CLIENT_ID}:${PAYPAL_CLIENT_SECRET}`
-  ).toString("base64");
-
-  const response = await fetch(`${PAYPAL_API_BASE}/v1/oauth2/token`, {
-    method: "POST",
-    headers: {
-      Authorization: `Basic ${basicAuth}`,
-      "Content-Type": "application/x-www-form-urlencoded"
-    },
-    body: "grant_type=client_credentials"
-  });
-
-  const text = await response.text();
-  let data;
-
-  try {
-    data = JSON.parse(text);
-  } catch {
-    throw new Error("Réponse PayPal token invalide.");
-  }
-
-  if (!response.ok) {
-    throw new Error(data.error_description || data.error || "Token PayPal refusé.");
-  }
-
-  return data.access_token;
-}
-
-async function createPayPalOrder({ amount, currency = "EUR", description = "HeliosAstro" }) {
-  const accessToken = await getPayPalAccessToken();
-
-  const response = await fetch(`${PAYPAL_API_BASE}/v2/checkout/orders`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      intent: "CAPTURE",
-      purchase_units: [
-        {
-          description,
-          amount: {
-            currency_code: currency,
-            value: amount
-          }
-        }
-      ]
-    })
-  });
-
-  const text = await response.text();
-  let data;
-
-  try {
-    data = JSON.parse(text);
-  } catch {
-    throw new Error("Réponse PayPal create order invalide.");
-  }
-
-  if (!response.ok) {
-    throw new Error(data.message || "Création ordre PayPal impossible.");
-  }
-
-  return data;
-}
-
-async function capturePayPalOrder(orderId) {
-  const accessToken = await getPayPalAccessToken();
-
-  const response = await fetch(`${PAYPAL_API_BASE}/v2/checkout/orders/${orderId}/capture`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      "Content-Type": "application/json"
-    }
-  });
-
-  const text = await response.text();
-  let data;
-
-  try {
-    data = JSON.parse(text);
-  } catch {
-    throw new Error("Réponse PayPal capture invalide.");
-  }
-
-  if (!response.ok) {
-    throw new Error(data.message || "Capture PayPal impossible.");
-  }
-
-  return data;
-}
-
-async function getPayPalOrder(orderId) {
-  const accessToken = await getPayPalAccessToken();
-
-  const response = await fetch(`${PAYPAL_API_BASE}/v2/checkout/orders/${orderId}`, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      "Content-Type": "application/json"
-    }
-  });
-
-  const text = await response.text();
-  let data;
-
-  try {
-    data = JSON.parse(text);
-  } catch {
-    throw new Error("Réponse PayPal lecture ordre invalide.");
-  }
-
-  if (!response.ok) {
-    throw new Error(data.message || "Lecture ordre PayPal impossible.");
-  }
-
-  return data;
-}
-
 app.get("/", (req, res) => {
   res.send(`
     <h1>HeliosAstro Backend</h1>
     <p>Serveur actif</p>
-    <p>API disponible :</p>
     <ul>
       <li>/api/health</li>
       <li>/api/calc</li>
-      <li>/api/paypal/create-order</li>
-      <li>/api/paypal/capture-order</li>
-      <li>/api/paypal/order/:orderId</li>
     </ul>
   `);
 });
@@ -287,75 +224,77 @@ app.get("/", (req, res) => {
 app.get("/api/health", (req, res) => {
   res.json({
     ok: true,
-    service: "heliosastro-backend",
-    paypalEnv: PAYPAL_ENV
+    service: "heliosastro-backend"
   });
 });
 
 app.post("/api/calc", (req, res) => {
   try {
-    const { date, time = "12:00", city = "", country = "" } = req.body || {};
+    const {
+      date,
+      time = "12:00",
+      city = "",
+      country = "",
+      latitude = 43.2965,
+      longitude = 5.3698,
+      offset = "+00:00"
+    } = req.body || {};
 
     if (!date) {
       return res.status(400).json({ error: "Date obligatoire." });
     }
 
-    const dateUtc = buildUtcDate(date, time);
+    const lat = Number(latitude);
+    const lon = Number(longitude);
+
+    if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
+      return res.status(400).json({ error: "Latitude/longitude invalides." });
+    }
+
+    const dateUtc = buildUtcDate(date, time, offset);
+    const jd = toJulianDate(dateUtc);
+
     const planets = computePlanets(dateUtc);
     const aspects = computeAspects(planets);
 
+    const ascendantLongitude = calculateAscendant(jd, lat, lon);
+    const mcLongitude = calculateMC(jd, lon);
+
+    const ascInfo = zodiacInfo(ascendantLongitude);
+    const mcInfo = zodiacInfo(mcLongitude);
+    const houses = calculateEqualHouses(ascendantLongitude);
+
     return res.json({
       ok: true,
-      meta: { date, time, city, country },
+      meta: {
+        date,
+        time,
+        city,
+        country,
+        latitude: lat,
+        longitude: lon,
+        offset,
+        utc: dateUtc.toISOString()
+      },
+      angles: {
+        ascendant: {
+          longitude: Number(ascendantLongitude.toFixed(6)),
+          sign: ascInfo.sign,
+          degreeInSign: ascInfo.degreeInSign
+        },
+        mc: {
+          longitude: Number(mcLongitude.toFixed(6)),
+          sign: mcInfo.sign,
+          degreeInSign: mcInfo.degreeInSign
+        }
+      },
+      houses,
       planets,
       aspects
     });
   } catch (error) {
     return res.status(500).json({
       error: "Calcul impossible.",
-      detail: error.message
-    });
-  }
-});
-
-app.post("/api/paypal/create-order", async (req, res) => {
-  try {
-    const { amount = "30.00", currency = "EUR", description = "Lecture HeliosAstro" } = req.body || {};
-    const order = await createPayPalOrder({ amount, currency, description });
-    res.json(order);
-  } catch (error) {
-    res.status(500).json({
-      error: "Création ordre PayPal impossible.",
-      detail: error.message
-    });
-  }
-});
-
-app.post("/api/paypal/capture-order", async (req, res) => {
-  try {
-    const { orderID } = req.body || {};
-
-    if (!orderID) {
-      return res.status(400).json({ error: "orderID obligatoire." });
-    }
-
-    const capture = await capturePayPalOrder(orderID);
-    res.json(capture);
-  } catch (error) {
-    res.status(500).json({
-      error: "Capture PayPal impossible.",
-      detail: error.message
-    });
-  }
-});
-
-app.get("/api/paypal/order/:orderId", async (req, res) => {
-  try {
-    const order = await getPayPalOrder(req.params.orderId);
-    res.json(order);
-  } catch (error) {
-    res.status(500).json({
-      error: "Lecture ordre PayPal impossible.",
       detail: error.message
     });
   }
