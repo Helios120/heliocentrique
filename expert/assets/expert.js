@@ -133,10 +133,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function adaptPlanets(rawPlanets) {
     return rawPlanets.map((p) => {
-      let lon = p.longitude;
-      if (typeof lon !== "number") lon = Number(p.degree);
-      lon = normalizeDeg(lon);
-
+      const lon = normalizeDeg(Number(p.longitude));
       const meta = planetMeta[p.name] || { glyph: "•", color: "#ffffff" };
 
       return {
@@ -283,9 +280,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function drawBackgroundGlow() {
     const glow = ctx.createRadialGradient(cx, cy, 30, cx, cy, 640);
-    glow.addColorStop(0, "rgba(255,240,180,0.20)");
-    glow.addColorStop(0.12, "rgba(0,220,255,0.12)");
-    glow.addColorStop(0.45, "rgba(255,170,80,0.06)");
+    glow.addColorStop(0, "rgba(255,240,180,0.12)");
+    glow.addColorStop(0.12, "rgba(0,220,255,0.10)");
+    glow.addColorStop(0.45, "rgba(255,170,80,0.05)");
     glow.addColorStop(1, "rgba(0,0,0,0)");
     ctx.fillStyle = glow;
     ctx.beginPath();
@@ -293,17 +290,16 @@ document.addEventListener("DOMContentLoaded", () => {
     ctx.fill();
   }
 
-  function drawPerfectWheel() {
+  function drawPerfectWheelBase() {
     const degreeOuter = 560;
     const degreeInner = 500;
     const zodiacOuter = 470;
     const zodiacInner = 355;
-    const innerRing = 265;
 
     clearCanvas();
     drawBackgroundGlow();
 
-    [degreeOuter, degreeInner, zodiacOuter, zodiacInner, innerRing].forEach((r, index) => {
+    [degreeOuter, degreeInner, zodiacOuter, zodiacInner].forEach((r, index) => {
       ctx.beginPath();
       ctx.arc(cx, cy, r, 0, Math.PI * 2);
       ctx.lineWidth = index < 2 ? 3 : 2;
@@ -353,31 +349,35 @@ document.addEventListener("DOMContentLoaded", () => {
       ctx.textBaseline = "middle";
       ctx.fillText(zodiac[i].glyph, p.x, p.y);
     }
+  }
 
-    for (let i = 0; i < 44; i++) {
-      const ratio = i / 44;
-      const radius = 230 - i * 3.4;
+  function drawCorePatternBack() {
+    for (let i = 0; i < 30; i++) {
+      const ratio = i / 30;
+      const radius = 170 - i * 4.2;
       ctx.beginPath();
       ctx.arc(
-        cx + Math.cos(ratio * Math.PI * 7) * 10,
-        cy + Math.sin(ratio * Math.PI * 7) * 10,
+        cx + Math.cos(ratio * Math.PI * 6) * 8,
+        cy + Math.sin(ratio * Math.PI * 6) * 8,
         radius,
-        ratio * Math.PI * 2.8,
-        ratio * Math.PI * 2.8 + Math.PI * 1.55
+        ratio * Math.PI * 2.3,
+        ratio * Math.PI * 2.3 + Math.PI * 1.35
       );
-      ctx.strokeStyle = `hsla(${ratio * 320 + 20}, 100%, 65%, ${0.95 - ratio * 0.45})`;
-      ctx.lineWidth = 5;
+      ctx.strokeStyle = `hsla(${ratio * 320 + 20}, 100%, 65%, ${0.45 - ratio * 0.18})`;
+      ctx.lineWidth = 4;
       ctx.stroke();
     }
+  }
 
-    const coreGlow = ctx.createRadialGradient(cx, cy, 0, cx, cy, 90);
-    coreGlow.addColorStop(0, "rgba(255,255,255,0.95)");
-    coreGlow.addColorStop(0.22, "rgba(255,220,120,0.95)");
-    coreGlow.addColorStop(0.65, "rgba(0,210,255,0.35)");
+  function drawSmallCoreLight() {
+    const coreGlow = ctx.createRadialGradient(cx, cy, 0, cx, cy, 34);
+    coreGlow.addColorStop(0, "rgba(255,255,255,1)");
+    coreGlow.addColorStop(0.18, "rgba(255,220,120,0.95)");
+    coreGlow.addColorStop(0.55, "rgba(0,210,255,0.28)");
     coreGlow.addColorStop(1, "rgba(0,0,0,0)");
     ctx.fillStyle = coreGlow;
     ctx.beginPath();
-    ctx.arc(cx, cy, 95, 0, Math.PI * 2);
+    ctx.arc(cx, cy, 36, 0, Math.PI * 2);
     ctx.fill();
   }
 
@@ -404,11 +404,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function drawAscMc(angles) {
-    const asc = angles.ascendant;
-    const mc = angles.mc;
-
-    const ascPoint = planetPoint(asc.longitude, 590);
-    const mcPoint = planetPoint(mc.longitude, 590);
+    const ascPoint = planetPoint(angles.ascendant.longitude, 590);
+    const mcPoint = planetPoint(angles.mc.longitude, 590);
 
     ctx.fillStyle = "#ffd369";
     ctx.font = "26px Arial";
@@ -432,54 +429,71 @@ document.addEventListener("DOMContentLoaded", () => {
     ctx.stroke();
   }
 
+  // CORRECTION FORTE : départ visuel net au centre
   function drawCurvedFlow(longitude, color, index) {
     const r = degToRad(longitude);
 
-    const startX = cx;
-    const startY = cy;
+    const p0x = cx;
+    const p0y = cy;
 
-    const cp1Radius = 70 + (index % 3) * 12;
-    const cp2Radius = 210 + (index % 4) * 16;
-    const cp3Radius = 360 + (index % 5) * 14;
+    const p1Radius = 28 + (index % 3) * 6;
+    const p2Radius = 120 + (index % 4) * 10;
+    const p3Radius = 260 + (index % 5) * 12;
+    const p4Radius = 405 + (index % 4) * 10;
     const endRadius = 520;
 
-    const cp1Angle = r - 0.95;
-    const cp2Angle = r - 0.40;
-    const cp3Angle = r - 0.10;
+    const a1 = r - 0.95;
+    const a2 = r - 0.55;
+    const a3 = r - 0.18;
+    const a4 = r - 0.04;
 
-    const cp1X = cx + Math.cos(cp1Angle) * cp1Radius;
-    const cp1Y = cy + Math.sin(cp1Angle) * cp1Radius;
+    const p1x = cx + Math.cos(a1) * p1Radius;
+    const p1y = cy + Math.sin(a1) * p1Radius;
 
-    const cp2X = cx + Math.cos(cp2Angle) * cp2Radius;
-    const cp2Y = cy + Math.sin(cp2Angle) * cp2Radius;
+    const p2x = cx + Math.cos(a2) * p2Radius;
+    const p2y = cy + Math.sin(a2) * p2Radius;
 
-    const cp3X = cx + Math.cos(cp3Angle) * cp3Radius;
-    const cp3Y = cy + Math.sin(cp3Angle) * cp3Radius;
+    const p3x = cx + Math.cos(a3) * p3Radius;
+    const p3y = cy + Math.sin(a3) * p3Radius;
+
+    const p4x = cx + Math.cos(a4) * p4Radius;
+    const p4y = cy + Math.sin(a4) * p4Radius;
 
     const endX = cx + Math.cos(r) * endRadius;
     const endY = cy + Math.sin(r) * endRadius;
 
-    ctx.beginPath();
-    ctx.moveTo(startX, startY);
-    ctx.bezierCurveTo(cp1X, cp1Y, cp2X, cp2Y, cp3X, cp3Y);
+    ctx.save();
     ctx.strokeStyle = color;
-    ctx.lineWidth = 4;
+    ctx.lineWidth = 4.8;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
     ctx.shadowBlur = 12;
     ctx.shadowColor = color;
+
+    // segment initial visible depuis le centre
+    ctx.beginPath();
+    ctx.moveTo(p0x, p0y);
+    ctx.lineTo(p1x, p1y);
     ctx.stroke();
 
+    // courbe principale
     ctx.beginPath();
-    ctx.moveTo(cp3X, cp3Y);
+    ctx.moveTo(p1x, p1y);
+    ctx.bezierCurveTo(p2x, p2y, p3x, p3y, p4x, p4y);
+    ctx.stroke();
+
+    // sortie finale
+    ctx.beginPath();
+    ctx.moveTo(p4x, p4y);
     ctx.quadraticCurveTo(
-      cx + Math.cos(r - 0.03) * (endRadius - 55),
-      cy + Math.sin(r - 0.03) * (endRadius - 55),
+      cx + Math.cos(r - 0.01) * (endRadius - 60),
+      cy + Math.sin(r - 0.01) * (endRadius - 60),
       endX,
       endY
     );
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 4;
     ctx.stroke();
-    ctx.shadowBlur = 0;
+
+    ctx.restore();
   }
 
   function drawPlanetArc(longitude, color, radius) {
@@ -524,7 +538,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function renderWheel(planets, aspects, houses, angles) {
-    drawPerfectWheel();
+    drawPerfectWheelBase();
+    drawCorePatternBack();
     drawHouseCusps(houses);
 
     if (aspects && aspects.length) {
@@ -549,6 +564,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     drawAscMc(angles);
+    drawSmallCoreLight();
   }
 
   function renderChart(payload) {
@@ -782,8 +798,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     doc.setFont("helvetica", "normal");
     doc.setFontSize(9.5);
-    doc.text(doc.splitTextToSize(houseLines.join("\n"), 180), 14, 28);
-    doc.text(doc.splitTextToSize(planetLines.join("\n"), 180), 110, 28);
+    doc.text(doc.splitTextToSize(houseLines.join("\n"), 85), 14, 28);
+    doc.text(doc.splitTextToSize(planetLines.join("\n"), 85), 110, 28);
 
     doc.setFont("helvetica", "bold");
     doc.text("Aspects", 14, 210);
@@ -831,5 +847,5 @@ document.addEventListener("DOMContentLoaded", () => {
     houses: demoPayload.houses
   });
 
-  setStatus("Frontend premium prêt. Ascendant et maisons sont intégrés.");
+  setStatus("Frontend premium prêt. Les arcs partent visiblement du centre, avec ascendant et maisons.");
 });
