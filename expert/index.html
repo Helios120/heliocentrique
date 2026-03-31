@@ -8,30 +8,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HeliosAstro Expert</title>
   <meta name="theme-color" content="#060913">
-  <meta name="description" content="HeliosAstro Expert — version premium avec ascendant, maisons et export PDF.">
+  <meta name="description" content="HeliosAstro Expert — version premium avec modèle HeliosAstro, ascendant, maisons et export PDF.">
 
-  <link rel="manifest" href="./manifest.webmanifest?v=120">
-  <link rel="icon" type="image/png" sizes="192x192" href="./assets/icon-192.png?v=120">
-  <link rel="icon" type="image/png" sizes="512x512" href="./assets/icon-512.png?v=120">
-  <link rel="apple-touch-icon" href="./assets/icon-192.png?v=120">
+  <link rel="manifest" href="./manifest.webmanifest?v=201">
+  <link rel="icon" type="image/png" sizes="192x192" href="./assets/icon-192.png?v=201">
+  <link rel="icon" type="image/png" sizes="512x512" href="./assets/icon-512.png?v=201">
+  <link rel="apple-touch-icon" href="./assets/icon-192.png?v=201">
 
-  <link rel="stylesheet" href="./assets/expert.css?v=120">
-
-  <script>
-    window.HELIOSASTRO_VERSION = "120";
-    console.log("INDEX HTML VERSION 120");
-  </script>
-
+  <link rel="stylesheet" href="./assets/expert.css?v=201">
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 </head>
 <body>
   <main class="app-shell">
     <aside class="sidebar">
       <div class="brand-box">
-        <img src="./assets/logo-heliosastro.png?v=120" alt="Logo HeliosAstro" class="brand-logo">
+        <img src="./assets/logo-heliosastro.png?v=201" alt="Logo HeliosAstro" class="brand-logo">
         <div>
           <h1>HeliosAstro Expert</h1>
-          <p class="subtitle">Version premium • Ascendant • Maisons • Export PDF</p>
+          <p class="subtitle">Modèle HeliosAstro • Ascendant • Maisons • Export PDF</p>
         </div>
       </div>
 
@@ -77,7 +71,7 @@
         <button id="export-pdf-btn">Exporter PDF premium</button>
       </div>
 
-      <div class="panel" id="status-box">Version 120 chargée. En attente.</div>
+      <div class="panel" id="status-box">Version 201 chargée. En attente.</div>
 
       <div class="panel">
         <h2>Lecture premium</h2>
@@ -143,15 +137,14 @@
           for (const reg of regs) {
             await reg.unregister();
           }
-          console.log("Tous les anciens service workers ont été supprimés.");
         } catch (e) {
-          console.log("Suppression service worker impossible :", e);
+          console.log("Nettoyage service worker impossible :", e);
         }
       }
     })();
   </script>
 
-  <script src="./assets/expert.js?v=120"></script>
+  <script src="./assets/expert.js?v=201"></script>
 </body>
 </html>
 
