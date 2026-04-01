@@ -4,47 +4,150 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Contact — Helios Astro</title>
-  <style>
-    :root{
-      --bg:#050814;
-      --panel:#0c1320;
-      --line:rgba(91,214,255,.18);
-      --text:#eef5ff;
-      --muted:#b5c7e8;
-      --accent:#45ddff;
-    }
-    body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
-    .wrap{max-width:860px;margin:0 auto;padding:24px}
-    .panel{background:var(--panel);border:1px solid var(--line);border-radius:24px;padding:28px}
-    label{display:block;margin:14px 0 8px}
-    input,textarea{
-      width:100%;padding:14px;border-radius:14px;border:1px solid var(--line);
-      background:#09101b;color:#eef5ff;font:inherit
-    }
-    button{
-      margin-top:18px;padding:14px 22px;border:none;border-radius:999px;
-      background:linear-gradient(135deg,var(--accent),#8ef2ff);color:#00131c;font-weight:800
-    }
-    p{color:var(--muted)}
-  </style>
+  <meta name="description" content="Envoyez vos informations de naissance pour recevoir votre thème astral Helios Astro.">
+  <link rel="canonical" href="https://heliosastro.com/contact.html">
+  <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
-  <div class="wrap">
-    <div class="panel">
-      <h1>Contact</h1>
-      <p>Pour toute demande d’information, de thème personnalisé ou d’accompagnement, utilisez ce formulaire.</p>
 
-      <label>Nom</label>
-      <input type="text" placeholder="Votre nom">
+<header class="site-header">
+  <div class="container nav-wrap">
+    <a href="index.html" class="brand">
+      <img src="assets/logo-heliosastro.png" alt="Logo Helios Astro">
+      <div>
+        <strong>Helios Astro</strong>
+        <span>Astrologie géométrique premium</span>
+      </div>
+    </a>
 
-      <label>Email</label>
-      <input type="email" placeholder="Votre email">
+    <button class="nav-toggle" data-nav-toggle>☰</button>
 
-      <label>Message</label>
-      <textarea rows="8" placeholder="Votre message"></textarea>
+    <nav class="site-nav" data-nav>
+      <a href="index.html">Accueil</a>
+      <a href="offres.html">Offres</a>
+      <a href="logiciel.html">Logiciel</a>
+      <a href="livre.html">Livre</a>
+      <a href="heliosastrosite.html">Méthode</a>
+      <a href="contact.html" class="active btn btn-small">Commander</a>
+    </nav>
+  </div>
+</header>
 
-      <button type="button">Envoyer</button>
+<main>
+
+<section class="page-hero section">
+  <div class="container">
+    <p class="eyebrow">Commande</p>
+    <h1>Envoyez vos informations</h1>
+    <p class="lead">
+      Après votre paiement, remplissez ce formulaire pour recevoir votre lecture Helios Astro.
+    </p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container split">
+
+    <!-- FORMULAIRE -->
+    <div class="card content-card">
+      <h2>Vos informations de naissance</h2>
+
+      <form action="https://formspree.io/f/your-id" method="POST" class="form">
+
+        <label>Nom complet</label>
+        <input type="text" name="nom" required>
+
+        <label>Email</label>
+        <input type="email" name="email" required>
+
+        <label>Date de naissance</label>
+        <input type="date" name="date" required>
+
+        <label>Heure de naissance (si connue)</label>
+        <input type="time" name="heure">
+
+        <label>Lieu de naissance (ville + pays)</label>
+        <input type="text" name="lieu" required>
+
+        <label>Offre choisie</label>
+        <select name="offre" required>
+          <option value="">-- Choisir --</option>
+          <option>Thème astral</option>
+          <option>Transit pour 3 mois</option>
+          <option>Révolution solaire</option>
+        </select>
+
+        <label>Informations complémentaires</label>
+        <textarea name="message" rows="4" placeholder="Ex : question, contexte, situation actuelle..."></textarea>
+
+        <button type="submit" class="btn">Envoyer mes informations</button>
+
+      </form>
+    </div>
+
+    <!-- VISUEL -->
+    <div class="image-frame">
+      <img src="assets/zodiac-wheel-blue.png" alt="Roue zodiacale Helios Astro">
+    </div>
+
+  </div>
+</section>
+
+<section class="section">
+  <div class="container cards-3">
+
+    <article class="card">
+      <h3>Étape 1</h3>
+      <p>Vous choisissez votre offre et effectuez le paiement.</p>
+    </article>
+
+    <article class="card">
+      <h3>Étape 2</h3>
+      <p>Vous envoyez vos données via ce formulaire.</p>
+    </article>
+
+    <article class="card">
+      <h3>Étape 3</h3>
+      <p>Vous recevez votre création Helios Astro par email.</p>
+    </article>
+
+  </div>
+</section>
+
+<section class="section cta-section">
+  <div class="container split">
+
+    <div class="quote-card">
+      <p>“Chaque thème est une structure vivante, pas un simple calcul.”</p>
+    </div>
+
+    <div class="content-card card">
+      <h2>Pas encore commandé ?</h2>
+      <p>
+        Choisissez votre formule avant d’envoyer vos informations.
+      </p>
+      <div class="btn-row">
+        <a href="offres.html" class="btn">Voir les offres</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-wrap">
+    <p>© <span data-year></span> Helios Astro</p>
+    <div class="footer-links">
+      <a href="index.html">Accueil</a>
+      <a href="offres.html">Offres</a>
+      <a href="livre.html">Livre</a>
     </div>
   </div>
+</footer>
+
+<script src="assets/app.js"></script>
+
 </body>
 </html>
