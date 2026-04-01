@@ -4,175 +4,43 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Offres — Helios Astro</title>
-  <meta name="description" content="Découvrez les offres Helios Astro : thème astral, transit pour 3 mois et révolution solaire. Paiement direct via PayPal.">
-  <link rel="canonical" href="https://heliosastro.com/offres.html">
-  <link rel="stylesheet" href="assets/styles.css">
+  <style>
+    body{margin:0;background:#050814;color:#eef5ff;font-family:Arial,Helvetica,sans-serif}
+    .wrap{max-width:1100px;margin:0 auto;padding:24px}
+    a{text-decoration:none;color:inherit}
+    .top{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap}
+    .btn{padding:12px 18px;border-radius:999px;background:#45ddff;color:#00131c;font-weight:800}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:24px}
+    .card{background:#0c1320;border:1px solid rgba(91,214,255,.18);border-radius:24px;padding:24px}
+    .price{font-size:34px;font-weight:800;color:#ffd369;margin:8px 0}
+    p{color:#b5c7e8;line-height:1.6}
+    @media(max-width:900px){.grid{grid-template-columns:1fr}}
+  </style>
 </head>
 <body>
-  <header class="site-header">
-    <div class="container nav-wrap">
-      <a href="index.html" class="brand">
-        <img src="assets/logo-heliosastro.png" alt="Logo Helios Astro">
-        <div>
-          <strong>Helios Astro</strong>
-          <span>Astrologie géométrique premium</span>
-        </div>
-      </a>
-
-      <button class="nav-toggle" type="button" aria-label="Ouvrir le menu" data-nav-toggle>☰</button>
-
-      <nav class="site-nav" data-nav>
-        <a href="index.html">Accueil</a>
-        <a href="offres.html" class="active">Offres</a>
-        <a href="logiciel.html">Logiciel</a>
-        <a href="livre.html">Livre</a>
-        <a href="heliosastrosite.html">Méthode</a>
-        <a href="contact.html" class="btn btn-small">Commander</a>
-      </nav>
+  <div class="wrap">
+    <div class="top">
+      <h1>Offres Helios Astro</h1>
+      <a class="btn" href="./expert/?v=401">Accéder au logiciel expert</a>
     </div>
-  </header>
 
-  <main>
-    <section class="page-hero section">
-      <div class="container">
-        <p class="eyebrow">Formules Helios Astro</p>
-        <h1>Choisissez l’expérience qui vous correspond.</h1>
-        <p class="lead">
-          Trois offres, trois niveaux de lecture, avec paiement direct et parcours simple.
-        </p>
+    <div class="grid">
+      <div class="card">
+        <h2>Découverte</h2>
+        <div class="price">49€</div>
+        <p>Une première lecture claire de votre thème, pensée pour découvrir vos axes essentiels dans un format élégant.</p>
       </div>
-    </section>
-
-    <section class="section">
-      <div class="container pricing-grid">
-        <article class="price-card" id="theme-astral">
-          <h3>Thème astral</h3>
-          <div class="price">
-            <strong>Lecture de naissance</strong>
-            <span>Pour découvrir votre structure personnelle dans l’univers Helios Astro</span>
-          </div>
-          <p>
-            Une porte d’entrée idéale pour recevoir une lecture visuelle et symbolique de votre thème de naissance.
-          </p>
-          <ul>
-            <li>Visuel personnalisé</li>
-            <li>Lecture synthétique</li>
-            <li>Format simple et élégant</li>
-            <li>Parfait pour une première découverte</li>
-          </ul>
-          <a href="https://www.paypal.com/ncp/payment/QF67W8ATHZX4U" target="_blank" rel="noopener" class="btn">Commander le thème astral</a>
-        </article>
-
-        <article class="price-card featured" id="transit-3-mois">
-          <span class="ribbon">Le plus demandé</span>
-          <h3>Transit pour 3 mois</h3>
-          <div class="price">
-            <strong>Lecture de période</strong>
-            <span>Une lecture ciblée pour mieux comprendre les mouvements à venir</span>
-          </div>
-          <p>
-            Pour celles et ceux qui veulent éclairer une phase de vie, anticiper une dynamique, ou mieux lire leur actualité symbolique.
-          </p>
-          <ul>
-            <li>Vision sur 3 mois</li>
-            <li>Analyse plus détaillée</li>
-            <li>Lecture enrichie des axes majeurs</li>
-            <li>Restitution plus précise et plus utile</li>
-          </ul>
-          <a href="https://www.paypal.com/ncp/payment/Z3SZPE6NUZYKG" target="_blank" rel="noopener" class="btn">Commander le transit 3 mois</a>
-        </article>
-
-        <article class="price-card" id="revolution-solaire">
-          <h3>Révolution solaire</h3>
-          <div class="price">
-            <strong>Lecture annuelle</strong>
-            <span>La grande lecture de votre année dans l’univers Helios Astro</span>
-          </div>
-          <p>
-            Une restitution premium pour lire les forces, les tonalités et les axes importants du cycle annuel qui s’ouvre.
-          </p>
-          <ul>
-            <li>Vision annuelle</li>
-            <li>Finition premium</li>
-            <li>Création forte et mémorable</li>
-            <li>Idéal pour marquer un nouveau cycle</li>
-          </ul>
-          <a href="https://www.paypal.com/ncp/payment/7HTYFEY8JA8EN" target="_blank" rel="noopener" class="btn">Commander la révolution solaire</a>
-        </article>
+      <div class="card">
+        <h2>Premium</h2>
+        <div class="price">99€</div>
+        <p>Une restitution complète avec maisons, ascendant, synthèse structurée et export PDF premium.</p>
       </div>
-    </section>
-
-    <section class="section">
-      <div class="container split">
-        <div class="image-frame">
-          <img src="assets/theme-rihanna-demo.png" alt="Exemple de thème Helios Astro">
-        </div>
-
-        <div class="card content-card">
-          <h2>Ce que reçoit le client</h2>
-          <ul class="feature-list">
-            <li>Une lecture visuelle personnalisée</li>
-            <li>Une restitution élégante et mémorable</li>
-            <li>Une création symbolique qui se distingue d’un thème classique</li>
-            <li>Un objet personnel à conserver ou à offrir</li>
-          </ul>
-          <p>
-            Tu ne vends pas simplement une analyse. Tu vends une expérience, une présence visuelle, une empreinte.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="container cards-3">
-        <article class="card">
-          <h3>Après paiement</h3>
-          <p>Le client passe sur la page contact pour transmettre ses données de naissance.</p>
-        </article>
-
-        <article class="card">
-          <h3>Données à fournir</h3>
-          <p>Nom, date, heure si possible, lieu de naissance, formule choisie.</p>
-        </article>
-
-        <article class="card">
-          <h3>Livraison</h3>
-          <p>Envoi par e-mail selon le délai annoncé sur ton site ou dans ton message de confirmation.</p>
-        </article>
-      </div>
-    </section>
-
-    <section class="section cta-section">
-      <div class="container split">
-        <div class="quote-card">
-          <p>“Choisir Helios Astro, c’est choisir un thème qui se regarde autant qu’il se lit.”</p>
-        </div>
-
-        <div class="content-card card">
-          <h2>Étape suivante</h2>
-          <p>
-            Une fois le paiement effectué, utilise la page contact pour envoyer toutes les informations nécessaires à la création du thème.
-          </p>
-          <div class="btn-row">
-            <a href="contact.html" class="btn">Envoyer mes informations</a>
-            <a href="logiciel.html" class="btn btn-outline">Voir le logiciel degrés</a>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <footer class="site-footer">
-    <div class="container footer-wrap">
-      <p>© <span data-year></span> Helios Astro</p>
-      <div class="footer-links">
-        <a href="index.html">Accueil</a>
-        <a href="contact.html">Contact</a>
-        <a href="logiciel.html">Logiciel</a>
+      <div class="card">
+        <h2>Expert</h2>
+        <div class="price">149€</div>
+        <p>Une approche approfondie avec lecture avancée, angles, aspects majeurs et interprétation élargie.</p>
       </div>
     </div>
-  </footer>
-
-  <script src="assets/app.js"></script>
+  </div>
 </body>
 </html>
