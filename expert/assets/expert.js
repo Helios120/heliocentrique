@@ -46,7 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
     wheelImageLoaded = true;
     if (currentChart) renderWheel(currentChart);
   };
-  wheelImage.src = "./assets/roue-heliosastro.png?v=301";
+  wheelImage.src = "./assets/roue-heliosastro.png?v=401";
 
   const zodiac = [
     { name: "Bélier", glyph: "♈", start: 0 },
@@ -272,6 +272,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const y1 = CY + Math.sin(a) * innerRadius;
       const x2 = CX + Math.cos(a) * outerRadius;
       const y2 = CY + Math.sin(a) * outerRadius;
+
       ctx.beginPath();
       ctx.moveTo(x1, y1);
       ctx.lineTo(x2, y2);
@@ -293,6 +294,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const p1 = planets.find(p => p.name === a.p1);
       const p2 = planets.find(p => p.name === a.p2);
       if (!p1 || !p2) return;
+
       const A = pointOnCircle(p1.longitude, 160);
       const B = pointOnCircle(p2.longitude, 160);
       ctx.beginPath();
@@ -543,5 +545,5 @@ document.addEventListener("DOMContentLoaded", () => {
     houses: demoPayload.houses
   });
 
-  setStatus("Version 301 chargée. Site vitrine + expert séparés, roue HeliosAstro utilisée.");
+  setStatus("Version 401 chargée. Rendu premium actif.");
 });
