@@ -46,7 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
     wheelImageLoaded = true;
     if (currentChart) renderWheel(currentChart);
   };
-  wheelImage.src = "assets/roue-heliosastro.png?v=500";
+  wheelImage.src = "assets/roue-heliosastro.png?v=600";
 
   const zodiac = [
     { name: "Bélier", start: 0 },
@@ -405,13 +405,13 @@ document.addEventListener("DOMContentLoaded", () => {
         throw new Error("Réponse backend invalide.");
       }
 
-      liveBadge.textContent = "CARTE LIVE";
       renderAll({
         planets: adaptPlanets(data.planets),
         aspects: data.aspects || [],
         angles: data.angles,
         houses: data.houses
       });
+      liveBadge.textContent = "CARTE LIVE";
       setStatus("Carte générée avec succès.");
     } catch (e) {
       liveBadge.textContent = "MODE DÉMO";
@@ -504,5 +504,5 @@ document.addEventListener("DOMContentLoaded", () => {
   exportPdfBtn.addEventListener("click", exportPdfPremium);
 
   renderAll(demoPayload);
-  setStatus("Version 500 chargée. Rendu premium actif.");
+  setStatus("Version 600 chargée. Rendu premium actif.");
 });
