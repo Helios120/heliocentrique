@@ -2,141 +2,32 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HeliosAstro Expert</title>
-  <meta name="theme-color" content="#060913">
-  <link rel="manifest" href="./manifest.webmanifest?v=301">
-  <link rel="icon" type="image/png" sizes="192x192" href="./assets/icon-192.png?v=301">
-  <link rel="icon" type="image/png" sizes="512x512" href="./assets/icon-512.png?v=301">
-  <link rel="stylesheet" href="./assets/expert.css?v=301">
-  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <title>Contact — Helios Astro</title>
+  <style>
+    body{margin:0;background:#050814;color:#eef5ff;font-family:Arial,Helvetica,sans-serif}
+    .wrap{max-width:860px;margin:0 auto;padding:24px}
+    .panel{background:#0c1320;border:1px solid rgba(91,214,255,.18);border-radius:24px;padding:28px}
+    label{display:block;margin:14px 0 8px}
+    input,textarea{width:100%;padding:14px;border-radius:14px;border:1px solid rgba(91,214,255,.18);background:#09101b;color:#eef5ff}
+    button{margin-top:18px;padding:14px 22px;border:none;border-radius:999px;background:#45ddff;color:#00131c;font-weight:800}
+    p{color:#b5c7e8}
+  </style>
 </head>
 <body>
-  <main class="app-shell">
-    <aside class="sidebar">
-      <div class="brand-box">
-        <img src="./assets/logo-heliosastro.png?v=301" alt="Logo HeliosAstro" class="brand-logo">
-        <div>
-          <h1>HeliosAstro Expert</h1>
-          <p class="subtitle">Modèle HeliosAstro • Ascendant • Maisons • Export PDF</p>
-        </div>
-      </div>
-
-      <label>Nom
-        <input type="text" id="expert-name" placeholder="Nom du consultant">
-      </label>
-
-      <label>Date
-        <input type="date" id="expert-date">
-      </label>
-
-      <label>Heure locale
-        <input type="time" id="expert-time" value="12:00">
-      </label>
-
-      <label>Ville
-        <input type="text" id="expert-city" value="Marseille">
-      </label>
-
-      <label>Pays
-        <input type="text" id="expert-country" value="France">
-      </label>
-
-      <label>Latitude
-        <input type="number" id="expert-latitude" step="0.000001" value="43.2965">
-      </label>
-
-      <label>Longitude
-        <input type="number" id="expert-longitude" step="0.000001" value="5.3698">
-      </label>
-
-      <label>Fuseau horaire
-        <input type="text" id="expert-offset" value="+01:00">
-      </label>
-
-      <div class="button-stack">
-        <button id="health-btn">Réveiller / tester le backend</button>
-        <button id="generate-btn">Générer la carte</button>
-        <button id="demo-btn" class="secondary">Démo Helios</button>
-        <button id="save-btn" class="secondary">Sauvegarder</button>
-        <button id="load-btn" class="secondary">Recharger</button>
-        <button id="export-json-btn" class="secondary">Exporter JSON</button>
-        <button id="export-pdf-btn">Exporter PDF premium</button>
-      </div>
-
-      <div class="panel" id="status-box">Version 301 chargée. En attente.</div>
-
-      <div class="panel">
-        <h2>Lecture premium</h2>
-        <div id="premium-summary-box"></div>
-      </div>
-    </aside>
-
-    <section class="content">
-      <div class="panel chart-panel">
-        <div class="panel-head">
-          <h2>Carte HeliosAstro</h2>
-          <span class="badge" id="live-badge">MODE PRÊT</span>
-        </div>
-
-        <div class="canvas-stage">
-          <div class="canvas-square">
-            <canvas id="expert-canvas" width="1600" height="1600"></canvas>
-          </div>
-        </div>
-      </div>
-
-      <div class="grid-two">
-        <div class="panel">
-          <h2>Synthèse</h2>
-          <div id="summary-box"></div>
-        </div>
-
-        <div class="panel">
-          <h2>Aspects</h2>
-          <div id="aspects-box"></div>
-        </div>
-      </div>
-
-      <div class="grid-two">
-        <div class="panel">
-          <h2>Ascendant et MC</h2>
-          <div id="angles-box"></div>
-        </div>
-
-        <div class="panel">
-          <h2>Maisons</h2>
-          <div id="houses-box"></div>
-        </div>
-      </div>
-
-      <div class="panel">
-        <h2>Positions planétaires</h2>
-        <div id="planets-box"></div>
-      </div>
-
-      <div class="panel">
-        <h2>Notes privées</h2>
-        <textarea id="private-notes" rows="8" placeholder="Observations, axes d’interprétation..."></textarea>
-      </div>
-    </section>
-  </main>
-
-  <script>
-    (async function () {
-      if ("serviceWorker" in navigator) {
-        try {
-          const regs = await navigator.serviceWorker.getRegistrations();
-          for (const reg of regs) await reg.unregister();
-        } catch (e) {}
-      }
-    })();
-  </script>
-
-  <script src="./assets/expert.js?v=301"></script>
+  <div class="wrap">
+    <div class="panel">
+      <h1>Contact</h1>
+      <p>Pour toute demande d’information, d’accompagnement ou de thème personnalisé, utilisez ce formulaire.</p>
+      <label>Nom</label>
+      <input type="text" placeholder="Votre nom">
+      <label>Email</label>
+      <input type="email" placeholder="Votre email">
+      <label>Message</label>
+      <textarea rows="8" placeholder="Votre message"></textarea>
+      <button type="button">Envoyer</button>
+    </div>
+  </div>
 </body>
 </html>
 
