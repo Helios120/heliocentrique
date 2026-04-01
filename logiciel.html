@@ -1,284 +1,89 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Logiciel Helios Astro</title>
-  <meta name="description" content="Carte céleste Helios Astro avec visualisation premium, synthèse du thème, répartition planétaire, export PDF et paiement PayPal.">
-  <link rel="canonical" href="https://heliosastro.com/logiciel.html">
-  <link rel="stylesheet" href="assets/styles.css">
-
-  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-
-  <script 
-    src="https://www.paypal.com/sdk/js?client-id=BAA73-rQL0lxFlgndYGaA-4f6QHDRitW0sUydpnUC7mKt8OaI-KrZ6RXIwBvuGX-p1my5os-g68bzDdzt4&components=hosted-buttons&disable-funding=venmo&currency=EUR">
-  </script>
-
-  <style>
-    .helios-layout{
-      display:grid;
-      grid-template-columns:420px 1fr;
-      gap:24px;
-      align-items:start;
-    }
-
-    .helios-panel,
-    .helios-canvas-shell{
-      background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.015));
-      border:1px solid rgba(113,224,255,.16);
-      border-radius:26px;
-      box-shadow:0 20px 60px rgba(0,0,0,.35);
-      padding:22px;
-    }
-
-    .helios-panel h2{
-      margin:0 0 18px;
-      font-size:1.9rem;
-    }
-
-    .helios-panel h3{
-      margin:18px 0 10px;
-      font-size:1.15rem;
-    }
-
-    .helios-panel label{
-      display:grid;
-      gap:8px;
-      margin-bottom:12px;
-      font-weight:700;
-      color:#fff;
-    }
-
-    .helios-panel input{
-      width:100%;
-      border-radius:14px;
-      border:1px solid rgba(113,224,255,.16);
-      background:rgba(255,255,255,.03);
-      color:#fff;
-      padding:12px 14px;
-      font:inherit;
-      outline:none;
-    }
-
-    .helios-panel input:focus{
-      border-color:rgba(113,224,255,.45);
-      box-shadow:0 0 0 4px rgba(113,224,255,.10);
-    }
-
-    .helios-info,
-    .helios-summary,
-    .helios-legend,
-    .helios-payment{
-      border:1px solid rgba(113,224,255,.16);
-      background:rgba(255,255,255,.03);
-      border-radius:18px;
-      padding:15px;
-      color:#d7e7ff;
-      line-height:1.65;
-      margin-top:12px;
-    }
-
-    .helios-info strong,
-    .helios-summary strong,
-    .helios-legend strong,
-    .helios-payment strong{
-      color:#fff;
-    }
-
-    .helios-summary{
-      color:#eef7ff;
-    }
-
-    .paypal-block{
-      margin-top:16px;
-      padding-top:12px;
-      border-top:1px solid rgba(255,255,255,.08);
-    }
-
-    .paypal-block:first-of-type{
-      border-top:none;
-      padding-top:0;
-    }
-
-    .paypal-block h4{
-      margin:0 0 8px;
-      font-size:1rem;
-      color:#fff;
-    }
-
-    .paypal-block p{
-      margin:0 0 10px;
-      color:#b9d7ff;
-      font-size:.95rem;
-    }
-
-    #heliosCanvas{
-      width:min(100%, 980px);
-      height:auto;
-      display:block;
-      margin:auto;
-      background:#000;
-      border-radius:22px;
-    }
-
-    @media (max-width: 1150px){
-      .helios-layout{
-        grid-template-columns:1fr;
-      }
-    }
-  </style>
-</head>
-<body>
-  <header class="site-header">
-    <div class="container nav-wrap">
-      <a href="index.html" class="brand">
-        <img src="assets/logo-heliosastro.png" alt="Logo Helios Astro">
-        <div>
-          <strong>Helios Astro</strong>
-          <span>Astrologie géométrique premium</span>
-        </div>
-      </a>
-
-      <button class="nav-toggle" type="button" aria-label="Ouvrir le menu" data-nav-toggle>☰</button>
-
-      <nav class="site-nav" data-nav>
-        <a href="index.html">Accueil</a>
-        <a href="offres.html">Offres</a>
-        <a href="logiciel.html" class="active">Logiciel</a>
-        <a href="livre.html">Livre</a>
-        <a href="heliosastrosite.html">Méthode</a>
-        <a href="contact.html" class="btn btn-small">Commander</a>
-      </nav>
-    </div>
-  </header>
-
-  <main>
-    <section class="page-hero section">
-      <div class="container">
-        <p class="eyebrow">Logiciel Helios Astro</p>
-        <h1>Carte céleste Helios</h1>
-        <p class="lead">
-          Une lecture visuelle premium pour faire apparaître la dynamique du thème,
-          la répartition des forces planétaires et la signature symbolique de la carte.
-        </p>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="container helios-layout">
-        <div class="helios-panel">
-          <h2>Données de naissance</h2>
-
-          <label>
-            Nom
-            <input type="text" id="astro-name" placeholder="Nom du client">
-          </label>
-
-          <label>
-            Date
-            <input type="date" id="astro-date">
-          </label>
-
-          <label>
-            Heure
-            <input type="time" id="astro-time" value="12:00">
-          </label>
-
-          <label>
-            Ville
-            <input type="text" id="astro-city" placeholder="Paris">
-          </label>
-
-          <label>
-            Pays
-            <input type="text" id="astro-country" placeholder="France">
-          </label>
-
-          <div class="btn-row">
-            <button class="btn" type="button" id="generate-chart-btn">Générer la carte</button>
-            <button class="btn btn-outline" type="button" id="demo-chart-btn">Démo Helios</button>
-          </div>
-
-          <div class="btn-row">
-            <button class="btn" type="button" id="export-pdf-btn">Exporter en PDF</button>
-          </div>
-
-          <div class="helios-info" id="astro-info-box">
-            <strong>État de la carte :</strong><br>
-            Prête à être générée à partir des données de naissance.
-          </div>
-
-          <div class="helios-summary" id="astro-summary-box">
-            <strong>Synthèse du thème :</strong><br>
-            Une lecture claire et élégante du thème apparaîtra ici après calcul.
-          </div>
-
-          <div class="helios-legend" id="astro-legend-box">
-            <strong>Répartition planétaire :</strong><br>
-            Les principaux repères du thème s’afficheront ici après génération.
-          </div>
-
-          <div class="helios-payment">
-            <strong>Commander votre lecture</strong><br>
-            Choisissez la formule adaptée à votre besoin. Le paiement s’effectue via PayPal.
-
-            <div class="paypal-block">
-              <h4>Thème astral</h4>
-              <p>Lecture de naissance Helios Astro.</p>
-              <div id="paypal-theme-astral"></div>
-            </div>
-
-            <div class="paypal-block">
-              <h4>Transit pour 3 mois</h4>
-              <p>Lecture de période pour anticiper les dynamiques à venir.</p>
-              <div id="paypal-transit"></div>
-            </div>
-
-            <div class="paypal-block">
-              <h4>Révolution solaire</h4>
-              <p>Lecture annuelle premium autour de votre nouveau cycle.</p>
-              <div id="paypal-revolution"></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="helios-canvas-shell">
-          <canvas id="heliosCanvas" width="1400" height="1400"></canvas>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <footer class="site-footer">
-    <div class="container footer-wrap">
-      <p>© <span data-year></span> Helios Astro</p>
-      <div class="footer-links">
-        <a href="index.html">Accueil</a>
-        <a href="offres.html">Offres</a>
-        <a href="contact.html">Contact</a>
-      </div>
-    </div>
-  </footer>
-
-  <script src="assets/app.js"></script>
-  <script src="assets/logiciel.js"></script>
-
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      if (window.paypal) {
-        paypal.HostedButtons({
-          hostedButtonId: "QF67W8ATHZX4U"
-        }).render("#paypal-theme-astral");
-
-        paypal.HostedButtons({
-          hostedButtonId: "Z3SZPE6NUZYKG"
-        }).render("#paypal-transit");
-
-        paypal.HostedButtons({
-          hostedButtonId: "7HTYFEY8JA8EN"
-        }).render("#paypal-revolution");
-      }
-    });
-  </script>
-</body>
-</html>
+:root{
+  --bg:#060913;
+  --panel:#101725;
+  --panel-2:#0c1320;
+  --line:rgba(113,224,255,.16);
+  --text:#f3f7ff;
+  --muted:#b7c8e6;
+  --accent:#3fd9ff;
+  --gold:#ffd369;
+}
+*{box-sizing:border-box}
+html,body{
+  margin:0;padding:0;min-height:100%;
+  font-family:Arial,Helvetica,sans-serif;
+  background:
+    radial-gradient(circle at top, rgba(61,217,255,0.08), transparent 35%),
+    radial-gradient(circle at center, rgba(255,211,105,0.05), transparent 25%),
+    var(--bg);
+  color:var(--text)
+}
+.app-shell{display:grid;grid-template-columns:390px 1fr;min-height:100vh}
+.sidebar{
+  padding:24px;border-right:1px solid var(--line);
+  background:linear-gradient(180deg,#0b1220,#08111c)
+}
+.content{padding:24px;display:grid;gap:20px}
+.brand-box{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+.brand-logo{
+  width:76px;height:76px;object-fit:contain;border-radius:18px;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);padding:8px
+}
+h1,h2{margin:0 0 10px}
+.subtitle{margin:0;color:var(--muted)}
+label{display:grid;gap:8px;margin-bottom:12px;font-weight:700}
+input,textarea,button{font:inherit}
+input,textarea{
+  width:100%;background:#0b1320;color:var(--text);
+  border:1px solid var(--line);border-radius:16px;padding:14px 16px;outline:none
+}
+textarea{resize:vertical}
+button{
+  background:linear-gradient(135deg,var(--accent),#74ecff);
+  color:#001018;border:none;border-radius:16px;padding:14px 16px;
+  font-weight:800;cursor:pointer;box-shadow:0 10px 24px rgba(63,217,255,.18)
+}
+button.secondary{
+  background:#152132;color:var(--text);border:1px solid var(--line);box-shadow:none
+}
+.button-stack{display:grid;gap:10px;margin:16px 0}
+.panel{
+  background:linear-gradient(180deg,var(--panel),var(--panel-2));
+  border:1px solid var(--line);border-radius:24px;padding:18px;
+  box-shadow:0 16px 30px rgba(0,0,0,0.24)
+}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.badge{
+  display:inline-flex;align-items:center;padding:7px 12px;border-radius:999px;
+  font-size:12px;font-weight:800;border:1px solid rgba(255,255,255,.12);
+  color:var(--gold);background:rgba(255,211,105,.08)
+}
+.canvas-stage{width:100%;display:flex;justify-content:center;align-items:center}
+.canvas-square{
+  width:min(100%,980px);
+  aspect-ratio:1/1;
+  background:#000;
+  border-radius:20px;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center
+}
+#expert-canvas{
+  width:100%;
+  height:100%;
+  display:block;
+  background:#000
+}
+.grid-two{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.table-like{display:grid;gap:10px}
+.row{
+  padding:12px 14px;border:1px solid rgba(255,255,255,.06);
+  border-radius:14px;background:rgba(255,255,255,.02)
+}
+.muted{color:var(--muted)}
+@media(max-width:1120px){
+  .app-shell{grid-template-columns:1fr}
+  .sidebar{border-right:none;border-bottom:1px solid var(--line)}
+  .grid-two{grid-template-columns:1fr}
+}
