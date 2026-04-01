@@ -1,128 +1,509 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HeliosAstro Expert</title>
-  <meta name="theme-color" content="#060913">
-  <link rel="stylesheet" href="assets/expert.css?v=500">
-  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-</head>
-<body>
-  <main class="app-shell">
-    <aside class="sidebar">
-      <div class="brand-box">
-        <img src="assets/logo-heliosastro.png?v=500" alt="Logo HeliosAstro" class="brand-logo">
-        <div>
-          <h1>HeliosAstro Expert</h1>
-          <p class="subtitle">Carte premium • Ascendant • Maisons • Export PDF</p>
-        </div>
+document.addEventListener("DOMContentLoaded", () => {
+  const API_BASE = "https://heliosastro-backend.onrender.com";
+  const { jsPDF } = window.jspdf;
+
+  const nameInput = document.getElementById("expert-name");
+  const dateInput = document.getElementById("expert-date");
+  const timeInput = document.getElementById("expert-time");
+  const cityInput = document.getElementById("expert-city");
+  const countryInput = document.getElementById("expert-country");
+  const latitudeInput = document.getElementById("expert-latitude");
+  const longitudeInput = document.getElementById("expert-longitude");
+  const offsetInput = document.getElementById("expert-offset");
+
+  const healthBtn = document.getElementById("health-btn");
+  const generateBtn = document.getElementById("generate-btn");
+  const demoBtn = document.getElementById("demo-btn");
+  const saveBtn = document.getElementById("save-btn");
+  const loadBtn = document.getElementById("load-btn");
+  const exportJsonBtn = document.getElementById("export-json-btn");
+  const exportPdfBtn = document.getElementById("export-pdf-btn");
+
+  const statusBox = document.getElementById("status-box");
+  const premiumSummaryBox = document.getElementById("premium-summary-box");
+  const summaryBox = document.getElementById("summary-box");
+  const planetsBox = document.getElementById("planets-box");
+  const aspectsBox = document.getElementById("aspects-box");
+  const anglesBox = document.getElementById("angles-box");
+  const housesBox = document.getElementById("houses-box");
+  const privateNotes = document.getElementById("private-notes");
+  const liveBadge = document.getElementById("live-badge");
+
+  const canvas = document.getElementById("expert-canvas");
+  const ctx = canvas.getContext("2d");
+
+  const SIZE = 1600;
+  canvas.width = SIZE;
+  canvas.height = SIZE;
+  const CX = SIZE / 2;
+  const CY = SIZE / 2;
+
+  let currentChart = null;
+  let wheelImageLoaded = false;
+
+  const wheelImage = new Image();
+  wheelImage.onload = () => {
+    wheelImageLoaded = true;
+    if (currentChart) renderWheel(currentChart);
+  };
+  wheelImage.src = "assets/roue-heliosastro.png?v=500";
+
+  const zodiac = [
+    { name: "Bélier", start: 0 },
+    { name: "Taureau", start: 30 },
+    { name: "Gémeaux", start: 60 },
+    { name: "Cancer", start: 90 },
+    { name: "Lion", start: 120 },
+    { name: "Vierge", start: 150 },
+    { name: "Balance", start: 180 },
+    { name: "Scorpion", start: 210 },
+    { name: "Sagittaire", start: 240 },
+    { name: "Capricorne", start: 270 },
+    { name: "Verseau", start: 300 },
+    { name: "Poissons", start: 330 }
+  ];
+
+  const planetMeta = {
+    "Soleil":   { glyph: "☉", color: "#ffb300" },
+    "Lune":     { glyph: "☽", color: "#f4f2d0" },
+    "Mercure":  { glyph: "☿", color: "#ff9c3a" },
+    "Vénus":    { glyph: "♀", color: "#ff86cb" },
+    "Mars":     { glyph: "♂", color: "#ff5d47" },
+    "Jupiter":  { glyph: "♃", color: "#9bb8ff" },
+    "Saturne":  { glyph: "♄", color: "#00b8ff" },
+    "Uranus":   { glyph: "♅", color: "#7dff6f" },
+    "Neptune":  { glyph: "♆", color: "#00d9ff" },
+    "Pluton":   { glyph: "♇", color: "#c66bff" }
+  };
+
+  const demoPayload = {
+    angles: {
+      ascendant: { longitude: 201.0, sign: "Balance", degreeInSign: 21.0 },
+      mc: { longitude: 110.0, sign: "Cancer", degreeInSign: 20.0 }
+    },
+    houses: Array.from({ length: 12 }, (_, i) => {
+      const lon = (201 + i * 30) % 360;
+      const idx = Math.floor(lon / 30);
+      return {
+        house: i + 1,
+        longitude: lon,
+        sign: zodiac[idx].name,
+        degreeInSign: lon - zodiac[idx].start
+      };
+    }),
+    planets: [
+      { name: "Soleil", longitude: 71.8, sign: "Gémeaux", degreeInSign: 11.8 },
+      { name: "Lune", longitude: 172.2, sign: "Vierge", degreeInSign: 22.2 },
+      { name: "Mercure", longitude: 251.8, sign: "Sagittaire", degreeInSign: 11.8 },
+      { name: "Vénus", longitude: 208.3, sign: "Balance", degreeInSign: 28.3 },
+      { name: "Mars", longitude: 197.3, sign: "Balance", degreeInSign: 17.3 },
+      { name: "Jupiter", longitude: 289.5, sign: "Capricorne", degreeInSign: 19.5 },
+      { name: "Saturne", longitude: 217.2, sign: "Scorpion", degreeInSign: 7.2 },
+      { name: "Uranus", longitude: 352.9, sign: "Poissons", degreeInSign: 22.9 },
+      { name: "Neptune", longitude: 139.5, sign: "Lion", degreeInSign: 19.5 },
+      { name: "Pluton", longitude: 300.1, sign: "Verseau", degreeInSign: 0.1 }
+    ],
+    aspects: [
+      { p1: "Soleil", p2: "Mercure", aspect: "Opposition", exactAngle: 180.0, orb: 0.0 },
+      { p1: "Vénus", p2: "Mars", aspect: "Conjonction", exactAngle: 11.0, orb: 11.0 }
+    ]
+  };
+
+  function setStatus(text) {
+    statusBox.innerHTML = text;
+  }
+
+  function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  function normalizeDeg(deg) {
+    return ((deg % 360) + 360) % 360;
+  }
+
+  function degToRad(deg) {
+    return (deg - 90) * Math.PI / 180;
+  }
+
+  function pointOnCircle(longitude, radius) {
+    const r = degToRad(longitude);
+    return { x: CX + Math.cos(r) * radius, y: CY + Math.sin(r) * radius };
+  }
+
+  function adaptPlanets(rawPlanets) {
+    return rawPlanets.map((p) => {
+      const lon = normalizeDeg(Number(p.longitude));
+      const meta = planetMeta[p.name] || { glyph: "•", color: "#ffffff" };
+      return {
+        name: p.name,
+        glyph: meta.glyph,
+        color: meta.color,
+        longitude: lon,
+        sign: p.sign,
+        degreeInSign: Number(p.degreeInSign)
+      };
+    });
+  }
+
+  async function wakeBackend(maxAttempts = 6) {
+    for (let i = 1; i <= maxAttempts; i++) {
+      try {
+        setStatus(`Réveil du backend… tentative ${i}/${maxAttempts}`);
+        const response = await fetch(`${API_BASE}/api/health?ts=${Date.now()}`, { cache: "no-store" });
+        const text = await response.text();
+        if (text.trim().startsWith("<")) {
+          await sleep(2000);
+          continue;
+        }
+        const data = JSON.parse(text);
+        if (response.ok && data.ok) {
+          liveBadge.textContent = "BACKEND OK";
+          setStatus("Backend actif.");
+          return true;
+        }
+      } catch (e) {}
+      await sleep(2000);
+    }
+    liveBadge.textContent = "MODE DÉMO";
+    setStatus("Backend indisponible. Démo HeliosAstro affichée.");
+    return false;
+  }
+
+  function renderPremiumSummary(planets, aspects, angles) {
+    const sun = planets.find(p => p.name === "Soleil");
+    const moon = planets.find(p => p.name === "Lune");
+    premiumSummaryBox.innerHTML = `
+      <div class="table-like">
+        <div class="row"><strong>Soleil</strong><br>${sun.degreeInSign.toFixed(2)}° ${sun.sign}</div>
+        <div class="row"><strong>Lune</strong><br>${moon.degreeInSign.toFixed(2)}° ${moon.sign}</div>
+        <div class="row"><strong>Ascendant</strong><br>${angles.ascendant.degreeInSign.toFixed(2)}° ${angles.ascendant.sign}</div>
+        <div class="row"><strong>MC</strong><br>${angles.mc.degreeInSign.toFixed(2)}° ${angles.mc.sign}</div>
+        <div class="row"><strong>Aspects clés</strong><br>${aspects.length ? aspects.map(a => `${a.p1} ${a.aspect} ${a.p2}`).join(" • ") : "Aucun aspect majeur."}</div>
       </div>
+    `;
+  }
 
-      <label>Nom
-        <input type="text" id="expert-name" placeholder="Nom du consultant">
-      </label>
-
-      <label>Date
-        <input type="date" id="expert-date">
-      </label>
-
-      <label>Heure locale
-        <input type="time" id="expert-time" value="12:00">
-      </label>
-
-      <label>Ville
-        <input type="text" id="expert-city" value="Marseille">
-      </label>
-
-      <label>Pays
-        <input type="text" id="expert-country" value="France">
-      </label>
-
-      <label>Latitude
-        <input type="number" id="expert-latitude" step="0.000001" value="43.2965">
-      </label>
-
-      <label>Longitude
-        <input type="number" id="expert-longitude" step="0.000001" value="5.3698">
-      </label>
-
-      <label>Fuseau horaire
-        <input type="text" id="expert-offset" value="+01:00">
-      </label>
-
-      <div class="button-stack">
-        <button id="health-btn">Réveiller / tester le backend</button>
-        <button id="generate-btn">Générer la carte</button>
-        <button id="demo-btn" class="secondary">Démo Helios</button>
-        <button id="save-btn" class="secondary">Sauvegarder</button>
-        <button id="load-btn" class="secondary">Recharger</button>
-        <button id="export-json-btn" class="secondary">Exporter JSON</button>
-        <button id="export-pdf-btn">Exporter PDF premium</button>
+  function renderSummary(planets, aspects, angles) {
+    summaryBox.innerHTML = `
+      <div class="table-like">
+        <div class="row"><strong>Consultant :</strong> ${nameInput.value || "—"}</div>
+        <div class="row"><strong>Ascendant :</strong> ${angles.ascendant.degreeInSign.toFixed(2)}° ${angles.ascendant.sign}</div>
+        <div class="row"><strong>MC :</strong> ${angles.mc.degreeInSign.toFixed(2)}° ${angles.mc.sign}</div>
+        <div class="row"><strong>Planètes :</strong> ${planets.length}</div>
+        <div class="row"><strong>Aspects :</strong> ${aspects.length}</div>
       </div>
+    `;
+  }
 
-      <div class="panel" id="status-box">Version 500 chargée. En attente.</div>
-
-      <div class="panel">
-        <h2>Lecture premium</h2>
-        <div id="premium-summary-box"></div>
+  function renderAnglesPanel(angles) {
+    anglesBox.innerHTML = `
+      <div class="table-like">
+        <div class="row"><strong>Ascendant</strong><br>${angles.ascendant.degreeInSign.toFixed(2)}° ${angles.ascendant.sign}<br><span class="muted">${angles.ascendant.longitude.toFixed(2)}°</span></div>
+        <div class="row"><strong>Milieu du Ciel</strong><br>${angles.mc.degreeInSign.toFixed(2)}° ${angles.mc.sign}<br><span class="muted">${angles.mc.longitude.toFixed(2)}°</span></div>
       </div>
-    </aside>
+    `;
+  }
 
-    <section class="content">
-      <div class="panel chart-panel">
-        <div class="panel-head">
-          <h2>Carte HeliosAstro</h2>
-          <span class="badge" id="live-badge">MODE PRÊT</span>
-        </div>
-
-        <div class="canvas-stage">
-          <div class="canvas-square">
-            <canvas id="expert-canvas" width="1600" height="1600"></canvas>
-          </div>
-        </div>
+  function renderHousesPanel(houses) {
+    housesBox.innerHTML = `
+      <div class="table-like">
+        ${houses.map(h => `
+          <div class="row"><strong>Maison ${h.house}</strong><br>${h.degreeInSign.toFixed(2)}° ${h.sign}<br><span class="muted">${h.longitude.toFixed(2)}°</span></div>
+        `).join("")}
       </div>
+    `;
+  }
 
-      <div class="grid-two">
-        <div class="panel">
-          <h2>Synthèse</h2>
-          <div id="summary-box"></div>
-        </div>
-
-        <div class="panel">
-          <h2>Aspects</h2>
-          <div id="aspects-box"></div>
-        </div>
+  function renderPlanetsPanel(planets) {
+    planetsBox.innerHTML = `
+      <div class="table-like">
+        ${planets.map(p => `
+          <div class="row"><strong>${p.glyph} ${p.name}</strong><br>${p.degreeInSign.toFixed(2)}° ${p.sign}<br><span class="muted">${p.longitude.toFixed(2)}°</span></div>
+        `).join("")}
       </div>
+    `;
+  }
 
-      <div class="grid-two">
-        <div class="panel">
-          <h2>Ascendant et MC</h2>
-          <div id="angles-box"></div>
-        </div>
-
-        <div class="panel">
-          <h2>Maisons</h2>
-          <div id="houses-box"></div>
-        </div>
+  function renderAspectsPanel(aspects) {
+    aspectsBox.innerHTML = `
+      <div class="table-like">
+        ${aspects.length ? aspects.map(a => `
+          <div class="row"><strong>${a.p1} – ${a.p2}</strong><br>${a.aspect}<br><span class="muted">Angle ${Number(a.exactAngle).toFixed(2)}° | Orbe ${Number(a.orb).toFixed(2)}°</span></div>
+        `).join("") : `<div class="row">Aucun aspect retenu.</div>`}
       </div>
+    `;
+  }
 
-      <div class="panel">
-        <h2>Positions planétaires</h2>
-        <div id="planets-box"></div>
-      </div>
+  function clearCanvas() {
+    ctx.clearRect(0, 0, SIZE, SIZE);
+    ctx.fillStyle = "#000";
+    ctx.fillRect(0, 0, SIZE, SIZE);
+  }
 
-      <div class="panel">
-        <h2>Notes privées</h2>
-        <textarea id="private-notes" rows="8" placeholder="Observations, axes d’interprétation..."></textarea>
-      </div>
-    </section>
-  </main>
+  function drawHeliosWheelBase() {
+    const side = 1120;
+    const x = (SIZE - side) / 2;
+    const y = (SIZE - side) / 2;
+    if (wheelImageLoaded) {
+      ctx.drawImage(wheelImage, x, y, side, side);
+    } else {
+      ctx.strokeStyle = "#fff";
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(CX, CY, 430, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+  }
 
-  <script src="assets/expert.js?v=500"></script>
-</body>
-</html>
+  function drawHouseCusps(houses) {
+    const innerRadius = 250;
+    const outerRadius = 500;
+
+    houses.forEach((h, idx) => {
+      const a = degToRad(h.longitude);
+      const x1 = CX + Math.cos(a) * innerRadius;
+      const y1 = CY + Math.sin(a) * innerRadius;
+      const x2 = CX + Math.cos(a) * outerRadius;
+      const y2 = CY + Math.sin(a) * outerRadius;
+
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.strokeStyle = idx === 0 ? "rgba(255,211,105,0.95)" : "rgba(120,232,255,0.55)";
+      ctx.lineWidth = idx === 0 ? 3.2 : 1.4;
+      ctx.stroke();
+
+      const label = pointOnCircle(h.longitude + 15, 290);
+      ctx.fillStyle = idx === 0 ? "#ffd369" : "#ffffff";
+      ctx.font = "24px Arial";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(String(h.house), label.x, label.y);
+    });
+  }
+
+  function drawPlanetArcFlow(planet, index) {
+    const endRadius = 530 + (index % 2) * 8;
+    const end = pointOnCircle(planet.longitude, endRadius);
+    const a = degToRad(planet.longitude);
+
+    ctx.save();
+    ctx.beginPath();
+
+    for (let t = 0; t <= 1; t += 0.02) {
+      const radius = t * 350;
+      const theta = a + (t * 1.2 * Math.PI);
+      const x = CX + radius * Math.cos(theta);
+      const y = CY + radius * Math.sin(theta);
+      if (t === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+
+    ctx.lineTo(end.x, end.y);
+    ctx.strokeStyle = planet.color;
+    ctx.lineWidth = 4.5;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = planet.color;
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawPlanetMarkers(planets) {
+    planets.forEach((p, i) => {
+      const radius = 565 + (i % 3) * 20;
+      const point = pointOnCircle(p.longitude, radius);
+
+      ctx.beginPath();
+      ctx.arc(point.x, point.y, 19, 0, Math.PI * 2);
+      ctx.fillStyle = p.color;
+      ctx.shadowBlur = 10;
+      ctx.shadowColor = p.color;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      ctx.fillStyle = "#fff";
+      ctx.font = "20px Arial";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(p.glyph, point.x, point.y + 1);
+
+      const label = pointOnCircle(p.longitude, radius + 34);
+      ctx.font = "18px Arial";
+      ctx.fillText(p.name, label.x, label.y);
+
+      const sub = pointOnCircle(p.longitude, radius + 55);
+      ctx.font = "14px Arial";
+      ctx.fillText(`${p.degreeInSign.toFixed(1)}° ${p.sign}`, sub.x, sub.y);
+    });
+  }
+
+  function drawAnglesOnWheel(angles) {
+    const asc = pointOnCircle(angles.ascendant.longitude, 540);
+    const mc = pointOnCircle(angles.mc.longitude, 540);
+
+    ctx.fillStyle = "#ffd369";
+    ctx.font = "30px Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("ASC", asc.x, asc.y);
+
+    ctx.fillStyle = "#78e8ff";
+    ctx.fillText("MC", mc.x, mc.y);
+  }
+
+  function renderWheel(payload) {
+    clearCanvas();
+    drawHeliosWheelBase();
+    drawHouseCusps(payload.houses);
+    payload.planets.forEach((planet, index) => drawPlanetArcFlow(planet, index));
+    drawPlanetMarkers(payload.planets);
+    drawAnglesOnWheel(payload.angles);
+  }
+
+  function renderAll(payload) {
+    currentChart = payload;
+    renderPremiumSummary(payload.planets, payload.aspects || [], payload.angles);
+    renderSummary(payload.planets, payload.aspects || [], payload.angles);
+    renderAnglesPanel(payload.angles);
+    renderHousesPanel(payload.houses);
+    renderPlanetsPanel(payload.planets);
+    renderAspectsPanel(payload.aspects || []);
+    renderWheel(payload);
+  }
+
+  async function generateLiveChart() {
+    const awake = await wakeBackend();
+    if (!awake) {
+      liveBadge.textContent = "MODE DÉMO";
+      renderAll(demoPayload);
+      return;
+    }
+
+    try {
+      setStatus("Calcul réel en cours…");
+      const response = await fetch(`${API_BASE}/api/calc`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+          date: dateInput.value || "1967-12-04",
+          time: timeInput.value || "12:00",
+          city: cityInput.value || "Marseille",
+          country: countryInput.value || "France",
+          latitude: Number(latitudeInput.value || "43.2965"),
+          longitude: Number(longitudeInput.value || "5.3698"),
+          offset: offsetInput.value || "+01:00"
+        })
+      });
+
+      const text = await response.text();
+      if (text.trim().startsWith("<")) throw new Error("Le backend renvoie du HTML.");
+      const data = JSON.parse(text);
+
+      if (!response.ok || !data.planets || !data.angles || !data.houses) {
+        throw new Error("Réponse backend invalide.");
+      }
+
+      liveBadge.textContent = "CARTE LIVE";
+      renderAll({
+        planets: adaptPlanets(data.planets),
+        aspects: data.aspects || [],
+        angles: data.angles,
+        houses: data.houses
+      });
+      setStatus("Carte générée avec succès.");
+    } catch (e) {
+      liveBadge.textContent = "MODE DÉMO";
+      renderAll(demoPayload);
+      setStatus(`Mode démo HeliosAstro. Motif : ${e.message}`);
+    }
+  }
+
+  function saveLocal() {
+    const payload = {
+      consultant: nameInput.value || "",
+      date: dateInput.value || "",
+      time: timeInput.value || "",
+      city: cityInput.value || "",
+      country: countryInput.value || "",
+      latitude: latitudeInput.value || "",
+      longitude: longitudeInput.value || "",
+      offset: offsetInput.value || "",
+      notes: privateNotes.value || "",
+      chart: currentChart
+    };
+    localStorage.setItem("heliosastro_expert_chart", JSON.stringify(payload));
+    setStatus("Sauvegarde locale effectuée.");
+  }
+
+  function loadLocal() {
+    const raw = localStorage.getItem("heliosastro_expert_chart");
+    if (!raw) {
+      setStatus("Aucune sauvegarde locale.");
+      return;
+    }
+    const saved = JSON.parse(raw);
+    nameInput.value = saved.consultant || "";
+    dateInput.value = saved.date || "";
+    timeInput.value = saved.time || "12:00";
+    cityInput.value = saved.city || "Marseille";
+    countryInput.value = saved.country || "France";
+    latitudeInput.value = saved.latitude || "43.2965";
+    longitudeInput.value = saved.longitude || "5.3698";
+    offsetInput.value = saved.offset || "+01:00";
+    privateNotes.value = saved.notes || "";
+    if (saved.chart) {
+      renderAll(saved.chart);
+      setStatus("Dernière sauvegarde rechargée.");
+    }
+  }
+
+  function exportJson() {
+    if (!currentChart) return;
+    const blob = new Blob([JSON.stringify(currentChart, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "heliosastro-expert.json";
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function exportPdfPremium() {
+    if (!currentChart) return;
+    const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+    const imageData = canvas.toDataURL("image/png", 1.0);
+
+    doc.setFillColor(6, 9, 19);
+    doc.rect(0, 0, 210, 297, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(22);
+    doc.text("HELIOSASTRO EXPERT", 105, 16, { align: "center" });
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.text(`Nom : ${nameInput.value || "Consultant"}`, 14, 28);
+    doc.text(`Date : ${dateInput.value || "—"}`, 14, 34);
+    doc.text(`Heure : ${timeInput.value || "—"}`, 14, 40);
+    doc.text(`Lieu : ${cityInput.value || "—"}, ${countryInput.value || "—"}`, 14, 46);
+    doc.addImage(imageData, "PNG", 15, 55, 180, 180, "", "FAST");
+    doc.save(`${(nameInput.value || "heliosastro").replace(/\s+/g, "-").toLowerCase()}-expert.pdf`);
+  }
+
+  healthBtn.addEventListener("click", wakeBackend);
+  generateBtn.addEventListener("click", generateLiveChart);
+  demoBtn.addEventListener("click", () => {
+    liveBadge.textContent = "MODE DÉMO";
+    renderAll(demoPayload);
+    setStatus("Démo HeliosAstro affichée.");
+  });
+  saveBtn.addEventListener("click", saveLocal);
+  loadBtn.addEventListener("click", loadLocal);
+  exportJsonBtn.addEventListener("click", exportJson);
+  exportPdfBtn.addEventListener("click", exportPdfPremium);
+
+  renderAll(demoPayload);
+  setStatus("Version 500 chargée. Rendu premium actif.");
+});
 
