@@ -7,88 +7,117 @@
   <meta http-equiv="Expires" content="0">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Helios Astro</title>
-  <meta name="description" content="Helios Astro — astrologie géométrique premium.">
+  <meta name="description" content="Helios Astro — astrologie géométrique premium, thèmes personnalisés et expérience visuelle nouvelle génération.">
   <style>
     :root{
       --bg:#050814;
       --panel:#0c1320;
+      --panel2:#09101b;
       --line:rgba(91,214,255,.18);
       --text:#eef5ff;
       --muted:#b5c7e8;
       --accent:#45ddff;
       --accent2:#8ef2ff;
+      --gold:#ffd369;
     }
     *{box-sizing:border-box}
     html,body{
-      margin:0;padding:0;background:
-      radial-gradient(circle at top, rgba(69,221,255,.08), transparent 30%),
-      radial-gradient(circle at center, rgba(255,215,120,.05), transparent 25%),
-      var(--bg);
+      margin:0;padding:0;
+      background:
+        radial-gradient(circle at top, rgba(69,221,255,.08), transparent 30%),
+        radial-gradient(circle at center, rgba(255,215,120,.05), transparent 25%),
+        var(--bg);
       color:var(--text);
-      font-family:Arial,Helvetica,sans-serif
+      font-family:Arial,Helvetica,sans-serif;
     }
     a{text-decoration:none;color:inherit}
-    .wrap{max-width:1200px;margin:0 auto;padding:24px}
+    .wrap{max-width:1240px;margin:0 auto;padding:24px}
     header{
       display:flex;align-items:center;justify-content:space-between;gap:20px;
-      padding:14px 0
+      padding:14px 0 20px;
     }
-    .brand{display:flex;align-items:center;gap:14px}
+    .brand{display:flex;align-items:center;gap:16px}
     .brand img{
-      width:68px;height:68px;object-fit:contain;border-radius:18px;
-      background:#fff;padding:6px
+      width:72px;height:72px;object-fit:contain;border-radius:20px;
+      background:#fff;padding:6px;
+      box-shadow:0 10px 24px rgba(0,0,0,.28);
     }
-    .brand h1{margin:0;font-size:40px;letter-spacing:.04em}
-    .brand p{margin:4px 0 0;color:var(--muted)}
-    nav{display:flex;gap:18px;flex-wrap:wrap}
+    .brand h1{margin:0;font-size:42px;letter-spacing:.04em}
+    .brand p{margin:4px 0 0;color:var(--muted);font-size:18px}
+    nav{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
     nav a{
-      padding:10px 14px;border-radius:999px;border:1px solid transparent;color:var(--muted)
+      padding:10px 14px;border-radius:999px;color:var(--muted);
+      border:1px solid transparent;
     }
     nav a:hover{border-color:var(--line);color:var(--text)}
     .cta{
       display:inline-flex;align-items:center;justify-content:center;
       padding:14px 22px;border-radius:999px;
       background:linear-gradient(135deg,var(--accent),var(--accent2));
-      color:#00131c;font-weight:800;box-shadow:0 10px 28px rgba(69,221,255,.2)
+      color:#00131c;font-weight:800;
+      box-shadow:0 10px 28px rgba(69,221,255,.20);
     }
     .hero{
-      display:grid;grid-template-columns:1.1fr .9fr;gap:26px;margin-top:20px
+      display:grid;grid-template-columns:1.05fr .95fr;gap:28px;
+      margin-top:12px;
     }
     .panel{
-      background:linear-gradient(180deg,#0b1220,#09101b);
+      background:linear-gradient(180deg,var(--panel),var(--panel2));
       border:1px solid var(--line);
-      border-radius:28px;
-      padding:24px;
-      box-shadow:0 18px 34px rgba(0,0,0,.25)
+      border-radius:30px;
+      padding:28px;
+      box-shadow:0 18px 34px rgba(0,0,0,.25);
     }
-    .hero h2{font-size:54px;line-height:.96;margin:0 0 16px}
-    .hero p{font-size:18px;color:var(--muted);line-height:1.6}
-    .actions{display:flex;gap:14px;flex-wrap:wrap;margin-top:24px}
+    .hero h2{
+      font-size:58px;line-height:.95;margin:0 0 18px;
+    }
+    .hero p{
+      font-size:19px;line-height:1.65;color:var(--muted);margin:0;
+    }
+    .actions{display:flex;gap:14px;flex-wrap:wrap;margin-top:28px}
     .ghost{
-      padding:14px 22px;border-radius:999px;border:1px solid var(--line);
-      color:var(--text);background:rgba(255,255,255,.03);font-weight:700
+      display:inline-flex;align-items:center;justify-content:center;
+      padding:14px 22px;border-radius:999px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      color:var(--text);font-weight:700;
     }
     .visual{
-      display:flex;align-items:center;justify-content:center;min-height:520px
+      display:flex;align-items:center;justify-content:center;min-height:560px;
     }
     .visual img{
-      width:min(100%,540px);aspect-ratio:1/1;object-fit:contain;
-      filter:drop-shadow(0 20px 40px rgba(0,0,0,.35))
+      width:min(100%,560px);
+      aspect-ratio:1/1;
+      object-fit:contain;
+      filter:drop-shadow(0 20px 40px rgba(0,0,0,.38));
     }
     .grid{
-      display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:18px;
+      margin-top:24px;
     }
-    .card h3{margin:0 0 10px}
-    .card p{margin:0;color:var(--muted);line-height:1.55}
+    .card h3{margin:0 0 10px;font-size:22px}
+    .card p{margin:0;color:var(--muted);line-height:1.6}
+    .section-title{
+      margin:36px 0 16px;
+      font-size:34px;
+    }
+    .offers-grid{
+      display:grid;grid-template-columns:repeat(3,1fr);gap:18px;
+    }
+    .price{
+      font-size:34px;font-weight:800;margin:10px 0;color:var(--gold);
+    }
     footer{
-      margin-top:30px;padding:26px 0;color:var(--muted);
-      display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap
+      margin-top:32px;padding:26px 0;color:var(--muted);
+      display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;
     }
     @media(max-width:980px){
       .hero{grid-template-columns:1fr}
-      .grid{grid-template-columns:1fr}
-      .brand h1{font-size:32px}
-      .hero h2{font-size:40px}
+      .grid,.offers-grid{grid-template-columns:1fr}
+      .brand h1{font-size:34px}
+      .hero h2{font-size:42px}
     }
   </style>
 </head>
@@ -96,7 +125,7 @@
   <div class="wrap">
     <header>
       <div class="brand">
-        <img src="./expert/assets/logo-heliosastro.png?v=301" alt="Logo Helios Astro">
+        <img src="./expert/assets/logo-heliosastro.png?v=401" alt="Logo Helios Astro">
         <div>
           <h1>HELIOS ASTRO</h1>
           <p>Astrologie géométrique premium</p>
@@ -104,11 +133,11 @@
       </div>
 
       <nav>
-        <a href="./index.html?v=301">Accueil</a>
-        <a href="./offres.html?v=301">Offres</a>
-        <a href="./livre.html?v=301">Livre</a>
-        <a href="./contact.html?v=301">Contact</a>
-        <a class="cta" href="./expert/?v=301">Accéder au logiciel expert</a>
+        <a href="./index.html?v=401">Accueil</a>
+        <a href="./offres.html?v=401">Offres</a>
+        <a href="./livre.html?v=401">Livre</a>
+        <a href="./contact.html?v=401">Contact</a>
+        <a class="cta" href="./expert/?v=401">Accéder au logiciel expert</a>
       </nav>
     </header>
 
@@ -116,43 +145,65 @@
       <div class="panel">
         <h2>L’astrologie réinventée.</h2>
         <p>
-          Une cartographie précise de votre thème,
-          alliant puissance symbolique, géométrie sacrée
-          et technologie avancée.
+          Découvrez une lecture visuelle, précise et immersive de votre thème.
+          Helios Astro réunit l’élégance de la géométrie sacrée, une restitution premium
+          et une approche moderne du symbolisme astrologique.
         </p>
         <div class="actions">
-          <a class="cta" href="./expert/?v=301">Accéder à mon thème</a>
-          <a class="ghost" href="./offres.html?v=301">Explorer l’expérience</a>
+          <a class="cta" href="./expert/?v=401">Générer mon thème</a>
+          <a class="ghost" href="./offres.html?v=401">Découvrir les offres</a>
         </div>
       </div>
 
       <div class="panel visual">
-        <img src="./expert/assets/roue-heliosastro.png?v=301" alt="Roue Helios Astro">
+        <img src="./expert/assets/roue-heliosastro.png?v=401" alt="Roue Helios Astro">
       </div>
     </section>
+
+    <h2 class="section-title">Une expérience pensée pour les clients</h2>
 
     <section class="grid">
       <div class="panel card">
         <h3>Lecture personnalisée</h3>
-        <p>Une approche visuelle et symbolique de votre thème, pensée pour une lecture claire, élégante et percutante.</p>
+        <p>Une vision claire et raffinée du thème natal, conçue pour mettre en valeur l’essentiel avec intensité et lisibilité.</p>
       </div>
       <div class="panel card">
-        <h3>Expérience premium</h3>
-        <p>Helios Astro conjugue esthétique sacrée, précision astrologique et restitution moderne.</p>
+        <h3>Esthétique premium</h3>
+        <p>Un univers visuel inspiré de la géométrie sacrée, au service d’une expérience unique, mémorable et élégante.</p>
       </div>
       <div class="panel card">
-        <h3>Logiciel expert</h3>
-        <p>Un module séparé permet le calcul du thème, l’ascendant, les maisons et l’export PDF.</p>
+        <h3>Outil expert</h3>
+        <p>Un module dédié permet le calcul, les maisons, l’ascendant, les aspects et l’export PDF dans un environnement séparé.</p>
+      </div>
+    </section>
+
+    <h2 class="section-title">Formules</h2>
+
+    <section class="offers-grid">
+      <div class="panel card">
+        <h3>Découverte</h3>
+        <div class="price">49€</div>
+        <p>Thème visuel, synthèse générale et lecture des axes majeurs.</p>
+      </div>
+      <div class="panel card">
+        <h3>Premium</h3>
+        <div class="price">99€</div>
+        <p>Thème complet, lecture approfondie, ascendant, maisons et export PDF.</p>
+      </div>
+      <div class="panel card">
+        <h3>Expert</h3>
+        <div class="price">149€</div>
+        <p>Analyse élargie, commentaires détaillés, angles, aspects et restitution avancée.</p>
       </div>
     </section>
 
     <footer>
       <div>© 2026 Helios Astro</div>
       <div>
-        <a href="./index.html?v=301">Accueil</a> ·
-        <a href="./offres.html?v=301">Offres</a> ·
-        <a href="./contact.html?v=301">Contact</a> ·
-        <a href="./expert/?v=301">Logiciel Expert</a>
+        <a href="./index.html?v=401">Accueil</a> ·
+        <a href="./offres.html?v=401">Offres</a> ·
+        <a href="./contact.html?v=401">Contact</a> ·
+        <a href="./expert/?v=401">Logiciel Expert</a>
       </div>
     </footer>
   </div>
