@@ -1,13 +1,12 @@
 {
-  "name": "heliosastro-backend",
-  "version": "2.0.0",
+  "name": "heliosastro-expert-backend",
+  "version": "1.0.0",
+  "private": true,
   "main": "server.js",
-  "type": "commonjs",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "astronomy-engine": "^2.1.19",
     "cors": "^2.8.5",
     "express": "^4.21.2"
   }
