@@ -1,107 +1,227 @@
-<div class="button-stack">
-  <button id="health-btn">Réveiller / tester le backend</button>
-  <button id="generate-btn">Générer la carte</button>
-  <button id="demo-btn" class="secondary">Démo Helios</button>
-  <button id="save-btn" class="secondary">Sauvegarder</button>
-  <button id="load-btn" class="secondary">Recharger</button>
-  <button id="export-json-btn" class="secondary">Exporter JSON</button>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HeliosAstro Expert</title>
+  <meta name="theme-color" content="#060913">
+  <link rel="manifest" href="manifest.webmanifest?v=800">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png?v=800">
+  <link rel="icon" type="image/png" sizes="512x512" href="assets/icon-512.png?v=800">
+  <link rel="stylesheet" href="assets/expert.css?v=700">
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+</head>
+<body>
+  <main class="app-shell">
+    <aside class="sidebar">
+      <div class="brand-box">
+        <img src="assets/logo-heliosastro.png?v=800" alt="Logo HeliosAstro" class="brand-logo">
+        <div>
+          <h1>HeliosAstro Expert</h1>
+          <p class="subtitle">Carte premium • Ascendant • Maisons • Export PDF</p>
+        </div>
+      </div>
 
-  <div class="paypal-pdf-box">
-    <style>
-      .paypal-pdf-box{
-        display:flex;
-        justify-content:center;
-        align-items:center;
-        margin-top:6px;
-      }
-      .paypal-pdf-form{
-        display:inline-grid;
-        justify-items:center;
-        align-content:start;
-        gap:10px;
-        width:100%;
-        padding:18px;
-        border-radius:18px;
-        background:linear-gradient(180deg,#0c1320,#09101b);
-        border:1px solid rgba(91,214,255,.18);
-        box-shadow:0 18px 34px rgba(0,0,0,.25);
-      }
-      .paypal-pdf-title{
-        margin:0;
-        color:#eef5ff;
-        font-family:Arial,Helvetica,sans-serif;
-        font-size:18px;
-        font-weight:700;
-        text-align:center;
-      }
-      .paypal-pdf-subtitle{
-        margin:0;
-        color:#b5c7e8;
-        font-family:Arial,Helvetica,sans-serif;
-        font-size:14px;
-        text-align:center;
-        line-height:1.5;
-      }
-      .pp-SQUMEZ7UVKZ4Q{
-        text-align:center;
-        border:none;
-        border-radius:999px;
-        min-width:220px;
-        padding:0 2rem;
-        height:46px;
-        font-weight:800;
-        background:linear-gradient(135deg,#FFD140,#ffea8a);
-        color:#000000;
-        font-family:Arial,Helvetica,sans-serif;
-        font-size:16px;
-        line-height:1.25rem;
-        cursor:pointer;
-        box-shadow:0 10px 24px rgba(255,209,64,.24);
-      }
-      .paypal-pdf-cards{
-        max-width:220px;
-        height:auto;
-      }
-      .paypal-pdf-powered{
-        font-size:12px;
-        color:#b5c7e8;
-        font-family:Arial,Helvetica,sans-serif;
-      }
-      .paypal-pdf-powered img{
-        height:14px;
-        vertical-align:middle;
-      }
-    </style>
+      <label>Nom
+        <input type="text" id="expert-name" placeholder="Nom du consultant">
+      </label>
 
-    <form
-      action="https://www.paypal.com/ncp/payment/SQUMEZ7UVKZ4Q"
-      method="post"
-      target="_blank"
-      class="paypal-pdf-form"
-    >
-      <p class="paypal-pdf-title">Export PDF premium</p>
-      <p class="paypal-pdf-subtitle">Débloquez l’export PDF de votre thème pour <strong>5 €</strong>.</p>
+      <label>Date
+        <input type="date" id="expert-date">
+      </label>
 
-      <input
-        class="pp-SQUMEZ7UVKZ4Q"
-        type="submit"
-        value="Acheter l’export PDF — 5 €"
-      />
+      <label>Heure locale
+        <input type="time" id="expert-time" value="12:00">
+      </label>
 
-      <img
-        class="paypal-pdf-cards"
-        src="https://www.paypalobjects.com/images/Debit_Credit_APM.svg"
-        alt="Paiement par carte et PayPal"
-      />
+      <label>Ville
+        <input type="text" id="expert-city" value="Marseille">
+      </label>
 
-      <section class="paypal-pdf-powered">
-        Optimisé par
-        <img
-          src="https://www.paypalobjects.com/paypal-ui/logos/svg/paypal-wordmark-color.svg"
-          alt="PayPal"
-        />
-      </section>
-    </form>
-  </div>
-</div>
+      <label>Pays
+        <input type="text" id="expert-country" value="France">
+      </label>
 
+      <label>Latitude
+        <input type="number" id="expert-latitude" step="0.000001" value="43.2965">
+      </label>
+
+      <label>Longitude
+        <input type="number" id="expert-longitude" step="0.000001" value="5.3698">
+      </label>
+
+      <label>Fuseau horaire
+        <input type="text" id="expert-offset" value="+01:00">
+      </label>
+
+      <div class="button-stack">
+        <button id="health-btn">Réveiller / tester le backend</button>
+        <button id="generate-btn">Générer la carte</button>
+        <button id="demo-btn" class="secondary">Démo Helios</button>
+        <button id="save-btn" class="secondary">Sauvegarder</button>
+        <button id="load-btn" class="secondary">Recharger</button>
+        <button id="export-json-btn" class="secondary">Exporter JSON</button>
+
+        <div class="paypal-pdf-box">
+          <style>
+            .paypal-pdf-box{
+              display:flex;
+              justify-content:center;
+              align-items:center;
+              margin-top:6px;
+            }
+            .paypal-pdf-form{
+              display:inline-grid;
+              justify-items:center;
+              align-content:start;
+              gap:10px;
+              width:100%;
+              padding:18px;
+              border-radius:18px;
+              background:linear-gradient(180deg,#0c1320,#09101b);
+              border:1px solid rgba(91,214,255,.18);
+              box-shadow:0 18px 34px rgba(0,0,0,.25);
+            }
+            .paypal-pdf-title{
+              margin:0;
+              color:#eef5ff;
+              font-family:Arial,Helvetica,sans-serif;
+              font-size:18px;
+              font-weight:700;
+              text-align:center;
+            }
+            .paypal-pdf-subtitle{
+              margin:0;
+              color:#b5c7e8;
+              font-family:Arial,Helvetica,sans-serif;
+              font-size:14px;
+              text-align:center;
+              line-height:1.5;
+            }
+            .pp-SQUMEZ7UVKZ4Q{
+              text-align:center;
+              border:none;
+              border-radius:999px;
+              min-width:220px;
+              padding:0 2rem;
+              height:46px;
+              font-weight:800;
+              background:linear-gradient(135deg,#FFD140,#ffea8a);
+              color:#000000;
+              font-family:Arial,Helvetica,sans-serif;
+              font-size:16px;
+              line-height:1.25rem;
+              cursor:pointer;
+              box-shadow:0 10px 24px rgba(255,209,64,.24);
+            }
+            .paypal-pdf-cards{
+              max-width:220px;
+              height:auto;
+            }
+            .paypal-pdf-powered{
+              font-size:12px;
+              color:#b5c7e8;
+              font-family:Arial,Helvetica,sans-serif;
+            }
+            .paypal-pdf-powered img{
+              height:14px;
+              vertical-align:middle;
+            }
+          </style>
+
+          <form
+            action="https://www.paypal.com/ncp/payment/SQUMEZ7UVKZ4Q"
+            method="post"
+            target="_blank"
+            class="paypal-pdf-form"
+          >
+            <p class="paypal-pdf-title">Export PDF premium</p>
+            <p class="paypal-pdf-subtitle">Débloquez l’export PDF de votre thème pour <strong>5 €</strong>.</p>
+
+            <input
+              class="pp-SQUMEZ7UVKZ4Q"
+              type="submit"
+              value="Acheter l’export PDF — 5 €"
+            >
+
+            <img
+              class="paypal-pdf-cards"
+              src="https://www.paypalobjects.com/images/Debit_Credit_APM.svg"
+              alt="Paiement par carte et PayPal"
+            >
+
+            <section class="paypal-pdf-powered">
+              Optimisé par
+              <img
+                src="https://www.paypalobjects.com/paypal-ui/logos/svg/paypal-wordmark-color.svg"
+                alt="PayPal"
+              >
+            </section>
+          </form>
+        </div>
+      </div>
+
+      <div class="panel" id="status-box">Version 700 chargée. En attente.</div>
+
+      <div class="panel">
+        <h2>Lecture premium</h2>
+        <div id="premium-summary-box"></div>
+      </div>
+    </aside>
+
+    <section class="content">
+      <div class="panel chart-panel">
+        <div class="panel-head">
+          <h2>Carte HeliosAstro</h2>
+          <span class="badge" id="live-badge">MODE PRÊT</span>
+        </div>
+
+        <div class="canvas-stage">
+          <div class="canvas-square">
+            <canvas id="expert-canvas" width="1600" height="1600"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-two">
+        <div class="panel">
+          <h2>Synthèse</h2>
+          <div id="summary-box"></div>
+        </div>
+
+        <div class="panel">
+          <h2>Aspects</h2>
+          <div id="aspects-box"></div>
+        </div>
+      </div>
+
+      <div class="grid-two">
+        <div class="panel">
+          <h2>Ascendant et MC</h2>
+          <div id="angles-box"></div>
+        </div>
+
+        <div class="panel">
+          <h2>Maisons</h2>
+          <div id="houses-box"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Positions planétaires</h2>
+        <div id="planets-box"></div>
+      </div>
+
+      <div class="panel">
+        <h2>Notes privées</h2>
+        <textarea id="private-notes" rows="8" placeholder="Observations, axes d’interprétation..."></textarea>
+      </div>
+    </section>
+  </main>
+
+  <script src="assets/expert.js?v=700"></script>
+</body>
+</html>
