@@ -35,7 +35,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const SIZE = 1600;
   canvas.width = SIZE;
   canvas.height = SIZE;
-
   const CX = SIZE / 2;
   const CY = SIZE / 2;
 
@@ -47,7 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
     wheelImageLoaded = true;
     if (currentChart) renderWheel(currentChart);
   };
-  wheelImage.src = "./roue-heliosastro.png?v=201";
+  wheelImage.src = "./assets/roue-heliosastro.png?v=301";
 
   const zodiac = [
     { name: "Bélier", glyph: "♈", start: 0 },
@@ -136,10 +135,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function pointOnCircle(longitude, radius) {
     const r = degToRad(longitude);
-    return {
-      x: CX + Math.cos(r) * radius,
-      y: CY + Math.sin(r) * radius
-    };
+    return { x: CX + Math.cos(r) * radius, y: CY + Math.sin(r) * radius };
   }
 
   function adaptPlanets(rawPlanets) {
@@ -161,118 +157,87 @@ document.addEventListener("DOMContentLoaded", () => {
     for (let i = 1; i <= maxAttempts; i++) {
       try {
         setStatus(`Réveil du backend… tentative ${i}/${maxAttempts}`);
-        const response = await fetch(`${API_BASE}/api/health?ts=${Date.now()}`, {
-          method: "GET",
-          cache: "no-store"
-        });
-
+        const response = await fetch(`${API_BASE}/api/health?ts=${Date.now()}`, { method: "GET", cache: "no-store" });
         const text = await response.text();
         if (text.trim().startsWith("<")) {
           await sleep(3000);
           continue;
         }
-
         const data = JSON.parse(text);
         if (response.ok && data.ok) {
           liveBadge.textContent = "BACKEND OK";
           setStatus("Backend actif.");
           return true;
         }
-      } catch (error) {
-      }
-
+      } catch (e) {}
       await sleep(3000);
     }
-
     liveBadge.textContent = "MODE DÉMO";
-    setStatus("Backend indisponible. Affichage de démo HeliosAstro.");
+    setStatus("Backend indisponible. Démo HeliosAstro affichée.");
     return false;
   }
 
   function renderPremiumSummary(planets, aspects, angles) {
     const sun = planets.find(p => p.name === "Soleil");
     const moon = planets.find(p => p.name === "Lune");
-    const venus = planets.find(p => p.name === "Vénus");
-    const mars = planets.find(p => p.name === "Mars");
-
     premiumSummaryBox.innerHTML = `
       <div class="table-like">
-        <div class="row"><strong>Axe central</strong><br>Soleil en ${sun.sign} : identité, rayonnement, direction.</div>
-        <div class="row"><strong>Vie intérieure</strong><br>Lune en ${moon.sign} : sensibilité, mémoire, sécurité.</div>
-        <div class="row"><strong>Relationnel</strong><br>Vénus en ${venus.sign}, Mars en ${mars.sign} : attraction, impulsion, désir.</div>
-        <div class="row"><strong>Angles</strong><br>Ascendant en ${angles.ascendant.sign}, MC en ${angles.mc.sign}.</div>
-        <div class="row"><strong>Aspects</strong><br>${aspects.length ? aspects.slice(0, 3).map(a => `${a.p1} ${a.aspect} ${a.p2}`).join(" • ") : "Aucun aspect majeur retenu."}</div>
+        <div class="row"><strong>Soleil</strong><br>${sun.degreeInSign.toFixed(2)}° ${sun.sign}</div>
+        <div class="row"><strong>Lune</strong><br>${moon.degreeInSign.toFixed(2)}° ${moon.sign}</div>
+        <div class="row"><strong>Ascendant</strong><br>${angles.ascendant.degreeInSign.toFixed(2)}° ${angles.ascendant.sign}</div>
+        <div class="row"><strong>MC</strong><br>${angles.mc.degreeInSign.toFixed(2)}° ${angles.mc.sign}</div>
+        <div class="row"><strong>Aspects clés</strong><br>${aspects.length ? aspects.map(a => `${a.p1} ${a.aspect} ${a.p2}`).join(" • ") : "Aucun aspect majeur."}</div>
       </div>
     `;
   }
 
   function renderSummary(planets, aspects, angles) {
-    const sun = planets.find(p => p.name === "Soleil");
-    const moon = planets.find(p => p.name === "Lune");
     summaryBox.innerHTML = `
       <div class="table-like">
         <div class="row"><strong>Consultant :</strong> ${nameInput.value || "—"}</div>
-        <div class="row"><strong>Soleil :</strong> ${sun.degreeInSign.toFixed(2)}° ${sun.sign}</div>
-        <div class="row"><strong>Lune :</strong> ${moon.degreeInSign.toFixed(2)}° ${moon.sign}</div>
         <div class="row"><strong>Ascendant :</strong> ${angles.ascendant.degreeInSign.toFixed(2)}° ${angles.ascendant.sign}</div>
         <div class="row"><strong>MC :</strong> ${angles.mc.degreeInSign.toFixed(2)}° ${angles.mc.sign}</div>
+        <div class="row"><strong>Planètes :</strong> ${planets.length}</div>
         <div class="row"><strong>Aspects :</strong> ${aspects.length}</div>
       </div>
     `;
   }
 
-  function renderAngles(angles) {
+  function renderAnglesPanel(angles) {
     anglesBox.innerHTML = `
       <div class="table-like">
-        <div class="row"><strong>Ascendant</strong><br>${angles.ascendant.degreeInSign.toFixed(2)}° ${angles.ascendant.sign}<br><span class="muted">Longitude : ${angles.ascendant.longitude.toFixed(2)}°</span></div>
-        <div class="row"><strong>Milieu du Ciel</strong><br>${angles.mc.degreeInSign.toFixed(2)}° ${angles.mc.sign}<br><span class="muted">Longitude : ${angles.mc.longitude.toFixed(2)}°</span></div>
+        <div class="row"><strong>Ascendant</strong><br>${angles.ascendant.degreeInSign.toFixed(2)}° ${angles.ascendant.sign}<br><span class="muted">${angles.ascendant.longitude.toFixed(2)}°</span></div>
+        <div class="row"><strong>Milieu du Ciel</strong><br>${angles.mc.degreeInSign.toFixed(2)}° ${angles.mc.sign}<br><span class="muted">${angles.mc.longitude.toFixed(2)}°</span></div>
       </div>
     `;
   }
 
-  function renderHouses(houses) {
+  function renderHousesPanel(houses) {
     housesBox.innerHTML = `
       <div class="table-like">
         ${houses.map(h => `
-          <div class="row">
-            <strong>Maison ${h.house}</strong><br>
-            ${h.degreeInSign.toFixed(2)}° ${h.sign}<br>
-            <span class="muted">Longitude : ${h.longitude.toFixed(2)}°</span>
-          </div>
+          <div class="row"><strong>Maison ${h.house}</strong><br>${h.degreeInSign.toFixed(2)}° ${h.sign}<br><span class="muted">${h.longitude.toFixed(2)}°</span></div>
         `).join("")}
       </div>
     `;
   }
 
-  function renderPlanetsList(planets) {
+  function renderPlanetsPanel(planets) {
     planetsBox.innerHTML = `
       <div class="table-like">
         ${planets.map(p => `
-          <div class="row">
-            <strong>${p.glyph} ${p.name}</strong><br>
-            ${p.degreeInSign.toFixed(2)}° ${p.sign}<br>
-            <span class="muted">Longitude : ${p.longitude.toFixed(2)}°</span>
-          </div>
+          <div class="row"><strong>${p.glyph} ${p.name}</strong><br>${p.degreeInSign.toFixed(2)}° ${p.sign}<br><span class="muted">${p.longitude.toFixed(2)}°</span></div>
         `).join("")}
       </div>
     `;
   }
 
-  function renderAspects(aspects) {
-    if (!aspects || !aspects.length) {
-      aspectsBox.innerHTML = `<div class="row">Aucun aspect retenu.</div>`;
-      return;
-    }
-
+  function renderAspectsPanel(aspects) {
     aspectsBox.innerHTML = `
       <div class="table-like">
-        ${aspects.map(a => `
-          <div class="row">
-            <strong>${a.p1} – ${a.p2}</strong><br>
-            ${a.aspect}<br>
-            <span class="muted">Angle : ${Number(a.exactAngle).toFixed(2)}° | Orbe : ${Number(a.orb).toFixed(2)}°</span>
-          </div>
-        `).join("")}
+        ${aspects.length ? aspects.map(a => `
+          <div class="row"><strong>${a.p1} – ${a.p2}</strong><br>${a.aspect}<br><span class="muted">Angle ${Number(a.exactAngle).toFixed(2)}° | Orbe ${Number(a.orb).toFixed(2)}°</span></div>
+        `).join("") : `<div class="row">Aucun aspect retenu.</div>`}
       </div>
     `;
   }
@@ -283,15 +248,14 @@ document.addEventListener("DOMContentLoaded", () => {
     ctx.fillRect(0, 0, SIZE, SIZE);
   }
 
-  function drawHeliosBaseImage() {
+  function drawHeliosWheelBase() {
     const side = 1120;
     const x = (SIZE - side) / 2;
     const y = (SIZE - side) / 2;
-
     if (wheelImageLoaded) {
       ctx.drawImage(wheelImage, x, y, side, side);
     } else {
-      ctx.strokeStyle = "#ffffff";
+      ctx.strokeStyle = "#fff";
       ctx.lineWidth = 3;
       ctx.beginPath();
       ctx.arc(CX, CY, 430, 0, Math.PI * 2);
@@ -300,25 +264,22 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function drawHouseCusps(houses) {
-    const innerRadius = 270;
+    const innerRadius = 250;
     const outerRadius = 500;
-
     houses.forEach((h, idx) => {
-      const r = degToRad(h.longitude);
-
-      const x1 = CX + Math.cos(r) * innerRadius;
-      const y1 = CY + Math.sin(r) * innerRadius;
-      const x2 = CX + Math.cos(r) * outerRadius;
-      const y2 = CY + Math.sin(r) * outerRadius;
-
+      const a = degToRad(h.longitude);
+      const x1 = CX + Math.cos(a) * innerRadius;
+      const y1 = CY + Math.sin(a) * innerRadius;
+      const x2 = CX + Math.cos(a) * outerRadius;
+      const y2 = CY + Math.sin(a) * outerRadius;
       ctx.beginPath();
       ctx.moveTo(x1, y1);
       ctx.lineTo(x2, y2);
-      ctx.strokeStyle = idx === 0 ? "rgba(255,211,105,0.95)" : "rgba(120,232,255,0.58)";
-      ctx.lineWidth = idx === 0 ? 3.5 : 1.6;
+      ctx.strokeStyle = idx === 0 ? "rgba(255,211,105,0.95)" : "rgba(120,232,255,0.55)";
+      ctx.lineWidth = idx === 0 ? 3.2 : 1.4;
       ctx.stroke();
 
-      const label = pointOnCircle(h.longitude + 15, 305);
+      const label = pointOnCircle(h.longitude + 15, 290);
       ctx.fillStyle = idx === 0 ? "#ffd369" : "#ffffff";
       ctx.font = "24px Arial";
       ctx.textAlign = "center";
@@ -327,136 +288,109 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  function drawAngles(angles) {
-    const ascP = pointOnCircle(angles.ascendant.longitude, 540);
-    const mcP = pointOnCircle(angles.mc.longitude, 540);
-
-    ctx.fillStyle = "#ffd369";
-    ctx.font = "30px Arial";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText("ASC", ascP.x, ascP.y);
-
-    ctx.fillStyle = "#78e8ff";
-    ctx.fillText("MC", mcP.x, mcP.y);
-  }
-
   function drawAspectLines(planets, aspects) {
     aspects.forEach((a) => {
       const p1 = planets.find(p => p.name === a.p1);
       const p2 = planets.find(p => p.name === a.p2);
       if (!p1 || !p2) return;
-
-      const A = pointOnCircle(p1.longitude, 165);
-      const B = pointOnCircle(p2.longitude, 165);
-
+      const A = pointOnCircle(p1.longitude, 160);
+      const B = pointOnCircle(p2.longitude, 160);
       ctx.beginPath();
       ctx.moveTo(A.x, A.y);
       ctx.lineTo(B.x, B.y);
-      ctx.strokeStyle = aspectColors[a.aspect] || "rgba(255,255,255,0.35)";
+      ctx.strokeStyle = aspectColors[a.aspect] || "rgba(255,255,255,.35)";
       ctx.lineWidth = 2;
       ctx.stroke();
     });
   }
 
-  function drawPlanetFlow(planet, index) {
-    const endRadius = 525 + (index % 2) * 8;
+  function drawPlanetArcFlow(planet, index) {
+    const endRadius = 530 + (index % 2) * 8;
     const end = pointOnCircle(planet.longitude, endRadius);
-
     const a = degToRad(planet.longitude);
-    const cp1 = {
-      x: CX + Math.cos(a - 0.90) * 18,
-      y: CY + Math.sin(a - 0.90) * 18
-    };
-    const cp2 = {
-      x: CX + Math.cos(a - 0.48) * 170,
-      y: CY + Math.sin(a - 0.48) * 170
-    };
-    const cp3 = {
-      x: CX + Math.cos(a - 0.12) * 355,
-      y: CY + Math.sin(a - 0.12) * 355
-    };
 
     ctx.save();
+    ctx.beginPath();
+
+    for (let t = 0; t <= 1; t += 0.02) {
+      const radius = t * 350;
+      const theta = a + (t * 1.2 * Math.PI);
+      const x = CX + radius * Math.cos(theta);
+      const y = CY + radius * Math.sin(theta);
+      if (t === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+
+    ctx.lineTo(end.x, end.y);
     ctx.strokeStyle = planet.color;
-    ctx.lineWidth = 5;
+    ctx.lineWidth = 4.5;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
-    ctx.shadowBlur = 12;
+    ctx.shadowBlur = 10;
     ctx.shadowColor = planet.color;
-
-    ctx.beginPath();
-    ctx.moveTo(CX, CY);
-    ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, cp3.x, cp3.y);
     ctx.stroke();
-
-    ctx.beginPath();
-    ctx.moveTo(cp3.x, cp3.y);
-    ctx.quadraticCurveTo(
-      CX + Math.cos(a - 0.02) * (endRadius - 55),
-      CY + Math.sin(a - 0.02) * (endRadius - 55),
-      end.x,
-      end.y
-    );
-    ctx.stroke();
-
     ctx.restore();
-
-    ctx.beginPath();
-    ctx.arc(CX, CY, 5, 0, Math.PI * 2);
-    ctx.fillStyle = planet.color;
-    ctx.fill();
   }
 
   function drawPlanetMarkers(planets) {
     planets.forEach((p, i) => {
-      const radius = 565 + (i % 3) * 24;
+      const radius = 565 + (i % 3) * 20;
       const point = pointOnCircle(p.longitude, radius);
 
       ctx.beginPath();
-      ctx.arc(point.x, point.y, 20, 0, Math.PI * 2);
+      ctx.arc(point.x, point.y, 19, 0, Math.PI * 2);
       ctx.fillStyle = p.color;
       ctx.shadowBlur = 10;
       ctx.shadowColor = p.color;
       ctx.fill();
       ctx.shadowBlur = 0;
 
-      ctx.fillStyle = "#ffffff";
+      ctx.fillStyle = "#fff";
       ctx.font = "20px Arial";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillText(p.glyph, point.x, point.y + 1);
 
       const label = pointOnCircle(p.longitude, radius + 34);
-      ctx.fillStyle = "#ffffff";
       ctx.font = "18px Arial";
       ctx.fillText(p.name, label.x, label.y);
 
-      const sub = pointOnCircle(p.longitude, radius + 56);
-      ctx.fillStyle = "rgba(255,255,255,0.9)";
+      const sub = pointOnCircle(p.longitude, radius + 55);
       ctx.font = "14px Arial";
       ctx.fillText(`${p.degreeInSign.toFixed(1)}° ${p.sign}`, sub.x, sub.y);
     });
   }
 
+  function drawAnglesOnWheel(angles) {
+    const asc = pointOnCircle(angles.ascendant.longitude, 540);
+    const mc = pointOnCircle(angles.mc.longitude, 540);
+    ctx.fillStyle = "#ffd369";
+    ctx.font = "30px Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("ASC", asc.x, asc.y);
+    ctx.fillStyle = "#78e8ff";
+    ctx.fillText("MC", mc.x, mc.y);
+  }
+
   function renderWheel(payload) {
     clearCanvas();
-    drawHeliosBaseImage();
+    drawHeliosWheelBase();
     drawHouseCusps(payload.houses);
     drawAspectLines(payload.planets, payload.aspects || []);
-    payload.planets.forEach((planet, index) => drawPlanetFlow(planet, index));
+    payload.planets.forEach((planet, index) => drawPlanetArcFlow(planet, index));
     drawPlanetMarkers(payload.planets);
-    drawAngles(payload.angles);
+    drawAnglesOnWheel(payload.angles);
   }
 
   function renderAll(payload) {
     currentChart = payload;
     renderPremiumSummary(payload.planets, payload.aspects || [], payload.angles);
     renderSummary(payload.planets, payload.aspects || [], payload.angles);
-    renderAngles(payload.angles);
-    renderHouses(payload.houses);
-    renderPlanetsList(payload.planets);
-    renderAspects(payload.aspects || []);
+    renderAnglesPanel(payload.angles);
+    renderHousesPanel(payload.houses);
+    renderPlanetsPanel(payload.planets);
+    renderAspectsPanel(payload.aspects || []);
     renderWheel(payload);
   }
 
@@ -483,32 +417,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
       setStatus("Calcul réel en cours…");
-
       const response = await fetch(`${API_BASE}/api/calc`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          date,
-          time,
-          city,
-          country,
-          latitude,
-          longitude,
-          offset
-        })
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ date, time, city, country, latitude, longitude, offset })
       });
 
       const text = await response.text();
-      if (text.trim().startsWith("<")) {
-        throw new Error("Le backend renvoie du HTML au lieu du JSON.");
-      }
-
+      if (text.trim().startsWith("<")) throw new Error("Le backend renvoie du HTML.");
       const data = JSON.parse(text);
-      if (!response.ok || !data.planets || !data.angles || !data.houses) {
-        throw new Error("Réponse backend invalide.");
-      }
+      if (!response.ok || !data.planets || !data.angles || !data.houses) throw new Error("Réponse backend invalide.");
 
       liveBadge.textContent = "CARTE LIVE";
       renderAll({
@@ -517,9 +435,8 @@ document.addEventListener("DOMContentLoaded", () => {
         angles: data.angles,
         houses: data.houses
       });
-
       setStatus(`Carte générée pour ${date} à ${time}, ${city}, ${country}.`);
-    } catch (error) {
+    } catch (e) {
       liveBadge.textContent = "MODE DÉMO";
       renderAll({
         planets: adaptPlanets(demoPayload.planets),
@@ -527,7 +444,7 @@ document.addEventListener("DOMContentLoaded", () => {
         angles: demoPayload.angles,
         houses: demoPayload.houses
       });
-      setStatus(`Mode démo HeliosAstro. Motif : ${error.message}`);
+      setStatus(`Mode démo HeliosAstro. Motif : ${e.message}`);
     }
   }
 
@@ -554,7 +471,6 @@ document.addEventListener("DOMContentLoaded", () => {
       setStatus("Aucune sauvegarde locale.");
       return;
     }
-
     const saved = JSON.parse(raw);
     nameInput.value = saved.consultant || "";
     dateInput.value = saved.date || "";
@@ -565,96 +481,60 @@ document.addEventListener("DOMContentLoaded", () => {
     longitudeInput.value = saved.longitude || "5.3698";
     offsetInput.value = saved.offset || "+01:00";
     privateNotes.value = saved.notes || "";
-
     if (saved.chart && saved.chart.planets?.length) {
       renderAll(saved.chart);
       setStatus("Dernière sauvegarde rechargée.");
-    } else {
-      setStatus("Sauvegarde chargée, sans carte.");
     }
   }
 
   function exportJson() {
-    if (!currentChart) {
-      setStatus("Aucune carte à exporter.");
-      return;
-    }
-
-    const data = {
-      consultant: nameInput.value || "",
-      date: dateInput.value || "",
-      time: timeInput.value || "",
-      city: cityInput.value || "",
-      country: countryInput.value || "",
-      latitude: latitudeInput.value || "",
-      longitude: longitudeInput.value || "",
-      offset: offsetInput.value || "",
-      notes: privateNotes.value || "",
-      chart: currentChart
-    };
-
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    if (!currentChart) return;
+    const blob = new Blob([JSON.stringify(currentChart, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${(nameInput.value || "heliosastro").replace(/\s+/g, "-").toLowerCase()}-expert.json`;
+    a.download = "heliosastro-expert.json";
     a.click();
     URL.revokeObjectURL(url);
   }
 
   function exportPdfPremium() {
-    if (!currentChart) {
-      setStatus("Aucune carte à exporter.");
-      return;
-    }
-
+    if (!currentChart) return;
     const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
     const imageData = canvas.toDataURL("image/png", 1.0);
-    const clientName = nameInput.value || "Consultant";
 
     doc.setFillColor(6, 9, 19);
     doc.rect(0, 0, 210, 297, "F");
     doc.setTextColor(255, 255, 255);
-
     doc.setFont("helvetica", "bold");
     doc.setFontSize(22);
     doc.text("HELIOSASTRO EXPERT", 105, 16, { align: "center" });
-
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
-    doc.text(`Nom : ${clientName}`, 14, 28);
+    doc.text(`Nom : ${nameInput.value || "Consultant"}`, 14, 28);
     doc.text(`Date : ${dateInput.value || "—"}`, 14, 34);
     doc.text(`Heure : ${timeInput.value || "—"}`, 14, 40);
     doc.text(`Lieu : ${cityInput.value || "—"}, ${countryInput.value || "—"}`, 14, 46);
-
     doc.addImage(imageData, "PNG", 15, 55, 180, 180, "", "FAST");
-
-    doc.setFontSize(10);
-    doc.text(`Ascendant : ${currentChart.angles.ascendant.degreeInSign.toFixed(2)}° ${currentChart.angles.ascendant.sign}`, 14, 245);
-    doc.text(`MC : ${currentChart.angles.mc.degreeInSign.toFixed(2)}° ${currentChart.angles.mc.sign}`, 14, 251);
-
-    doc.save(`${clientName.replace(/\s+/g, "-").toLowerCase()}-heliosastro-expert.pdf`);
+    doc.save(`${(nameInput.value || "heliosastro").replace(/\s+/g, "-").toLowerCase()}-expert.pdf`);
   }
 
-  if (healthBtn) healthBtn.addEventListener("click", wakeBackend);
-  if (generateBtn) generateBtn.addEventListener("click", generateLiveChart);
-  if (demoBtn) {
-    demoBtn.addEventListener("click", () => {
-      liveBadge.textContent = "MODE DÉMO";
-      renderAll({
-        planets: adaptPlanets(demoPayload.planets),
-        aspects: demoPayload.aspects,
-        angles: demoPayload.angles,
-        houses: demoPayload.houses
-      });
-      setStatus("Démo HeliosAstro affichée avec ton modèle.");
+  healthBtn.addEventListener("click", wakeBackend);
+  generateBtn.addEventListener("click", generateLiveChart);
+  demoBtn.addEventListener("click", () => {
+    liveBadge.textContent = "MODE DÉMO";
+    renderAll({
+      planets: adaptPlanets(demoPayload.planets),
+      aspects: demoPayload.aspects,
+      angles: demoPayload.angles,
+      houses: demoPayload.houses
     });
-  }
-
-  if (saveBtn) saveBtn.addEventListener("click", saveLocal);
-  if (loadBtn) loadBtn.addEventListener("click", loadLocal);
-  if (exportJsonBtn) exportJsonBtn.addEventListener("click", exportJson);
-  if (exportPdfBtn) exportPdfBtn.addEventListener("click", exportPdfPremium);
+    setStatus("Démo HeliosAstro affichée avec ta roue.");
+  });
+  saveBtn.addEventListener("click", saveLocal);
+  loadBtn.addEventListener("click", loadLocal);
+  exportJsonBtn.addEventListener("click", exportJson);
+  exportPdfBtn.addEventListener("click", exportPdfPremium);
 
   renderAll({
     planets: adaptPlanets(demoPayload.planets),
@@ -663,5 +543,5 @@ document.addEventListener("DOMContentLoaded", () => {
     houses: demoPayload.houses
   });
 
-  setStatus("Version 201 chargée. Ton modèle HeliosAstro est utilisé comme base visuelle.");
+  setStatus("Version 301 chargée. Site vitrine + expert séparés, roue HeliosAstro utilisée.");
 });
