@@ -3,26 +3,47 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Livre — Helios Astro</title>
+  <title>Contact — Helios Astro</title>
   <style>
-    body{margin:0;background:#050814;color:#eef5ff;font-family:Arial,Helvetica,sans-serif}
-    .wrap{max-width:1000px;margin:0 auto;padding:24px}
-    .panel{background:#0c1320;border:1px solid rgba(91,214,255,.18);border-radius:24px;padding:28px}
-    p{color:#b5c7e8;line-height:1.7}
+    :root{
+      --bg:#050814;
+      --panel:#0c1320;
+      --line:rgba(91,214,255,.18);
+      --text:#eef5ff;
+      --muted:#b5c7e8;
+      --accent:#45ddff;
+    }
+    body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
+    .wrap{max-width:860px;margin:0 auto;padding:24px}
+    .panel{background:var(--panel);border:1px solid var(--line);border-radius:24px;padding:28px}
+    label{display:block;margin:14px 0 8px}
+    input,textarea{
+      width:100%;padding:14px;border-radius:14px;border:1px solid var(--line);
+      background:#09101b;color:#eef5ff;font:inherit
+    }
+    button{
+      margin-top:18px;padding:14px 22px;border:none;border-radius:999px;
+      background:linear-gradient(135deg,var(--accent),#8ef2ff);color:#00131c;font-weight:800
+    }
+    p{color:var(--muted)}
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="panel">
-      <h1>Le livre Helios Astro</h1>
-      <p>
-        Découvrez un prolongement éditorial de l’univers Helios Astro, entre symbolisme,
-        lumière, géométrie sacrée et lecture des formes profondes du thème.
-      </p>
-      <p>
-        Cette page peut accueillir ensuite ton lien Amazon, une couverture, un résumé, des extraits
-        et un bouton d’achat.
-      </p>
+      <h1>Contact</h1>
+      <p>Pour toute demande d’information, de thème personnalisé ou d’accompagnement, utilisez ce formulaire.</p>
+
+      <label>Nom</label>
+      <input type="text" placeholder="Votre nom">
+
+      <label>Email</label>
+      <input type="email" placeholder="Votre email">
+
+      <label>Message</label>
+      <textarea rows="8" placeholder="Votre message"></textarea>
+
+      <button type="button">Envoyer</button>
     </div>
   </div>
 </body>
