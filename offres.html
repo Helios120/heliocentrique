@@ -3,26 +3,76 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Livre — Helios Astro</title>
+  <title>Offres — Helios Astro</title>
   <style>
-    body{margin:0;background:#050814;color:#eef5ff;font-family:Arial,Helvetica,sans-serif}
-    .wrap{max-width:1000px;margin:0 auto;padding:24px}
-    .panel{background:#0c1320;border:1px solid rgba(91,214,255,.18);border-radius:24px;padding:28px}
-    p{color:#b5c7e8;line-height:1.7}
+    :root{
+      --bg:#050814;
+      --panel:#0c1320;
+      --line:rgba(91,214,255,.18);
+      --text:#eef5ff;
+      --muted:#b5c7e8;
+      --accent:#45ddff;
+      --gold:#ffd369;
+    }
+    body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
+    a{text-decoration:none;color:inherit}
+    .wrap{max-width:1180px;margin:0 auto;padding:24px}
+    .top{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap}
+    .btn{
+      padding:12px 18px;border-radius:999px;
+      background:linear-gradient(135deg,var(--accent),#8ef2ff);
+      color:#00131c;font-weight:800
+    }
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:24px}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:24px;padding:24px}
+    .price{font-size:34px;font-weight:800;color:var(--gold);margin:10px 0}
+    p{color:var(--muted);line-height:1.6}
+    ul{color:var(--muted);line-height:1.7;padding-left:18px}
+    @media(max-width:900px){.grid{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
   <div class="wrap">
-    <div class="panel">
-      <h1>Le livre Helios Astro</h1>
-      <p>
-        Découvrez un prolongement éditorial de l’univers Helios Astro, entre symbolisme,
-        lumière, géométrie sacrée et lecture des formes profondes du thème.
-      </p>
-      <p>
-        Cette page peut accueillir ensuite ton lien Amazon, une couverture, un résumé, des extraits
-        et un bouton d’achat.
-      </p>
+    <div class="top">
+      <h1>Les offres Helios Astro</h1>
+      <a class="btn" href="./expert/?v=600">Accéder au logiciel</a>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h2>Découverte</h2>
+        <div class="price">49€</div>
+        <p>Une première approche claire, élégante et accessible de votre thème.</p>
+        <ul>
+          <li>Carte visuelle</li>
+          <li>Synthèse générale</li>
+          <li>Lecture des axes essentiels</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h2>Premium</h2>
+        <div class="price">99€</div>
+        <p>Une lecture enrichie avec structure du thème et restitution plus approfondie.</p>
+        <ul>
+          <li>Carte complète</li>
+          <li>Maisons astrologiques</li>
+          <li>Ascendant et MC</li>
+          <li>Export PDF premium</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h2>Expert</h2>
+        <div class="price">149€</div>
+        <p>Une formule avancée pensée pour celles et ceux qui souhaitent une lecture poussée.</p>
+        <ul>
+          <li>Analyse détaillée</li>
+          <li>Aspects majeurs</li>
+          <li>Angles, maisons, structure complète</li>
+          <li>Restitution avancée</li>
+        </ul>
+      </div>
     </div>
   </div>
 </body>
