@@ -46,21 +46,21 @@ document.addEventListener("DOMContentLoaded", () => {
     wheelImageLoaded = true;
     if (currentChart) renderWheel(currentChart);
   };
-  wheelImage.src = "./assets/roue-heliosastro.png?v=401";
+  wheelImage.src = "assets/roue-heliosastro.png?v=500";
 
   const zodiac = [
-    { name: "Bélier", glyph: "♈", start: 0 },
-    { name: "Taureau", glyph: "♉", start: 30 },
-    { name: "Gémeaux", glyph: "♊", start: 60 },
-    { name: "Cancer", glyph: "♋", start: 90 },
-    { name: "Lion", glyph: "♌", start: 120 },
-    { name: "Vierge", glyph: "♍", start: 150 },
-    { name: "Balance", glyph: "♎", start: 180 },
-    { name: "Scorpion", glyph: "♏", start: 210 },
-    { name: "Sagittaire", glyph: "♐", start: 240 },
-    { name: "Capricorne", glyph: "♑", start: 270 },
-    { name: "Verseau", glyph: "♒", start: 300 },
-    { name: "Poissons", glyph: "♓", start: 330 }
+    { name: "Bélier", start: 0 },
+    { name: "Taureau", start: 30 },
+    { name: "Gémeaux", start: 60 },
+    { name: "Cancer", start: 90 },
+    { name: "Lion", start: 120 },
+    { name: "Vierge", start: 150 },
+    { name: "Balance", start: 180 },
+    { name: "Scorpion", start: 210 },
+    { name: "Sagittaire", start: 240 },
+    { name: "Capricorne", start: 270 },
+    { name: "Verseau", start: 300 },
+    { name: "Poissons", start: 330 }
   ];
 
   const planetMeta = {
@@ -74,14 +74,6 @@ document.addEventListener("DOMContentLoaded", () => {
     "Uranus":   { glyph: "♅", color: "#7dff6f" },
     "Neptune":  { glyph: "♆", color: "#00d9ff" },
     "Pluton":   { glyph: "♇", color: "#c66bff" }
-  };
-
-  const aspectColors = {
-    "Conjonction": "#ffffff",
-    "Sextile": "#78e8ff",
-    "Carré": "#ff6b6b",
-    "Trigone": "#6dff9c",
-    "Opposition": "#ffd369"
   };
 
   const demoPayload = {
@@ -153,14 +145,14 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  async function wakeBackend(maxAttempts = 8) {
+  async function wakeBackend(maxAttempts = 6) {
     for (let i = 1; i <= maxAttempts; i++) {
       try {
         setStatus(`Réveil du backend… tentative ${i}/${maxAttempts}`);
-        const response = await fetch(`${API_BASE}/api/health?ts=${Date.now()}`, { method: "GET", cache: "no-store" });
+        const response = await fetch(`${API_BASE}/api/health?ts=${Date.now()}`, { cache: "no-store" });
         const text = await response.text();
         if (text.trim().startsWith("<")) {
-          await sleep(3000);
+          await sleep(2000);
           continue;
         }
         const data = JSON.parse(text);
@@ -170,7 +162,7 @@ document.addEventListener("DOMContentLoaded", () => {
           return true;
         }
       } catch (e) {}
-      await sleep(3000);
+      await sleep(2000);
     }
     liveBadge.textContent = "MODE DÉMO";
     setStatus("Backend indisponible. Démo HeliosAstro affichée.");
@@ -266,6 +258,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function drawHouseCusps(houses) {
     const innerRadius = 250;
     const outerRadius = 500;
+
     houses.forEach((h, idx) => {
       const a = degToRad(h.longitude);
       const x1 = CX + Math.cos(a) * innerRadius;
@@ -286,23 +279,6 @@ document.addEventListener("DOMContentLoaded", () => {
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillText(String(h.house), label.x, label.y);
-    });
-  }
-
-  function drawAspectLines(planets, aspects) {
-    aspects.forEach((a) => {
-      const p1 = planets.find(p => p.name === a.p1);
-      const p2 = planets.find(p => p.name === a.p2);
-      if (!p1 || !p2) return;
-
-      const A = pointOnCircle(p1.longitude, 160);
-      const B = pointOnCircle(p2.longitude, 160);
-      ctx.beginPath();
-      ctx.moveTo(A.x, A.y);
-      ctx.lineTo(B.x, B.y);
-      ctx.strokeStyle = aspectColors[a.aspect] || "rgba(255,255,255,.35)";
-      ctx.lineWidth = 2;
-      ctx.stroke();
     });
   }
 
@@ -366,11 +342,13 @@ document.addEventListener("DOMContentLoaded", () => {
   function drawAnglesOnWheel(angles) {
     const asc = pointOnCircle(angles.ascendant.longitude, 540);
     const mc = pointOnCircle(angles.mc.longitude, 540);
+
     ctx.fillStyle = "#ffd369";
     ctx.font = "30px Arial";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillText("ASC", asc.x, asc.y);
+
     ctx.fillStyle = "#78e8ff";
     ctx.fillText("MC", mc.x, mc.y);
   }
@@ -379,7 +357,6 @@ document.addEventListener("DOMContentLoaded", () => {
     clearCanvas();
     drawHeliosWheelBase();
     drawHouseCusps(payload.houses);
-    drawAspectLines(payload.planets, payload.aspects || []);
     payload.planets.forEach((planet, index) => drawPlanetArcFlow(planet, index));
     drawPlanetMarkers(payload.planets);
     drawAnglesOnWheel(payload.angles);
@@ -397,23 +374,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   async function generateLiveChart() {
-    const date = dateInput.value || "1967-12-04";
-    const time = timeInput.value || "12:00";
-    const city = cityInput.value || "Marseille";
-    const country = countryInput.value || "France";
-    const latitude = Number(latitudeInput.value || "43.2965");
-    const longitude = Number(longitudeInput.value || "5.3698");
-    const offset = offsetInput.value || "+01:00";
-
     const awake = await wakeBackend();
     if (!awake) {
       liveBadge.textContent = "MODE DÉMO";
-      renderAll({
-        planets: adaptPlanets(demoPayload.planets),
-        aspects: demoPayload.aspects,
-        angles: demoPayload.angles,
-        houses: demoPayload.houses
-      });
+      renderAll(demoPayload);
       return;
     }
 
@@ -422,13 +386,24 @@ document.addEventListener("DOMContentLoaded", () => {
       const response = await fetch(`${API_BASE}/api/calc`, {
         method: "POST",
         headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ date, time, city, country, latitude, longitude, offset })
+        body: JSON.stringify({
+          date: dateInput.value || "1967-12-04",
+          time: timeInput.value || "12:00",
+          city: cityInput.value || "Marseille",
+          country: countryInput.value || "France",
+          latitude: Number(latitudeInput.value || "43.2965"),
+          longitude: Number(longitudeInput.value || "5.3698"),
+          offset: offsetInput.value || "+01:00"
+        })
       });
 
       const text = await response.text();
       if (text.trim().startsWith("<")) throw new Error("Le backend renvoie du HTML.");
       const data = JSON.parse(text);
-      if (!response.ok || !data.planets || !data.angles || !data.houses) throw new Error("Réponse backend invalide.");
+
+      if (!response.ok || !data.planets || !data.angles || !data.houses) {
+        throw new Error("Réponse backend invalide.");
+      }
 
       liveBadge.textContent = "CARTE LIVE";
       renderAll({
@@ -437,15 +412,10 @@ document.addEventListener("DOMContentLoaded", () => {
         angles: data.angles,
         houses: data.houses
       });
-      setStatus(`Carte générée pour ${date} à ${time}, ${city}, ${country}.`);
+      setStatus("Carte générée avec succès.");
     } catch (e) {
       liveBadge.textContent = "MODE DÉMO";
-      renderAll({
-        planets: adaptPlanets(demoPayload.planets),
-        aspects: demoPayload.aspects,
-        angles: demoPayload.angles,
-        houses: demoPayload.houses
-      });
+      renderAll(demoPayload);
       setStatus(`Mode démo HeliosAstro. Motif : ${e.message}`);
     }
   }
@@ -483,7 +453,7 @@ document.addEventListener("DOMContentLoaded", () => {
     longitudeInput.value = saved.longitude || "5.3698";
     offsetInput.value = saved.offset || "+01:00";
     privateNotes.value = saved.notes || "";
-    if (saved.chart && saved.chart.planets?.length) {
+    if (saved.chart) {
       renderAll(saved.chart);
       setStatus("Dernière sauvegarde rechargée.");
     }
@@ -525,25 +495,14 @@ document.addEventListener("DOMContentLoaded", () => {
   generateBtn.addEventListener("click", generateLiveChart);
   demoBtn.addEventListener("click", () => {
     liveBadge.textContent = "MODE DÉMO";
-    renderAll({
-      planets: adaptPlanets(demoPayload.planets),
-      aspects: demoPayload.aspects,
-      angles: demoPayload.angles,
-      houses: demoPayload.houses
-    });
-    setStatus("Démo HeliosAstro affichée avec ta roue.");
+    renderAll(demoPayload);
+    setStatus("Démo HeliosAstro affichée.");
   });
   saveBtn.addEventListener("click", saveLocal);
   loadBtn.addEventListener("click", loadLocal);
   exportJsonBtn.addEventListener("click", exportJson);
   exportPdfBtn.addEventListener("click", exportPdfPremium);
 
-  renderAll({
-    planets: adaptPlanets(demoPayload.planets),
-    aspects: demoPayload.aspects,
-    angles: demoPayload.angles,
-    houses: demoPayload.houses
-  });
-
-  setStatus("Version 401 chargée. Rendu premium actif.");
+  renderAll(demoPayload);
+  setStatus("Version 500 chargée. Rendu premium actif.");
 });
