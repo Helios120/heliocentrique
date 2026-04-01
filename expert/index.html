@@ -8,17 +8,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HeliosAstro Expert</title>
   <meta name="theme-color" content="#060913">
-  <link rel="manifest" href="./manifest.webmanifest?v=401">
-  <link rel="icon" type="image/png" sizes="192x192" href="./assets/icon-192.png?v=401">
-  <link rel="icon" type="image/png" sizes="512x512" href="./assets/icon-512.png?v=401">
-  <link rel="stylesheet" href="./assets/expert.css?v=401">
+  <link rel="stylesheet" href="assets/expert.css?v=500">
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 </head>
 <body>
   <main class="app-shell">
     <aside class="sidebar">
       <div class="brand-box">
-        <img src="./assets/logo-heliosastro.png?v=401" alt="Logo HeliosAstro" class="brand-logo">
+        <img src="assets/logo-heliosastro.png?v=500" alt="Logo HeliosAstro" class="brand-logo">
         <div>
           <h1>HeliosAstro Expert</h1>
           <p class="subtitle">Carte premium • Ascendant • Maisons • Export PDF</p>
@@ -67,7 +64,7 @@
         <button id="export-pdf-btn">Exporter PDF premium</button>
       </div>
 
-      <div class="panel" id="status-box">Version 401 chargée. En attente.</div>
+      <div class="panel" id="status-box">Version 500 chargée. En attente.</div>
 
       <div class="panel">
         <h2>Lecture premium</h2>
@@ -125,18 +122,7 @@
     </section>
   </main>
 
-  <script>
-    (async function () {
-      if ("serviceWorker" in navigator) {
-        try {
-          const regs = await navigator.serviceWorker.getRegistrations();
-          for (const reg of regs) await reg.unregister();
-        } catch (e) {}
-      }
-    })();
-  </script>
-
-  <script src="./assets/expert.js?v=401"></script>
+  <script src="assets/expert.js?v=500"></script>
 </body>
 </html>
 
