@@ -2,207 +2,295 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Helios Astro</title>
-  <meta name="description" content="Helios Astro — astrologie visuelle, vibratoire et géométrique premium.">
-  <style>
-    :root{
-      --bg:#050814;
-      --panel:#0c1320;
-      --panel2:#09101b;
-      --line:rgba(91,214,255,.18);
-      --text:#eef5ff;
-      --muted:#b5c7e8;
-      --accent:#45ddff;
-      --accent2:#8ef2ff;
-      --gold:#ffd369;
-    }
-    *{box-sizing:border-box}
-    html,body{
-      margin:0;padding:0;
-      background:
-        radial-gradient(circle at top, rgba(69,221,255,.08), transparent 30%),
-        radial-gradient(circle at center, rgba(255,215,120,.05), transparent 25%),
-        var(--bg);
-      color:var(--text);
-      font-family:Arial,Helvetica,sans-serif;
-    }
-    a{text-decoration:none;color:inherit}
-    .wrap{max-width:1240px;margin:0 auto;padding:24px}
-    header{
-      display:flex;align-items:center;justify-content:space-between;gap:20px;
-      padding:14px 0 20px;flex-wrap:wrap;
-    }
-    .brand{display:flex;align-items:center;gap:16px}
-    .brand img{
-      width:72px;height:72px;object-fit:contain;border-radius:20px;
-      background:#fff;padding:6px;box-shadow:0 10px 24px rgba(0,0,0,.28);
-    }
-    .brand h1{margin:0;font-size:42px;letter-spacing:.04em}
-    .brand p{margin:4px 0 0;color:var(--muted);font-size:18px}
-    nav{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
-    nav a{
-      padding:10px 14px;border-radius:999px;color:var(--muted);
-      border:1px solid transparent;
-    }
-    nav a:hover{border-color:var(--line);color:var(--text)}
-    .cta{
-      display:inline-flex;align-items:center;justify-content:center;
-      padding:14px 22px;border-radius:999px;
-      background:linear-gradient(135deg,var(--accent),var(--accent2));
-      color:#00131c;font-weight:800;
-      box-shadow:0 10px 28px rgba(69,221,255,.20);
-    }
-    .hero{
-      display:grid;grid-template-columns:1.05fr .95fr;gap:28px;
-      margin-top:12px;
-    }
-    .panel{
-      background:linear-gradient(180deg,var(--panel),var(--panel2));
-      border:1px solid var(--line);
-      border-radius:30px;
-      padding:28px;
-      box-shadow:0 18px 34px rgba(0,0,0,.25);
-    }
-    .hero h2{
-      font-size:58px;line-height:.95;margin:0 0 18px;
-    }
-    .hero p{
-      font-size:19px;line-height:1.65;color:var(--muted);margin:0;
-    }
-    .actions{display:flex;gap:14px;flex-wrap:wrap;margin-top:28px}
-    .ghost{
-      display:inline-flex;align-items:center;justify-content:center;
-      padding:14px 22px;border-radius:999px;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.03);
-      color:var(--text);font-weight:700;
-    }
-    .visual{
-      display:flex;align-items:center;justify-content:center;min-height:560px;
-    }
-    .visual img{
-      width:min(100%,560px);
-      aspect-ratio:1/1;
-      object-fit:contain;
-      filter:drop-shadow(0 20px 40px rgba(0,0,0,.38));
-    }
-    .grid{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:18px;
-      margin-top:24px;
-    }
-    .card h3{margin:0 0 10px;font-size:22px}
-    .card p{margin:0;color:var(--muted);line-height:1.6}
-    .section-title{margin:38px 0 16px;font-size:34px}
-    .offer-row{
-      display:grid;grid-template-columns:repeat(3,1fr);gap:18px;
-    }
-    .price{
-      font-size:34px;font-weight:800;margin:10px 0;color:var(--gold);
-    }
-    footer{
-      margin-top:32px;padding:26px 0;color:var(--muted);
-      display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;
-    }
-    @media(max-width:980px){
-      .hero{grid-template-columns:1fr}
-      .grid,.offer-row{grid-template-columns:1fr}
-      .brand h1{font-size:34px}
-      .hero h2{font-size:42px}
-    }
-  </style>
+  <title>Helios Astro — Astrologie visuelle, vibratoire et géométrique</title>
+  <meta name="description" content="Helios Astro révèle une lecture visuelle, vibratoire et symbolique de votre thème astral. Thème astral, transit pour 3 mois, révolution solaire et univers inspiré par la géométrie sacrée.">
+  <meta name="keywords" content="astrologie, thème astral, carte du ciel, astrologie visuelle, géométrie sacrée, mandala, transit, révolution solaire, Helios Astro">
+  <meta property="og:title" content="Helios Astro — Votre thème astral version vivante">
+  <meta property="og:description" content="Une lecture visuelle, symbolique et vibratoire de votre empreinte céleste.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="assets/logo-heliosastro.png">
+  <meta property="og:locale" content="fr_FR">
+  <link rel="canonical" href="https://heliosastro.com/">
+  <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <div class="brand">
-        <img src="./expert/assets/logo-heliosastro.png?v=600" alt="Logo Helios Astro">
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a href="index.html" class="brand">
+        <img src="assets/logo-heliosastro.png" alt="Logo Helios Astro">
         <div>
-          <h1>HELIOS ASTRO</h1>
-          <p>Astrologie visuelle, vibratoire et géométrique premium</p>
+          <strong>Helios Astro</strong>
+          <span>Astrologie géométrique premium</span>
         </div>
-      </div>
+      </a>
 
-      <nav>
-        <a href="./index.html?v=600">Accueil</a>
-        <a href="./offres.html?v=600">Offres</a>
-        <a href="./livre.html?v=600">Livre</a>
-        <a href="./contact.html?v=600">Contact</a>
-        <a class="cta" href="./expert/?v=600">Accéder au logiciel</a>
+      <button class="nav-toggle" type="button" aria-label="Ouvrir le menu" data-nav-toggle>☰</button>
+
+      <nav class="site-nav" data-nav>
+        <a href="index.html" class="active">Accueil</a>
+        <a href="offres.html">Offres</a>
+        <a href="logiciel.html">Logiciel</a>
+        <a href="livre.html">Livre</a>
+        <a href="heliosastrosite.html">Méthode</a>
+        <a href="contact.html" class="btn btn-small">Commander</a>
       </nav>
-    </header>
+    </div>
+  </header>
 
-    <section class="hero">
-      <div class="panel">
-        <h2>Votre thème astrologique, dans une expérience nouvelle génération.</h2>
-        <p>
-          Helios Astro propose une lecture élégante, immersive et personnalisée de votre thème.
-          Une approche visuelle inspirée de la géométrie sacrée, pensée pour donner à votre carte
-          une puissance symbolique et une restitution haut de gamme.
-        </p>
-        <div class="actions">
-          <a class="cta" href="./expert/?v=600">Générer mon thème</a>
-          <a class="ghost" href="./offres.html?v=600">Découvrir les offres</a>
+  <main>
+    <section class="hero section">
+      <div class="container hero-grid">
+        <div>
+          <p class="eyebrow">Astrologie • Géométrie sacrée • Lecture vibratoire</p>
+          <h1>Votre thème astral, <span class="accent">version vivante</span>.</h1>
+          <p class="lead">
+            Helios Astro transforme votre carte du ciel en une création visuelle forte, sensible et mémorable.
+            Chaque lecture devient une expérience symbolique unique, à conserver, à offrir ou à explorer comme une empreinte personnelle.
+          </p>
+
+          <div class="btn-row">
+            <a href="offres.html" class="btn">Découvrir les offres</a>
+            <a href="logiciel.html" class="btn btn-outline">Tester le logiciel degrés</a>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-card">
+              <strong>Thème astral</strong>
+              <span>Votre lecture de naissance Helios Astro</span>
+              <a href="https://www.paypal.com/ncp/payment/QF67W8ATHZX4U" target="_blank" rel="noopener" class="btn pay-btn">Commander</a>
+            </div>
+
+            <div class="stat-card">
+              <strong>Transit pour 3 mois</strong>
+              <span>Une lecture de période pour mieux anticiper</span>
+              <a href="https://www.paypal.com/ncp/payment/Z3SZPE6NUZYKG" target="_blank" rel="noopener" class="btn pay-btn">Commander</a>
+            </div>
+
+            <div class="stat-card">
+              <strong>Révolution solaire</strong>
+              <span>Votre grande lecture annuelle Helios Astro</span>
+              <a href="https://www.paypal.com/ncp/payment/7HTYFEY8JA8EN" target="_blank" rel="noopener" class="btn pay-btn">Commander</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-card hero-visual">
+          <span class="badge">Signature visuelle Helios Astro</span>
+          <img src="assets/mandala-hero.png" alt="Mandala cosmique Helios Astro">
         </div>
       </div>
+    </section>
 
-      <div class="panel visual">
-        <img src="./expert/assets/roue-heliosastro.png?v=600" alt="Roue Helios Astro">
+    <section class="section">
+      <div class="container">
+        <div class="section-title">
+          <h2>Pourquoi les clients aiment Helios Astro</h2>
+          <p>
+            Helios Astro transforme une simple carte du ciel en expérience visuelle, symbolique et émotionnelle.
+            Chaque thème devient une création unique, élégante, marquante et facile à offrir ou à conserver.
+          </p>
+        </div>
+
+        <div class="cards-3">
+          <article class="card">
+            <div class="icon">✺</div>
+            <h3>Un thème vraiment unique</h3>
+            <p>
+              Chaque création possède sa propre énergie visuelle, son propre équilibre, sa propre signature.
+              Le client ne reçoit pas un document banal, mais une œuvre personnelle.
+            </p>
+          </article>
+
+          <article class="card">
+            <div class="icon">✦</div>
+            <h3>Une lecture qui marque</h3>
+            <p>
+              Helios Astro met en lumière les formes, les symboles et les axes forts du thème pour créer
+              une lecture plus sensible, plus mémorable et plus captivante.
+            </p>
+          </article>
+
+          <article class="card">
+            <div class="icon">∞</div>
+            <h3>Un cadeau premium</h3>
+            <p>
+              Idéal pour se faire plaisir ou offrir : le rendu visuel, l’univers cosmique et la mise en forme
+              donnent au thème une vraie valeur émotionnelle et esthétique.
+            </p>
+          </article>
+        </div>
       </div>
     </section>
 
-    <h2 class="section-title">Une approche différente</h2>
+    <section class="section">
+      <div class="container split">
+        <div class="card content-card">
+          <h2>Une méthode conçue pour marquer</h2>
+          <p>
+            Helios Astro relie le ciel, la géométrie et le récit. Résultat : une cartographie symbolique
+            que l’on peut consulter, imprimer, offrir et collectionner.
+          </p>
+          <ul class="feature-list">
+            <li>Thème astral, transit pour 3 mois, révolution solaire</li>
+            <li>Lecture par degrés avec démonstration interactive</li>
+            <li>Pont direct avec le livre et l’univers Helios Astro</li>
+          </ul>
+          <div class="btn-row">
+            <a href="heliosastrosite.html" class="btn btn-outline">Voir la méthode</a>
+            <a href="livre.html" class="btn-link">Explorer le livre →</a>
+          </div>
+        </div>
 
-    <section class="grid">
-      <div class="panel card">
-        <h3>Lecture personnalisée</h3>
-        <p>Chaque thème est présenté dans un langage clair, visuel et structuré, pour une lecture plus directe et plus mémorable.</p>
-      </div>
-      <div class="panel card">
-        <h3>Esthétique premium</h3>
-        <p>Une direction artistique inspirée de la lumière, du symbole et de la géométrie sacrée.</p>
-      </div>
-      <div class="panel card">
-        <h3>Outil expert</h3>
-        <p>Le logiciel dédié permet l’affichage du thème, des maisons, de l’ascendant, des angles et l’export PDF.</p>
+        <div class="image-frame">
+          <img src="assets/zodiac-wheel-blue.png" alt="Roue zodiacale Helios Astro">
+        </div>
       </div>
     </section>
 
-    <h2 class="section-title">Formules</h2>
+    <section class="section">
+      <div class="container">
+        <div class="section-title">
+          <h2>Les offres Helios Astro</h2>
+          <p>Une gamme simple, claire et premium, avec paiement direct.</p>
+        </div>
 
-    <section class="offer-row">
-      <div class="panel card">
-        <h3>Découverte</h3>
-        <div class="price">49€</div>
-        <p>Une lecture générale du thème avec restitution visuelle et synthèse des axes majeurs.</p>
-      </div>
-      <div class="panel card">
-        <h3>Premium</h3>
-        <div class="price">99€</div>
-        <p>Une version complète avec maisons, ascendant, synthèse plus approfondie et export PDF.</p>
-      </div>
-      <div class="panel card">
-        <h3>Expert</h3>
-        <div class="price">149€</div>
-        <p>Une lecture avancée avec structure détaillée, angles, aspects et restitution enrichie.</p>
+        <div class="pricing-grid">
+          <article class="price-card">
+            <h3>Thème astral</h3>
+            <div class="price">
+              <strong>Naissance</strong>
+              <span>Votre lecture personnelle de base dans l’univers Helios Astro</span>
+            </div>
+            <ul>
+              <li>Visuel personnalisé</li>
+              <li>Lecture synthétique</li>
+              <li>Envoi par e-mail</li>
+            </ul>
+            <a href="https://www.paypal.com/ncp/payment/QF67W8ATHZX4U" target="_blank" rel="noopener" class="btn">Commander</a>
+          </article>
+
+          <article class="price-card featured">
+            <span class="ribbon">Le plus demandé</span>
+            <h3>Transit pour 3 mois</h3>
+            <div class="price">
+              <strong>Période</strong>
+              <span>Une lecture ciblée pour comprendre les mouvements à venir</span>
+            </div>
+            <ul>
+              <li>Vision sur 3 mois</li>
+              <li>Analyse plus détaillée</li>
+              <li>Lecture symbolique enrichie</li>
+            </ul>
+            <a href="https://www.paypal.com/ncp/payment/Z3SZPE6NUZYKG" target="_blank" rel="noopener" class="btn">Commander</a>
+          </article>
+
+          <article class="price-card">
+            <h3>Révolution solaire</h3>
+            <div class="price">
+              <strong>Année</strong>
+              <span>La lecture de votre cycle annuel dans sa forme la plus ample</span>
+            </div>
+            <ul>
+              <li>Restitution premium</li>
+              <li>Vision annuelle</li>
+              <li>Création forte et mémorable</li>
+            </ul>
+            <a href="https://www.paypal.com/ncp/payment/7HTYFEY8JA8EN" target="_blank" rel="noopener" class="btn">Commander</a>
+          </article>
+        </div>
       </div>
     </section>
 
-    <footer>
-      <div>© 2026 Helios Astro</div>
-      <div>
-        <a href="./index.html?v=600">Accueil</a> ·
-        <a href="./offres.html?v=600">Offres</a> ·
-        <a href="./livre.html?v=600">Livre</a> ·
-        <a href="./contact.html?v=600">Contact</a>
+    <section class="section">
+      <div class="container split">
+        <div class="image-frame">
+          <img src="assets/livre-dieu-est-la-lumiere.png" alt="Couverture du livre Dieu est la lumière, géométrie sacrée">
+        </div>
+
+        <div class="card content-card">
+          <h2>Le livre au cœur de l’univers Helios Astro</h2>
+          <p>
+            <strong>Dieu est la lumière, géométrie sacrée</strong> prolonge la vision d’Helios Astro :
+            lumière, structure, symbole, géométrie, vibration et lecture du réel.
+          </p>
+          <p>
+            Ce livre sert de socle philosophique et artistique à l’univers du site.
+          </p>
+          <div class="btn-row">
+            <a href="livre.html" class="btn">Découvrir le livre</a>
+            <a href="https://www.amazon.fr/Dieu-est-lumiere-geometrie-sacr%C4%97e/dp/B08MSNHZDR" target="_blank" rel="noopener" class="btn btn-outline">Acheter sur Amazon</a>
+          </div>
+        </div>
       </div>
-    </footer>
-  </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-title">
+          <h2>Galerie d’univers</h2>
+          <p>La marque se comprend en quelques secondes grâce au visuel.</p>
+        </div>
+
+        <div class="cards-3">
+          <article class="card">
+            <div class="image-frame small-frame">
+              <img src="assets/mandala-hero.png" alt="Mandala Helios Astro">
+            </div>
+            <h3>Mandala signature</h3>
+            <p>Visuel principal pour accueil, PDF et réseaux sociaux.</p>
+          </article>
+
+          <article class="card">
+            <div class="image-frame small-frame">
+              <img src="assets/mandala-kaleidoscope.png" alt="Mandala détaillé Helios Astro">
+            </div>
+            <h3>Détail vibratoire</h3>
+            <p>Idéal pour les zooms, articles et vidéos courtes.</p>
+          </article>
+
+          <article class="card">
+            <div class="image-frame small-frame">
+              <img src="assets/theme-rihanna-demo.png" alt="Exemple de thème visuel Helios Astro">
+            </div>
+            <h3>Démo de thème</h3>
+            <p>Exemple d’une restitution graphique premium.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section cta-section">
+      <div class="container split">
+        <div class="quote-card">
+          <p>“Ce n’est pas un thème astral de plus. C’est une structure que le ciel laisse apparaître.”</p>
+        </div>
+        <div class="content-card card">
+          <h2>Prêt à commander votre lecture ?</h2>
+          <p>
+            Choisissez votre formule, payez directement, puis utilisez la page contact pour transmettre vos données de naissance.
+          </p>
+          <div class="btn-row">
+            <a href="offres.html" class="btn">Voir les offres</a>
+            <a href="contact.html" class="btn btn-outline">Envoyer mes informations</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-wrap">
+      <p>© <span data-year></span> Helios Astro — Tous droits réservés.</p>
+      <div class="footer-links">
+        <a href="contact.html">Contact</a>
+        <a href="offres.html">Offres</a>
+        <a href="livre.html">Livre</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/app.js"></script>
 </body>
 </html>
 
