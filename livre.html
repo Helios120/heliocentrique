@@ -5,10 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Livre — Helios Astro</title>
   <style>
-    body{margin:0;background:#050814;color:#eef5ff;font-family:Arial,Helvetica,sans-serif}
+    :root{
+      --bg:#050814;
+      --panel:#0c1320;
+      --line:rgba(91,214,255,.18);
+      --text:#eef5ff;
+      --muted:#b5c7e8;
+      --accent:#45ddff;
+    }
+    body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
     .wrap{max-width:1000px;margin:0 auto;padding:24px}
-    .panel{background:#0c1320;border:1px solid rgba(91,214,255,.18);border-radius:24px;padding:28px}
-    p{color:#b5c7e8;line-height:1.7}
+    .panel{background:var(--panel);border:1px solid var(--line);border-radius:24px;padding:28px}
+    h1{margin-top:0}
+    p{color:var(--muted);line-height:1.7}
+    .btn{
+      display:inline-block;margin-top:18px;padding:12px 18px;border-radius:999px;
+      background:linear-gradient(135deg,var(--accent),#8ef2ff);color:#00131c;font-weight:800;text-decoration:none
+    }
   </style>
 </head>
 <body>
@@ -16,13 +29,14 @@
     <div class="panel">
       <h1>Le livre Helios Astro</h1>
       <p>
-        Découvrez un prolongement éditorial de l’univers Helios Astro, entre symbolisme,
-        lumière, géométrie sacrée et lecture des formes profondes du thème.
+        Découvrez un prolongement éditorial de l’univers Helios Astro, entre lumière,
+        symbolisme, géométrie sacrée et lecture des formes profondes du thème.
       </p>
       <p>
-        Cette page peut accueillir ensuite ton lien Amazon, une couverture, un résumé, des extraits
-        et un bouton d’achat.
+        Cette page peut accueillir votre couverture, votre résumé, vos extraits,
+        ainsi qu’un accès direct à la page d’achat.
       </p>
+      <a class="btn" href="#">Découvrir le livre</a>
     </div>
   </div>
 </body>
