@@ -35,8 +35,21 @@ document.addEventListener("DOMContentLoaded", () => {
   const SIZE = 1600;
   canvas.width = SIZE;
   canvas.height = SIZE;
+
   const CX = SIZE / 2;
   const CY = SIZE / 2;
+
+  const WHEEL_SIDE = 1120;
+  const WHEEL_X = (SIZE - WHEEL_SIDE) / 2;
+  const WHEEL_Y = (SIZE - WHEEL_SIDE) / 2;
+
+  const CENTER_CORE_RADIUS = 48;       // vrai centre visuel
+  const FLOW_START_RADIUS = 0;         // départ strict du centre
+  const FLOW_TURN_STRENGTH = 0.92;     // courbure des arcs
+  const HOUSE_INNER_RADIUS = 250;
+  const HOUSE_OUTER_RADIUS = 500;
+  const PLANET_DOT_RADIUS = 18;
+  const PLANET_BASE_RADIUS = 565;
 
   let currentChart = null;
   let wheelImageLoaded = false;
@@ -46,7 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
     wheelImageLoaded = true;
     if (currentChart) renderWheel(currentChart);
   };
-  wheelImage.src = "assets/roue-heliosastro.png?v=600";
+  wheelImage.src = "assets/roue-heliosastro.png?v=700";
 
   const zodiac = [
     { name: "Bélier", start: 0 },
@@ -127,20 +140,33 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function pointOnCircle(longitude, radius) {
     const r = degToRad(longitude);
-    return { x: CX + Math.cos(r) * radius, y: CY + Math.sin(r) * radius };
+    return {
+      x: CX + Math.cos(r) * radius,
+      y: CY + Math.sin(r) * radius
+    };
+  }
+
+  function zodiacInfo(longitude) {
+    const lon = normalizeDeg(longitude);
+    const index = Math.floor(lon / 30);
+    return {
+      sign: zodiac[index].name,
+      degreeInSign: lon - zodiac[index].start
+    };
   }
 
   function adaptPlanets(rawPlanets) {
     return rawPlanets.map((p) => {
       const lon = normalizeDeg(Number(p.longitude));
       const meta = planetMeta[p.name] || { glyph: "•", color: "#ffffff" };
+      const zi = zodiacInfo(lon);
       return {
         name: p.name,
         glyph: meta.glyph,
         color: meta.color,
         longitude: lon,
-        sign: p.sign,
-        degreeInSign: Number(p.degreeInSign)
+        sign: p.sign || zi.sign,
+        degreeInSign: Number(p.degreeInSign ?? zi.degreeInSign)
       };
     });
   }
@@ -241,11 +267,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function drawHeliosWheelBase() {
-    const side = 1120;
-    const x = (SIZE - side) / 2;
-    const y = (SIZE - side) / 2;
     if (wheelImageLoaded) {
-      ctx.drawImage(wheelImage, x, y, side, side);
+      ctx.drawImage(wheelImage, WHEEL_X, WHEEL_Y, WHEEL_SIDE, WHEEL_SIDE);
     } else {
       ctx.strokeStyle = "#fff";
       ctx.lineWidth = 3;
@@ -255,56 +278,99 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  function drawHouseCusps(houses) {
-    const innerRadius = 250;
-    const outerRadius = 500;
+  function drawCenterCore() {
+    const g = ctx.createRadialGradient(CX, CY, 0, CX, CY, 80);
+    g.addColorStop(0, "rgba(255,255,255,0.95)");
+    g.addColorStop(0.25, "rgba(173,244,255,0.9)");
+    g.addColorStop(0.55, "rgba(77,214,255,0.45)");
+    g.addColorStop(1, "rgba(77,214,255,0.02)");
 
+    ctx.beginPath();
+    ctx.arc(CX, CY, 80, 0, Math.PI * 2);
+    ctx.fillStyle = g;
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(CX, CY, CENTER_CORE_RADIUS, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(255,255,255,0.95)";
+    ctx.fill();
+  }
+
+  function drawHouseCusps(houses) {
     houses.forEach((h, idx) => {
       const a = degToRad(h.longitude);
-      const x1 = CX + Math.cos(a) * innerRadius;
-      const y1 = CY + Math.sin(a) * innerRadius;
-      const x2 = CX + Math.cos(a) * outerRadius;
-      const y2 = CY + Math.sin(a) * outerRadius;
+
+      const x1 = CX + Math.cos(a) * HOUSE_INNER_RADIUS;
+      const y1 = CY + Math.sin(a) * HOUSE_INNER_RADIUS;
+      const x2 = CX + Math.cos(a) * HOUSE_OUTER_RADIUS;
+      const y2 = CY + Math.sin(a) * HOUSE_OUTER_RADIUS;
 
       ctx.beginPath();
       ctx.moveTo(x1, y1);
       ctx.lineTo(x2, y2);
-      ctx.strokeStyle = idx === 0 ? "rgba(255,211,105,0.95)" : "rgba(120,232,255,0.55)";
-      ctx.lineWidth = idx === 0 ? 3.2 : 1.4;
+      ctx.strokeStyle = idx === 0 ? "rgba(255,211,105,0.98)" : "rgba(130,230,255,0.60)";
+      ctx.lineWidth = idx === 0 ? 3.6 : 1.6;
       ctx.stroke();
 
-      const label = pointOnCircle(h.longitude + 15, 290);
-      ctx.fillStyle = idx === 0 ? "#ffd369" : "#ffffff";
-      ctx.font = "24px Arial";
+      const labelPoint = pointOnCircle(h.longitude + 15, 304);
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 26px Arial";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillText(String(h.house), label.x, label.y);
+      ctx.fillText(String(h.house), labelPoint.x, labelPoint.y);
     });
   }
 
+  function buildFlowPoints(longitude, endRadius) {
+    const baseAngle = degToRad(longitude);
+    const points = [];
+    const steps = 56;
+
+    for (let i = 0; i <= steps; i++) {
+      const t = i / steps;
+      const radius = FLOW_START_RADIUS + (endRadius * t);
+
+      // démarre strictement du centre et s’ouvre progressivement
+      const twist = (1 - t) * FLOW_TURN_STRENGTH;
+      const theta = baseAngle - twist;
+
+      points.push({
+        x: CX + Math.cos(theta) * radius,
+        y: CY + Math.sin(theta) * radius
+      });
+    }
+
+    return points;
+  }
+
   function drawPlanetArcFlow(planet, index) {
-    const endRadius = 530 + (index % 2) * 8;
-    const end = pointOnCircle(planet.longitude, endRadius);
-    const a = degToRad(planet.longitude);
+    const endRadius = 520;
+    const points = buildFlowPoints(planet.longitude, endRadius);
 
     ctx.save();
     ctx.beginPath();
 
-    for (let t = 0; t <= 1; t += 0.02) {
-      const radius = t * 350;
-      const theta = a + (t * 1.2 * Math.PI);
-      const x = CX + radius * Math.cos(theta);
-      const y = CY + radius * Math.sin(theta);
-      if (t === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
+    // vrai départ au centre
+    ctx.moveTo(CX, CY);
+
+    if (points.length > 1) {
+      ctx.lineTo(points[1].x, points[1].y);
     }
 
-    ctx.lineTo(end.x, end.y);
+    for (let i = 1; i < points.length - 1; i++) {
+      const xc = (points[i].x + points[i + 1].x) / 2;
+      const yc = (points[i].y + points[i + 1].y) / 2;
+      ctx.quadraticCurveTo(points[i].x, points[i].y, xc, yc);
+    }
+
+    const last = points[points.length - 1];
+    ctx.lineTo(last.x, last.y);
+
     ctx.strokeStyle = planet.color;
-    ctx.lineWidth = 4.5;
+    ctx.lineWidth = 5;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
-    ctx.shadowBlur = 10;
+    ctx.shadowBlur = 12;
     ctx.shadowColor = planet.color;
     ctx.stroke();
     ctx.restore();
@@ -312,13 +378,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function drawPlanetMarkers(planets) {
     planets.forEach((p, i) => {
-      const radius = 565 + (i % 3) * 20;
+      const radius = PLANET_BASE_RADIUS + (i % 3) * 18;
       const point = pointOnCircle(p.longitude, radius);
 
       ctx.beginPath();
-      ctx.arc(point.x, point.y, 19, 0, Math.PI * 2);
+      ctx.arc(point.x, point.y, PLANET_DOT_RADIUS, 0, Math.PI * 2);
       ctx.fillStyle = p.color;
-      ctx.shadowBlur = 10;
+      ctx.shadowBlur = 12;
       ctx.shadowColor = p.color;
       ctx.fill();
       ctx.shadowBlur = 0;
@@ -330,32 +396,33 @@ document.addEventListener("DOMContentLoaded", () => {
       ctx.fillText(p.glyph, point.x, point.y + 1);
 
       const label = pointOnCircle(p.longitude, radius + 34);
-      ctx.font = "18px Arial";
+      ctx.font = "bold 18px Arial";
       ctx.fillText(p.name, label.x, label.y);
 
-      const sub = pointOnCircle(p.longitude, radius + 55);
+      const sub = pointOnCircle(p.longitude, radius + 56);
       ctx.font = "14px Arial";
       ctx.fillText(`${p.degreeInSign.toFixed(1)}° ${p.sign}`, sub.x, sub.y);
     });
   }
 
   function drawAnglesOnWheel(angles) {
-    const asc = pointOnCircle(angles.ascendant.longitude, 540);
-    const mc = pointOnCircle(angles.mc.longitude, 540);
+    const ascPoint = pointOnCircle(angles.ascendant.longitude, 545);
+    const mcPoint = pointOnCircle(angles.mc.longitude, 545);
 
     ctx.fillStyle = "#ffd369";
-    ctx.font = "30px Arial";
+    ctx.font = "bold 32px Arial";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText("ASC", asc.x, asc.y);
+    ctx.fillText("ASC", ascPoint.x, ascPoint.y);
 
     ctx.fillStyle = "#78e8ff";
-    ctx.fillText("MC", mc.x, mc.y);
+    ctx.fillText("MC", mcPoint.x, mcPoint.y);
   }
 
   function renderWheel(payload) {
     clearCanvas();
     drawHeliosWheelBase();
+    drawCenterCore();
     drawHouseCusps(payload.houses);
     payload.planets.forEach((planet, index) => drawPlanetArcFlow(planet, index));
     drawPlanetMarkers(payload.planets);
@@ -377,7 +444,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const awake = await wakeBackend();
     if (!awake) {
       liveBadge.textContent = "MODE DÉMO";
-      renderAll(demoPayload);
+      renderAll({
+        ...demoPayload,
+        planets: adaptPlanets(demoPayload.planets)
+      });
       return;
     }
 
@@ -411,11 +481,15 @@ document.addEventListener("DOMContentLoaded", () => {
         angles: data.angles,
         houses: data.houses
       });
+
       liveBadge.textContent = "CARTE LIVE";
       setStatus("Carte générée avec succès.");
     } catch (e) {
       liveBadge.textContent = "MODE DÉMO";
-      renderAll(demoPayload);
+      renderAll({
+        ...demoPayload,
+        planets: adaptPlanets(demoPayload.planets)
+      });
       setStatus(`Mode démo HeliosAstro. Motif : ${e.message}`);
     }
   }
@@ -443,6 +517,7 @@ document.addEventListener("DOMContentLoaded", () => {
       setStatus("Aucune sauvegarde locale.");
       return;
     }
+
     const saved = JSON.parse(raw);
     nameInput.value = saved.consultant || "";
     dateInput.value = saved.date || "";
@@ -453,6 +528,7 @@ document.addEventListener("DOMContentLoaded", () => {
     longitudeInput.value = saved.longitude || "5.3698";
     offsetInput.value = saved.offset || "+01:00";
     privateNotes.value = saved.notes || "";
+
     if (saved.chart) {
       renderAll(saved.chart);
       setStatus("Dernière sauvegarde rechargée.");
@@ -472,6 +548,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function exportPdfPremium() {
     if (!currentChart) return;
+
     const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
     const imageData = canvas.toDataURL("image/png", 1.0);
 
@@ -495,7 +572,10 @@ document.addEventListener("DOMContentLoaded", () => {
   generateBtn.addEventListener("click", generateLiveChart);
   demoBtn.addEventListener("click", () => {
     liveBadge.textContent = "MODE DÉMO";
-    renderAll(demoPayload);
+    renderAll({
+      ...demoPayload,
+      planets: adaptPlanets(demoPayload.planets)
+    });
     setStatus("Démo HeliosAstro affichée.");
   });
   saveBtn.addEventListener("click", saveLocal);
@@ -503,6 +583,9 @@ document.addEventListener("DOMContentLoaded", () => {
   exportJsonBtn.addEventListener("click", exportJson);
   exportPdfBtn.addEventListener("click", exportPdfPremium);
 
-  renderAll(demoPayload);
-  setStatus("Version 600 chargée. Rendu premium actif.");
+  renderAll({
+    ...demoPayload,
+    planets: adaptPlanets(demoPayload.planets)
+  });
+  setStatus("Version 700 chargée. Arcs centrés, maisons et ascendant renforcés.");
 });
