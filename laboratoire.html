@@ -1,766 +1,149 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Laboratoire Photonique — Helios Astro</title>
-  <meta name="description" content="Laboratoire photonique Helios Astro : mandala vivant, flux lumineux, fréquences et géométrie sacrée.">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HeliosAstro — Laboratoire Photonique</title>
 
-  <style>
-    :root{
-      --bg:#050814;
-      --panel:#0c1320;
-      --panel2:#09101b;
-      --line:rgba(91,214,255,.18);
-      --text:#eef5ff;
-      --muted:#b5c7e8;
-      --accent:#45ddff;
-      --accent2:#8ef2ff;
-      --gold:#ffd369;
-      --green:#9dff8c;
-      --danger:#ff6b6b;
-    }
+<style>
+body{
+  margin:0;
+  background:#000;
+  color:#fff;
+  font-family:Arial, Helvetica, sans-serif;
+  overflow:hidden;
+}
 
-    *{box-sizing:border-box}
+canvas{
+  display:block;
+}
 
-    html,body{
-      margin:0;
-      padding:0;
-      min-height:100%;
-      font-family:Arial,Helvetica,sans-serif;
-      background:
-        radial-gradient(circle at top, rgba(69,221,255,.08), transparent 32%),
-        radial-gradient(circle at center, rgba(255,211,105,.05), transparent 30%),
-        #000;
-      color:var(--text);
-      overflow-x:hidden;
-    }
+.topbar{
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:60px;
+  background:linear-gradient(#02040a,#000);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 20px;
+  z-index:10;
+  border-bottom:1px solid rgba(255,255,255,0.1);
+}
 
-    a{text-decoration:none;color:inherit}
+.topbar a{
+  color:#fff;
+  text-decoration:none;
+  margin-left:20px;
+  font-size:14px;
+}
 
-    .wrap{
-      max-width:1480px;
-      margin:0 auto;
-      padding:22px;
-    }
+.topbar a:hover{
+  color:#2ea8ff;
+}
 
-    header{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:18px;
-      flex-wrap:wrap;
-      margin-bottom:18px;
-    }
-
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:14px;
-    }
-
-    .brand img{
-      width:62px;
-      height:62px;
-      object-fit:contain;
-      background:#fff;
-      border-radius:18px;
-      padding:6px;
-    }
-
-    .brand h1{
-      margin:0;
-      font-size:26px;
-      letter-spacing:.04em;
-      text-transform:uppercase;
-    }
-
-    .brand p{
-      margin:4px 0 0;
-      color:var(--muted);
-      font-size:14px;
-      letter-spacing:.08em;
-      text-transform:uppercase;
-    }
-
-    nav{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-
-    nav a{
-      padding:10px 13px;
-      border-radius:999px;
-      color:var(--muted);
-      border:1px solid transparent;
-      background:rgba(255,255,255,.03);
-    }
-
-    nav a:hover,
-    nav a.active{
-      color:var(--text);
-      border-color:var(--line);
-    }
-
-    .cta{
-      background:linear-gradient(135deg,var(--accent),var(--accent2));
-      color:#00131c;
-      font-weight:800;
-      box-shadow:0 10px 28px rgba(69,221,255,.22);
-    }
-
-    .status-bar{
-      display:flex;
-      justify-content:flex-end;
-      gap:18px;
-      flex-wrap:wrap;
-      margin-bottom:16px;
-      color:var(--muted);
-      font-size:13px;
-      text-transform:uppercase;
-      letter-spacing:.08em;
-    }
-
-    .status-bar strong{
-      color:var(--green);
-    }
-
-    .lab-grid{
-      display:grid;
-      grid-template-columns:260px 1fr 340px;
-      gap:18px;
-      align-items:stretch;
-    }
-
-    .panel{
-      background:linear-gradient(180deg,rgba(12,19,32,.88),rgba(9,16,27,.9));
-      border:1px solid var(--line);
-      border-radius:26px;
-      padding:20px;
-      box-shadow:0 18px 34px rgba(0,0,0,.28);
-      backdrop-filter:blur(10px);
-    }
-
-    .panel h2{
-      margin:0 0 16px;
-      font-size:18px;
-      text-transform:uppercase;
-      letter-spacing:.05em;
-    }
-
-    .info-row{
-      display:flex;
-      justify-content:space-between;
-      gap:16px;
-      color:var(--muted);
-      margin:0 0 12px;
-      font-weight:700;
-    }
-
-    .info-row span:last-child{
-      color:var(--accent2);
-    }
-
-    .legend{
-      margin-top:36px;
-    }
-
-    .gradient-bar{
-      height:14px;
-      border-radius:999px;
-      background:linear-gradient(90deg,#ff4040,#ffd84a,#3dff7a,#00eaff,#4169ff,#ff77ff);
-      margin:12px 0;
-      box-shadow:0 0 22px rgba(69,221,255,.22);
-    }
-
-    .legend-scale{
-      display:flex;
-      justify-content:space-between;
-      color:var(--muted);
-      font-size:13px;
-      font-weight:700;
-    }
-
-    .stage{
-      position:relative;
-      min-height:680px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      overflow:hidden;
-    }
-
-    #lab-canvas{
-      width:100%;
-      aspect-ratio:1/1;
-      max-height:720px;
-      display:block;
-      border-radius:24px;
-      background:#000;
-    }
-
-    .fps{
-      position:absolute;
-      right:22px;
-      bottom:22px;
-      padding:9px 13px;
-      border-radius:999px;
-      border:1px solid rgba(157,255,140,.32);
-      color:var(--green);
-      background:rgba(0,0,0,.38);
-      font-size:13px;
-      font-weight:800;
-    }
-
-    .controls{
-      display:grid;
-      gap:18px;
-    }
-
-    .control-group{
-      padding:16px;
-      border-radius:20px;
-      border:1px solid rgba(255,255,255,.08);
-      background:rgba(255,255,255,.025);
-    }
-
-    .control-group h3{
-      margin:0 0 12px;
-      font-size:17px;
-      text-transform:uppercase;
-      letter-spacing:.04em;
-    }
-
-    label{
-      display:grid;
-      gap:8px;
-      color:var(--muted);
-      font-weight:700;
-      margin-bottom:14px;
-    }
-
-    .label-line{
-      display:flex;
-      justify-content:space-between;
-      gap:10px;
-    }
-
-    input[type="range"]{
-      width:100%;
-      accent-color:var(--accent);
-    }
-
-    .hint{
-      margin:8px 0 0;
-      color:var(--muted);
-      font-size:13px;
-      line-height:1.45;
-    }
-
-    .bottom-controls{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:14px;
-      flex-wrap:wrap;
-      margin-top:18px;
-    }
-
-    button{
-      border:none;
-      border-radius:18px;
-      padding:15px 22px;
-      font-weight:900;
-      cursor:pointer;
-      color:#00131c;
-      background:linear-gradient(135deg,var(--accent),var(--accent2));
-      box-shadow:0 12px 28px rgba(69,221,255,.2);
-    }
-
-    button.secondary{
-      color:var(--text);
-      background:#152132;
-      border:1px solid var(--line);
-      box-shadow:none;
-    }
-
-    .pause{
-      width:72px;
-      height:72px;
-      border-radius:50%;
-      display:grid;
-      place-items:center;
-      font-size:28px;
-      border:1px solid rgba(69,221,255,.32);
-      background:rgba(69,221,255,.12);
-      color:var(--text);
-      box-shadow:0 0 28px rgba(69,221,255,.2);
-    }
-
-    .time-control{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      min-width:320px;
-      color:var(--muted);
-      font-weight:800;
-    }
-
-    .time-control input{
-      flex:1;
-    }
-
-    @media(max-width:1180px){
-      .lab-grid{
-        grid-template-columns:1fr;
-      }
-
-      .stage{
-        min-height:auto;
-      }
-
-      #lab-canvas{
-        max-height:none;
-      }
-    }
-  </style>
+.title{
+  font-weight:bold;
+  color:#ffd36a;
+}
+</style>
 </head>
 
 <body>
-  <div class="wrap">
-    <header>
-      <div class="brand">
-        <img src="./expert/assets/logo-heliosastro.png?v=1200" alt="Logo Helios Astro">
-        <div>
-          <h1>HeliosAstro — Mandala Photonique</h1>
-          <p>Flux • Ondes • Hertz • Anneaux • Couleurs • Dimensions</p>
-        </div>
-      </div>
 
-      <nav>
-        <a href="./index.html?v=1200">Accueil</a>
-        <a href="./offres.html?v=1200">Offres</a>
-        <a href="./logiciel.html?v=1200">Logiciel</a>
-        <a href="./livre.html?v=1200">Livre</a>
-        <a href="./contact.html?v=1200">Contact</a>
-        <a class="active" href="./laboratoire.html?v=1200">Laboratoire</a>
-        <a class="cta" href="./expert/?v=1200">Commander</a>
-      </nav>
-    </header>
-
-    <div class="status-bar">
-      <span>↗ Mode Lab</span>
-      <span>↯ Flux coordonné</span>
-      <span>● <strong>Système stable</strong></span>
-    </div>
-
-    <section class="lab-grid">
-      <aside class="panel">
-        <h2>Informations</h2>
-
-        <div class="info-row"><span>Anneaux actifs</span><span id="info-rings">9</span></div>
-        <div class="info-row"><span>Photons calculés</span><span id="info-photons">540</span></div>
-        <div class="info-row"><span>Degré source</span><span id="info-degree">111°</span></div>
-        <div class="info-row"><span>Fréquence base</span><span id="info-frequency">432 Hz</span></div>
-        <div class="info-row"><span>Harmonique</span><span id="info-harmony">7.87</span></div>
-        <div class="info-row"><span>Résonances</span><span id="info-resonance">18</span></div>
-
-        <div class="legend">
-          <h2>Légende</h2>
-          <p class="hint">Fréquence → couleur</p>
-          <div class="gradient-bar"></div>
-          <div class="legend-scale">
-            <span>Rouge</span>
-            <span>Violet</span>
-          </div>
-        </div>
-      </aside>
-
-      <main>
-        <div class="panel stage">
-          <canvas id="lab-canvas"></canvas>
-          <div class="fps" id="fps">FPS: 60 ↻</div>
-        </div>
-
-        <div class="bottom-controls">
-          <button id="startBtn">▶ Démarrer</button>
-          <button id="pauseBtn" class="pause">Ⅱ</button>
-          <button id="resetBtn" class="secondary">↻ Réinitialiser</button>
-
-          <div class="time-control">
-            <span>Temps</span>
-            <input type="range" id="timeSlider" min="0" max="60" value="12" step="0.1">
-            <span id="timeValue">12.0 s</span>
-          </div>
-        </div>
-      </main>
-
-      <aside class="panel controls">
-        <div class="control-group">
-          <h3>Architecture</h3>
-
-          <label>
-            <div class="label-line"><span>Anneaux</span><span id="ringsValue">9</span></div>
-            <input type="range" id="rings" min="3" max="16" value="9">
-          </label>
-
-          <label>
-            <div class="label-line"><span>Branches sacrées</span><span id="branchesValue">12</span></div>
-            <input type="range" id="branches" min="3" max="24" value="12">
-          </label>
-
-          <label>
-            <div class="label-line"><span>Rotation globale</span><span id="rotationValue">0.26</span></div>
-            <input type="range" id="rotation" min="-2" max="2" value="0.26" step="0.01">
-          </label>
-
-          <p class="hint">Structure : mandala central + anneaux porteurs + flux d’information par degré.</p>
-        </div>
-
-        <div class="control-group">
-          <h3>Fréquence</h3>
-
-          <label>
-            <div class="label-line"><span>Base Hz</span><span id="frequencyValue">432</span></div>
-            <input type="range" id="frequency" min="100" max="963" value="432">
-          </label>
-
-          <div class="gradient-bar"></div>
-          <p class="hint">La fréquence module la couleur, la phase et la vitesse interne du champ.</p>
-        </div>
-
-        <div class="control-group">
-          <h3>Flux photonique</h3>
-
-          <label>
-            <div class="label-line"><span>Vitesse</span><span id="speedValue">1.00x</span></div>
-            <input type="range" id="speed" min="0.1" max="3" value="1" step="0.01">
-          </label>
-
-          <label>
-            <div class="label-line"><span>Densité</span><span id="densityValue">58%</span></div>
-            <input type="range" id="density" min="20" max="100" value="58">
-          </label>
-
-          <label>
-            <div class="label-line"><span>Rayonnement</span><span id="glowValue">72%</span></div>
-            <input type="range" id="glow" min="10" max="100" value="72">
-          </label>
-
-          <p class="hint">Le flux simule un champ vivant : photons, anneaux, impulsions et mémoire vibratoire.</p>
-        </div>
-      </aside>
-    </section>
+<div class="topbar">
+  <div class="title">☉ HELIOSASTRO LAB</div>
+  <div>
+    <a href="./index.html">Accueil</a>
+    <a href="./offres.html">Offres</a>
+    <a href="./logiciel.html">Logiciel</a>
   </div>
+</div>
 
-  <script>
-    const canvas = document.getElementById("lab-canvas");
-    const ctx = canvas.getContext("2d");
+<canvas id="c"></canvas>
 
-    const ringsInput = document.getElementById("rings");
-    const branchesInput = document.getElementById("branches");
-    const rotationInput = document.getElementById("rotation");
-    const frequencyInput = document.getElementById("frequency");
-    const speedInput = document.getElementById("speed");
-    const densityInput = document.getElementById("density");
-    const glowInput = document.getElementById("glow");
-    const timeSlider = document.getElementById("timeSlider");
+<script>
+const canvas = document.getElementById("c");
+const ctx = canvas.getContext("2d");
 
-    const ringsValue = document.getElementById("ringsValue");
-    const branchesValue = document.getElementById("branchesValue");
-    const rotationValue = document.getElementById("rotationValue");
-    const frequencyValue = document.getElementById("frequencyValue");
-    const speedValue = document.getElementById("speedValue");
-    const densityValue = document.getElementById("densityValue");
-    const glowValue = document.getElementById("glowValue");
-    const timeValue = document.getElementById("timeValue");
+let w,h,t=0;
 
-    const infoRings = document.getElementById("info-rings");
-    const infoPhotons = document.getElementById("info-photons");
-    const infoDegree = document.getElementById("info-degree");
-    const infoFrequency = document.getElementById("info-frequency");
-    const infoHarmony = document.getElementById("info-harmony");
-    const infoResonance = document.getElementById("info-resonance");
+function resize(){
+  w = canvas.width = window.innerWidth;
+  h = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener("resize", resize);
 
-    const startBtn = document.getElementById("startBtn");
-    const pauseBtn = document.getElementById("pauseBtn");
-    const resetBtn = document.getElementById("resetBtn");
-    const fpsBox = document.getElementById("fps");
+function glow(x,y,r,c){
+  const g = ctx.createRadialGradient(x,y,0,x,y,r);
+  g.addColorStop(0,c);
+  g.addColorStop(1,"rgba(0,0,0,0)");
+  ctx.fillStyle=g;
+  ctx.beginPath();
+  ctx.arc(x,y,r,0,Math.PI*2);
+  ctx.fill();
+}
 
-    let width = 1000;
-    let height = 1000;
-    let running = true;
-    let t = 12;
-    let lastFrame = performance.now();
-    let fps = 60;
+function draw(){
+  requestAnimationFrame(draw);
+  t+=0.01;
 
-    function resizeCanvas(){
-      const rect = canvas.getBoundingClientRect();
-      const size = Math.max(520, Math.floor(Math.min(rect.width, window.innerHeight * 0.82)));
-      canvas.width = size * window.devicePixelRatio;
-      canvas.height = size * window.devicePixelRatio;
-      canvas.style.height = size + "px";
-      width = canvas.width;
-      height = canvas.height;
-      ctx.setTransform(1,0,0,1,0,0);
-      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-      width = size;
-      height = size;
+  ctx.fillStyle="black";
+  ctx.fillRect(0,0,w,h);
+
+  const cx=w/2;
+  const cy=h/2;
+
+  const R = Math.min(w,h)*0.35;
+
+  glow(cx,cy,R*1.2,"rgba(0,255,200,0.04)");
+  glow(cx,cy,R*0.8,"rgba(0,120,255,0.05)");
+
+  ctx.strokeStyle="rgba(120,220,255,0.08)";
+  ctx.lineWidth=1;
+
+  for(let k=0;k<6;k++){
+    let rot = k*Math.PI/3 + t*0.05;
+
+    ctx.beginPath();
+    for(let i=0;i<200;i++){
+      let a = i/200*Math.PI*2;
+      let r = R*0.6 + Math.sin(a*6+t)*20;
+
+      let x = cx + Math.cos(a+rot)*r;
+      let y = cy + Math.sin(a+rot)*r*0.8;
+
+      if(i===0) ctx.moveTo(x,y);
+      else ctx.lineTo(x,y);
     }
+    ctx.stroke();
+  }
 
-    window.addEventListener("resize", resizeCanvas);
-    resizeCanvas();
+  for(let i=0;i<40;i++){
+    let a = i/40*Math.PI*2 + t;
 
-    function updateLabels(){
-      const rings = Number(ringsInput.value);
-      const branches = Number(branchesInput.value);
-      const rotation = Number(rotationInput.value);
-      const frequency = Number(frequencyInput.value);
-      const speed = Number(speedInput.value);
-      const density = Number(densityInput.value);
-      const glow = Number(glowInput.value);
+    let r = R*0.5;
 
-      ringsValue.textContent = rings;
-      branchesValue.textContent = branches;
-      rotationValue.textContent = rotation.toFixed(2);
-      frequencyValue.textContent = frequency;
-      speedValue.textContent = speed.toFixed(2) + "x";
-      densityValue.textContent = density + "%";
-      glowValue.textContent = glow + "%";
-      timeValue.textContent = t.toFixed(1) + " s";
+    let x = cx + Math.cos(a)*r;
+    let y = cy + Math.sin(a*1.2)*r;
 
-      infoRings.textContent = rings;
-      infoPhotons.textContent = Math.round(rings * branches * density / 10 * 5);
-      infoDegree.textContent = Math.round((frequency * 0.257) % 360) + "°";
-      infoFrequency.textContent = frequency + " Hz";
-      infoHarmony.textContent = (frequency / 54.9).toFixed(2);
-      infoResonance.textContent = Math.round(branches * 1.5);
-    }
+    let pulse = 0.5 + 0.5*Math.sin(t*4+i);
 
-    [ringsInput, branchesInput, rotationInput, frequencyInput, speedInput, densityInput, glowInput].forEach(input=>{
-      input.addEventListener("input", updateLabels);
-    });
+    glow(x,y,8*pulse,"rgba(120,240,255,0.15)");
+    glow(x,y,3,"rgba(255,255,180,0.9)");
+  }
 
-    timeSlider.addEventListener("input", () => {
-      t = Number(timeSlider.value);
-      updateLabels();
-      draw();
-    });
+  let p = 0.5+0.5*Math.sin(t*3);
 
-    startBtn.addEventListener("click", () => {
-      running = true;
-      pauseBtn.textContent = "Ⅱ";
-    });
+  glow(cx,cy,40*p,"rgba(255,255,255,0.15)");
+  glow(cx,cy,10,"rgba(255,255,200,0.9)");
+}
 
-    pauseBtn.addEventListener("click", () => {
-      running = !running;
-      pauseBtn.textContent = running ? "Ⅱ" : "▶";
-    });
+draw();
+</script>
 
-    resetBtn.addEventListener("click", () => {
-      t = 0;
-      timeSlider.value = 0;
-      updateLabels();
-    });
-
-    function hsl(h, s, l, a){
-      return `hsla(${h}, ${s}%, ${l}%, ${a})`;
-    }
-
-    function glowCircle(x,y,r,color){
-      const g = ctx.createRadialGradient(x,y,0,x,y,r);
-      g.addColorStop(0,color);
-      g.addColorStop(1,"rgba(0,0,0,0)");
-      ctx.fillStyle = g;
-      ctx.beginPath();
-      ctx.arc(x,y,r,0,Math.PI*2);
-      ctx.fill();
-    }
-
-    function drawBackground(cx,cy,R,glowPower){
-      ctx.fillStyle = "rgba(0,0,0,1)";
-      ctx.fillRect(0,0,width,height);
-
-      glowCircle(cx,cy,R*1.2,`rgba(40,210,255,${0.04 * glowPower})`);
-      glowCircle(cx,cy,R*0.8,`rgba(255,255,255,${0.035 * glowPower})`);
-
-      for(let i=0;i<120;i++){
-        const a = i * 12.9898;
-        const x = (Math.sin(a) * 43758.5453 % 1) * width;
-        const y = (Math.cos(a) * 21344.7721 % 1) * height;
-        ctx.fillStyle = "rgba(180,220,255,0.10)";
-        ctx.fillRect(Math.abs(x), Math.abs(y), 1, 1);
-      }
-    }
-
-    function drawCore(cx,cy,t,frequency,glowPower){
-      const spin = t * 0.7 + frequency * 0.002;
-
-      for(let k=0;k<7;k++){
-        ctx.beginPath();
-        for(let i=0;i<=360;i++){
-          const a = i * Math.PI / 180;
-          const r = 24 + 8 * Math.sin(a * 6 + spin + k);
-          const x = cx + Math.cos(a + k * Math.PI / 7) * r;
-          const y = cy + Math.sin(a + k * Math.PI / 7) * r;
-          if(i===0) ctx.moveTo(x,y);
-          else ctx.lineTo(x,y);
-        }
-        ctx.strokeStyle = hsl((frequency + k*38) % 360,90,72,0.55);
-        ctx.lineWidth = 1.4;
-        ctx.shadowBlur = 12 * glowPower;
-        ctx.shadowColor = hsl((frequency + k*38) % 360,90,72,0.9);
-        ctx.stroke();
-      }
-
-      glowCircle(cx,cy,54,`rgba(255,255,255,${0.10 * glowPower})`);
-      glowCircle(cx,cy,18,`rgba(255,255,255,${0.85})`);
-      ctx.shadowBlur = 0;
-    }
-
-    function drawRings(cx,cy,R,rings,frequency,rotation,t,glowPower){
-      for(let r=1;r<=rings;r++){
-        const radius = R * (r / rings) * 0.96;
-        const hue = (frequency * 0.18 + r * 31 + t * 8) % 360;
-
-        ctx.beginPath();
-        ctx.arc(cx,cy,radius,0,Math.PI*2);
-        ctx.strokeStyle = hsl(hue,92,65,0.14 + r / rings * 0.12);
-        ctx.lineWidth = 1.2;
-        ctx.shadowBlur = 5 * glowPower;
-        ctx.shadowColor = hsl(hue,92,65,0.4);
-        ctx.stroke();
-
-        const count = Math.round(90 + r * 9);
-        for(let i=0;i<count;i++){
-          const a = (i/count) * Math.PI*2 + t * 0.05 * rotation * r;
-          const wave = Math.sin(a * 6 + t * 1.5 + r) * 2.2;
-          const x = cx + Math.cos(a) * (radius + wave);
-          const y = cy + Math.sin(a) * (radius + wave);
-          ctx.fillStyle = hsl(hue + i * 0.7,95,68,0.32);
-          ctx.fillRect(x,y,1.4,1.4);
-        }
-      }
-
-      ctx.shadowBlur = 0;
-    }
-
-    function drawSacredBranches(cx,cy,R,branches,frequency,rotation,t,glowPower){
-      for(let b=0;b<branches;b++){
-        const base = (b/branches) * Math.PI*2 + t * 0.04 * rotation;
-        const hue = (frequency * 0.25 + b * 360 / branches) % 360;
-
-        ctx.beginPath();
-        for(let i=0;i<=180;i++){
-          const p = i / 180;
-          const angle = base + p * Math.PI * 1.25 + Math.sin(p*Math.PI)*0.28;
-          const radius = R * p * 0.88;
-          const x = cx + Math.cos(angle) * radius;
-          const y = cy + Math.sin(angle) * radius;
-          if(i===0) ctx.moveTo(x,y);
-          else ctx.lineTo(x,y);
-        }
-
-        ctx.strokeStyle = hsl(hue,95,70,0.24);
-        ctx.lineWidth = 1.4;
-        ctx.shadowBlur = 10 * glowPower;
-        ctx.shadowColor = hsl(hue,95,70,0.45);
-        ctx.stroke();
-      }
-
-      ctx.shadowBlur = 0;
-    }
-
-    function drawPhotonFlux(cx,cy,R,rings,branches,frequency,density,speed,t,glowPower){
-      const photons = Math.round(rings * branches * density / 9);
-
-      for(let i=0;i<photons;i++){
-        const layer = (i % rings) + 1;
-        const branch = i % branches;
-        const phase = i * 0.618;
-        const p = ((t * 0.075 * speed + phase) % 1);
-
-        const radius = R * (layer / rings) * (0.18 + 0.78 * p);
-        const angle =
-          (branch / branches) * Math.PI * 2 +
-          p * Math.PI * 2.5 +
-          Math.sin(p * Math.PI) * 0.8 +
-          t * 0.02 * speed;
-
-        const hue = (frequency * 0.22 + layer * 24 + branch * 11 + p * 120) % 360;
-        const x = cx + Math.cos(angle) * radius;
-        const y = cy + Math.sin(angle) * radius;
-        const size = 1.2 + 2.8 * Math.sin(p * Math.PI);
-
-        glowCircle(x,y,size * (2.6 + glowPower),hsl(hue,95,70,0.22));
-        ctx.fillStyle = hsl(hue,95,76,0.78);
-        ctx.beginPath();
-        ctx.arc(x,y,size,0,Math.PI*2);
-        ctx.fill();
-      }
-    }
-
-    function drawDegreeSource(cx,cy,R,frequency,t){
-      const degree = (frequency * 0.257 + t * 6) % 360;
-      const a = (degree - 90) * Math.PI / 180;
-      const x1 = cx + Math.cos(a) * (R * 0.12);
-      const y1 = cy + Math.sin(a) * (R * 0.12);
-      const x2 = cx + Math.cos(a) * (R * 1.02);
-      const y2 = cy + Math.sin(a) * (R * 1.02);
-
-      ctx.beginPath();
-      ctx.moveTo(x1,y1);
-      ctx.lineTo(x2,y2);
-      ctx.strokeStyle = "rgba(255,211,105,0.44)";
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
-
-      glowCircle(x2,y2,18,"rgba(255,211,105,0.35)");
-    }
-
-    function draw(){
-      const now = performance.now();
-      fps = Math.round(1000 / Math.max(1, now - lastFrame));
-      lastFrame = now;
-      fpsBox.textContent = `FPS: ${Math.min(99,fps)} ↻`;
-
-      const rings = Number(ringsInput.value);
-      const branches = Number(branchesInput.value);
-      const rotation = Number(rotationInput.value);
-      const frequency = Number(frequencyInput.value);
-      const speed = Number(speedInput.value);
-      const density = Number(densityInput.value);
-      const glowPower = Number(glowInput.value) / 70;
-
-      if(running){
-        t += 0.016 * speed;
-        const tv = Math.min(60, t);
-        timeSlider.value = tv;
-      }
-
-      updateLabels();
-
-      const cx = width/2;
-      const cy = height/2;
-      const R = Math.min(width,height) * 0.42;
-
-      drawBackground(cx,cy,R,glowPower);
-      drawSacredBranches(cx,cy,R,branches,frequency,rotation,t,glowPower);
-      drawRings(cx,cy,R,rings,frequency,rotation,t,glowPower);
-      drawPhotonFlux(cx,cy,R,rings,branches,frequency,density,speed,t,glowPower);
-      drawDegreeSource(cx,cy,R,frequency,t);
-      drawCore(cx,cy,t,frequency,glowPower);
-
-      requestAnimationFrame(draw);
-    }
-
-    updateLabels();
-    draw();
-  </script>
 </body>
 </html>
