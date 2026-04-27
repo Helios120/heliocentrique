@@ -1,160 +1,296 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta name="robots" content="index, follow">
-
-<meta property="og:url" content="https://heliosastro.fr/">
-<meta property="og:type" content="website">
-
-<meta name="twitter:card" content="summary_large_image">
-
-<link rel="icon" href="assets/icon-192.png">
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Helios Lab — Flux vivant</title>
-
-<style>
-body{
-  margin:0;
-  background:black;
-  overflow:hidden;
-  font-family:sans-serif;
-}
-
-#ui{
-  position:fixed;
-  top:20px;
-  left:20px;
-  color:white;
-  z-index:10;
-}
-
-#ui h1{
-  font-size:20px;
-  margin:0 0 10px;
-}
-
-#ui button{
-  background:#00eaff;
-  border:none;
-  padding:8px 14px;
-  border-radius:20px;
-  cursor:pointer;
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Helios Astro — Astrologie visuelle, vibratoire et géométrique</title>
+  <meta name="description" content="Helios Astro révèle une lecture visuelle, vibratoire et symbolique de votre thème astral. Thème astral, transit pour 3 mois, révolution solaire et univers inspiré par la géométrie sacrée.">
+  <meta name="keywords" content="astrologie, thème astral, carte du ciel, astrologie visuelle, géométrie sacrée, mandala, transit, révolution solaire, Helios Astro">
+  <meta property="og:title" content="Helios Astro — Votre thème astral version vivante">
+  <meta property="og:description" content="Une lecture visuelle, symbolique et vibratoire de votre empreinte céleste.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="assets/logo-heliosastro.png">
+  <meta property="og:locale" content="fr_FR">
+  <link rel="canonical" href="https://heliosastro.com/">
+  <link rel="stylesheet" href="assets/styles.css">
 </head>
-
 <body>
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a href="index.html" class="brand">
+        <img src="assets/logo-heliosastro.png" alt="Logo Helios Astro">
+        <div>
+          <strong>Helios Astro</strong>
+          <span>Astrologie géométrique premium</span>
+        </div>
+      </a>
 
-<div id="ui">
-  <h1>Helios Lab</h1>
-  <button onclick="toggle()">Pause</button>
-</div>
+      <button class="nav-toggle" type="button" aria-label="Ouvrir le menu" data-nav-toggle>☰</button>
 
-<canvas id="c"></canvas>
+      <nav class="site-nav" data-nav>
+        <a href="index.html" class="active">Accueil</a>
+        <a href="offres.html">Offres</a>
+        <a href="logiciel.html">Logiciel</a>
+        <a href="livre.html">Livre</a>
+        <a href="heliosastrosite.html">Méthode</a>
+        <a href="contact.html" class="btn btn-small">Commander</a>
+      </nav>
+    </div>
+  </header>
 
-<script>
-const canvas = document.getElementById("c");
-const ctx = canvas.getContext("2d");
+  <main>
+    <section class="hero section">
+      <div class="container hero-grid">
+        <div>
+          <p class="eyebrow">Astrologie • Géométrie sacrée • Lecture vibratoire</p>
+          <h1>Votre thème astral, <span class="accent">version vivante</span>.</h1>
+          <p class="lead">
+            Helios Astro transforme votre carte du ciel en une création visuelle forte, sensible et mémorable.
+            Chaque lecture devient une expérience symbolique unique, à conserver, à offrir ou à explorer comme une empreinte personnelle.
+          </p>
 
-let w,h,t=0,run=true;
+          <div class="btn-row">
+            <a href="offres.html" class="btn">Découvrir les offres</a>
+            <a href="logiciel.html" class="btn btn-outline">Tester le logiciel degrés</a>
+          </div>
 
-function resize(){
-  w = canvas.width = window.innerWidth;
-  h = canvas.height = window.innerHeight;
-}
-resize();
-window.addEventListener("resize", resize);
+          <div class="stats-grid">
+            <div class="stat-card">
+              <strong>Thème astral</strong>
+              <span>Votre lecture de naissance Helios Astro</span>
+              <a href="https://www.paypal.com/ncp/payment/QF67W8ATHZX4U" target="_blank" rel="noopener" class="btn pay-btn">Commander</a>
+            </div>
 
-function glow(x,y,r,c){
-  const g = ctx.createRadialGradient(x,y,0,x,y,r);
-  g.addColorStop(0,c);
-  g.addColorStop(1,"rgba(0,0,0,0)");
-  ctx.fillStyle=g;
-  ctx.beginPath();
-  ctx.arc(x,y,r,0,Math.PI*2);
-  ctx.fill();
-}
+            <div class="stat-card">
+              <strong>Transit pour 3 mois</strong>
+              <span>Une lecture de période pour mieux anticiper</span>
+              <a href="https://www.paypal.com/ncp/payment/Z3SZPE6NUZYKG" target="_blank" rel="noopener" class="btn pay-btn">Commander</a>
+            </div>
 
-function draw(){
-  requestAnimationFrame(draw);
-  if(!run) return;
+            <div class="stat-card">
+              <strong>Révolution solaire</strong>
+              <span>Votre grande lecture annuelle Helios Astro</span>
+              <a href="https://www.paypal.com/ncp/payment/7HTYFEY8JA8EN" target="_blank" rel="noopener" class="btn pay-btn">Commander</a>
+            </div>
+          </div>
+        </div>
 
-  t+=0.01;
+        <div class="glass-card hero-visual">
+          <span class="badge">Signature visuelle Helios Astro</span>
+          <img src="assets/mandala-hero.png" alt="Mandala cosmique Helios Astro">
+        </div>
+      </div>
+    </section>
 
-  ctx.fillStyle="rgba(0,0,0,0.2)";
-  ctx.fillRect(0,0,w,h);
+    <section class="section">
+      <div class="container">
+        <div class="section-title">
+          <h2>Pourquoi les clients aiment Helios Astro</h2>
+          <p>
+            Helios Astro transforme une simple carte du ciel en expérience visuelle, symbolique et émotionnelle.
+            Chaque thème devient une création unique, élégante, marquante et facile à offrir ou à conserver.
+          </p>
+        </div>
 
-  const cx=w/2;
-  const cy=h/2;
-  const R=Math.min(w,h)*0.35;
+        <div class="cards-3">
+          <article class="card">
+            <div class="icon">✺</div>
+            <h3>Un thème vraiment unique</h3>
+            <p>
+              Chaque création possède sa propre énergie visuelle, son propre équilibre, sa propre signature.
+              Le client ne reçoit pas un document banal, mais une œuvre personnelle.
+            </p>
+          </article>
 
-  // halo central
-  glow(cx,cy,R*1.4,"rgba(0,255,255,0.05)");
-  glow(cx,cy,R*0.6,"rgba(255,200,0,0.05)");
+          <article class="card">
+            <div class="icon">✦</div>
+            <h3>Une lecture qui marque</h3>
+            <p>
+              Helios Astro met en lumière les formes, les symboles et les axes forts du thème pour créer
+              une lecture plus sensible, plus mémorable et plus captivante.
+            </p>
+          </article>
 
-  // spirales
-  for(let k=0;k<10;k++){
-    ctx.beginPath();
+          <article class="card">
+            <div class="icon">∞</div>
+            <h3>Un cadeau premium</h3>
+            <p>
+              Idéal pour se faire plaisir ou offrir : le rendu visuel, l’univers cosmique et la mise en forme
+              donnent au thème une vraie valeur émotionnelle et esthétique.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
 
-    for(let i=0;i<600;i++){
-      let p=i/600;
-      let a=p*Math.PI*10 + k + t;
-      let r=R*p;
+    <section class="section">
+      <div class="container split">
+        <div class="card content-card">
+          <h2>Une méthode conçue pour marquer</h2>
+          <p>
+            Helios Astro relie le ciel, la géométrie et le récit. Résultat : une cartographie symbolique
+            que l’on peut consulter, imprimer, offrir et collectionner.
+          </p>
+          <ul class="feature-list">
+            <li>Thème astral, transit pour 3 mois, révolution solaire</li>
+            <li>Lecture par degrés avec démonstration interactive</li>
+            <li>Pont direct avec le livre et l’univers Helios Astro</li>
+          </ul>
+          <div class="btn-row">
+            <a href="heliosastrosite.html" class="btn btn-outline">Voir la méthode</a>
+            <a href="livre.html" class="btn-link">Explorer le livre →</a>
+          </div>
+        </div>
 
-      let x=cx+Math.cos(a)*r;
-      let y=cy+Math.sin(a)*r;
+        <div class="image-frame">
+          <img src="assets/zodiac-wheel-blue.png" alt="Roue zodiacale Helios Astro">
+        </div>
+      </div>
+    </section>
 
-      if(i===0) ctx.moveTo(x,y);
-      else ctx.lineTo(x,y);
-    }
+    <section class="section">
+      <div class="container">
+        <div class="section-title">
+          <h2>Les offres Helios Astro</h2>
+          <p>Une gamme simple, claire et premium, avec paiement direct.</p>
+        </div>
 
-    ctx.strokeStyle=`hsla(${k*30+t*40},100%,60%,0.3)`;
-    ctx.lineWidth=1.2;
-    ctx.stroke();
-  }
+        <div class="pricing-grid">
+          <article class="price-card">
+            <h3>Thème astral</h3>
+            <div class="price">
+              <strong>Naissance</strong>
+              <span>Votre lecture personnelle de base dans l’univers Helios Astro</span>
+            </div>
+            <ul>
+              <li>Visuel personnalisé</li>
+              <li>Lecture synthétique</li>
+              <li>Envoi par e-mail</li>
+            </ul>
+            <a href="https://www.paypal.com/ncp/payment/QF67W8ATHZX4U" target="_blank" rel="noopener" class="btn">Commander</a>
+          </article>
 
-  // rosace centrale
-  ctx.strokeStyle="rgba(0,255,255,0.3)";
-  ctx.lineWidth=1.5;
+          <article class="price-card featured">
+            <span class="ribbon">Le plus demandé</span>
+            <h3>Transit pour 3 mois</h3>
+            <div class="price">
+              <strong>Période</strong>
+              <span>Une lecture ciblée pour comprendre les mouvements à venir</span>
+            </div>
+            <ul>
+              <li>Vision sur 3 mois</li>
+              <li>Analyse plus détaillée</li>
+              <li>Lecture symbolique enrichie</li>
+            </ul>
+            <a href="https://www.paypal.com/ncp/payment/Z3SZPE6NUZYKG" target="_blank" rel="noopener" class="btn">Commander</a>
+          </article>
 
-  ctx.beginPath();
-  for(let i=0;i<300;i++){
-    let a=i/300*Math.PI*2;
-    let r=120+Math.sin(a*8+t)*30;
+          <article class="price-card">
+            <h3>Révolution solaire</h3>
+            <div class="price">
+              <strong>Année</strong>
+              <span>La lecture de votre cycle annuel dans sa forme la plus ample</span>
+            </div>
+            <ul>
+              <li>Restitution premium</li>
+              <li>Vision annuelle</li>
+              <li>Création forte et mémorable</li>
+            </ul>
+            <a href="https://www.paypal.com/ncp/payment/7HTYFEY8JA8EN" target="_blank" rel="noopener" class="btn">Commander</a>
+          </article>
+        </div>
+      </div>
+    </section>
 
-    let x=cx+Math.cos(a)*r;
-    let y=cy+Math.sin(a)*r;
+    <section class="section">
+      <div class="container split">
+        <div class="image-frame">
+          <img src="assets/livre-dieu-est-la-lumiere.png" alt="Couverture du livre Dieu est la lumière, géométrie sacrée">
+        </div>
 
-    if(i===0) ctx.moveTo(x,y);
-    else ctx.lineTo(x,y);
-  }
-  ctx.stroke();
+        <div class="card content-card">
+          <h2>Le livre au cœur de l’univers Helios Astro</h2>
+          <p>
+            <strong>Dieu est la lumière, géométrie sacrée</strong> prolonge la vision d’Helios Astro :
+            lumière, structure, symbole, géométrie, vibration et lecture du réel.
+          </p>
+          <p>
+            Ce livre sert de socle philosophique et artistique à l’univers du site.
+          </p>
+          <div class="btn-row">
+            <a href="livre.html" class="btn">Découvrir le livre</a>
+            <a href="https://www.amazon.fr/Dieu-est-lumiere-geometrie-sacr%C4%97e/dp/B08MSNHZDR" target="_blank" rel="noopener" class="btn btn-outline">Acheter sur Amazon</a>
+          </div>
+        </div>
+      </div>
+    </section>
 
-  // photons
-  for(let i=0;i<120;i++){
-    let a=i/120*Math.PI*2 + t;
-    let r=R*(0.3+Math.sin(t+i)*0.2);
+    <section class="section">
+      <div class="container">
+        <div class="section-title">
+          <h2>Galerie d’univers</h2>
+          <p>La marque se comprend en quelques secondes grâce au visuel.</p>
+        </div>
 
-    let x=cx+Math.cos(a)*r;
-    let y=cy+Math.sin(a)*r;
+        <div class="cards-3">
+          <article class="card">
+            <div class="image-frame small-frame">
+              <img src="assets/mandala-hero.png" alt="Mandala Helios Astro">
+            </div>
+            <h3>Mandala signature</h3>
+            <p>Visuel principal pour accueil, PDF et réseaux sociaux.</p>
+          </article>
 
-    glow(x,y,6,"rgba(0,255,255,0.2)");
-    glow(x,y,2,"rgba(255,255,200,1)");
-  }
+          <article class="card">
+            <div class="image-frame small-frame">
+              <img src="assets/mandala-kaleidoscope.png" alt="Mandala détaillé Helios Astro">
+            </div>
+            <h3>Détail vibratoire</h3>
+            <p>Idéal pour les zooms, articles et vidéos courtes.</p>
+          </article>
 
-  // coeur
-  glow(cx,cy,40+Math.sin(t*3)*20,"rgba(255,255,255,0.15)");
-  glow(cx,cy,10,"rgba(255,255,200,1)");
-}
+          <article class="card">
+            <div class="image-frame small-frame">
+              <img src="assets/theme-rihanna-demo.png" alt="Exemple de thème visuel Helios Astro">
+            </div>
+            <h3>Démo de thème</h3>
+            <p>Exemple d’une restitution graphique premium.</p>
+          </article>
+        </div>
+      </div>
+    </section>
 
-draw();
+    <section class="section cta-section">
+      <div class="container split">
+        <div class="quote-card">
+          <p>“Ce n’est pas un thème astral de plus. C’est une structure que le ciel laisse apparaître.”</p>
+        </div>
+        <div class="content-card card">
+          <h2>Prêt à commander votre lecture ?</h2>
+          <p>
+            Choisissez votre formule, payez directement, puis utilisez la page contact pour transmettre vos données de naissance.
+          </p>
+          <div class="btn-row">
+            <a href="offres.html" class="btn">Voir les offres</a>
+            <a href="contact.html" class="btn btn-outline">Envoyer mes informations</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
 
-function toggle(){
-  run=!run;
-}
-</script>
+  <footer class="site-footer">
+    <div class="container footer-wrap">
+      <p>© <span data-year></span> Helios Astro — Tous droits réservés.</p>
+      <div class="footer-links">
+        <a href="contact.html">Contact</a>
+        <a href="offres.html">Offres</a>
+        <a href="livre.html">Livre</a>
+      </div>
+    </div>
+  </footer>
 
+  <script src="assets/app.js"></script>
 </body>
 </html>
   
