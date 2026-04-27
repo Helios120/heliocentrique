@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://heliosastro.com/sitemap.xml
+Sitemap: https://heliosastro.fr/sitemap.xml
