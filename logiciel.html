@@ -1,288 +1,67 @@
 <!DOCTYPE html>
-
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Logiciel — Helios Astro</title>
-  <meta name="description" content="Le logiciel expert Helios Astro pour générer une carte visuelle haut de gamme.">
-  <style>
-    :root{
-      --bg:#050814;
-      --panel:#0c1320;
-      --panel-2:#09101b;
-      --line:rgba(91,214,255,.18);
-      --text:#eef5ff;
-      --muted:#b5c7e8;
-      --accent:#45ddff;
-      --accent-2:#8ef2ff;
-    }
-    *{box-sizing:border-box}
-    html,body{
-      margin:0;
-      padding:0;
-      min-height:100%;
-      font-family:Arial,Helvetica,sans-serif;
-      background:
-        radial-gradient(circle at top, rgba(69,221,255,.08), transparent 30%),
-        radial-gradient(circle at center, rgba(255,215,120,.05), transparent 25%),
-        var(--bg);
-      color:var(--text);
-    }
-
-    a{text-decoration:none;color:inherit}
-    .wrap{max-width:1260px;margin:0 auto;padding:24px}
-
-    header{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:20px;
-      padding:14px 0 20px;
-      flex-wrap:wrap;
-    }
-
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:16px;
-    }
-
-    .brand img{
-      width:72px;
-      height:72px;
-      object-fit:contain;
-      border-radius:20px;
-      background:#fff;
-      padding:6px;
-    }
-
-    .brand h1{margin:0;font-size:40px}
-    .brand p{margin:4px 0 0;color:var(--muted);font-size:18px}
-
-    nav{
-      display:flex;
-      gap:12px;
-      flex-wrap:wrap;
-      align-items:center;
-    }
-
-    nav a{
-      padding:10px 14px;
-      border-radius:999px;
-      color:var(--muted);
-      border:1px solid transparent;
-    }
-
-    nav a:hover{border-color:var(--line);color:var(--text)}
-
-    .cta{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      padding:14px 22px;
-      border-radius:999px;
-      background:linear-gradient(135deg,var(--accent),var(--accent-2));
-      color:#00131c;
-      font-weight:800;
-      box-shadow:0 10px 28px rgba(69,221,255,.20);
-    }
-
-    .hero{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:22px;
-      align-items:center;
-    }
-
-    .panel{
-      background:linear-gradient(180deg,var(--panel),var(--panel-2));
-      border:1px solid var(--line);
-      border-radius:30px;
-      padding:28px;
-      box-shadow:0 18px 34px rgba(0,0,0,.25);
-    }
-
-    .hero h2{
-      margin:0 0 18px;
-      font-size:58px;
-      line-height:1;
-    }
-
-    .hero p{
-      margin:0;
-      color:var(--muted);
-      line-height:1.75;
-      font-size:20px;
-    }
-
-    .actions{
-      display:flex;
-      gap:14px;
-      flex-wrap:wrap;
-      margin-top:24px;
-    }
-
-    .btn{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      padding:14px 22px;
-      border-radius:999px;
-      background:linear-gradient(135deg,var(--accent),var(--accent-2));
-      color:#00131c;
-      font-weight:800;
-    }
-
-    .ghost{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      padding:14px 22px;
-      border-radius:999px;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.03);
-      color:var(--text);
-      font-weight:700;
-    }
-
-    .visual{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      min-height:540px;
-    }
-
-    .visual img{
-      width:min(100%,520px);
-      aspect-ratio:1/1;
-      object-fit:contain;
-      border-radius:24px;
-    }
-
-    .features{
-      margin-top:22px;
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:18px;
-    }
-
-    .feature{
-      background:linear-gradient(180deg,rgba(16,23,37,.94),rgba(9,16,27,.92));
-      border:1px solid var(--line);
-      border-radius:24px;
-      padding:22px;
-    }
-
-    .feature h3{
-      margin:0 0 10px;
-      font-size:28px;
-    }
-
-    .feature p{
-      margin:0;
-      color:var(--muted);
-      line-height:1.7;
-      font-size:18px;
-    }
-
-    footer{
-      margin-top:34px;
-      padding:26px 0 10px;
-      color:var(--muted);
-      display:flex;
-      justify-content:space-between;
-      gap:18px;
-      flex-wrap:wrap;
-    }
-
-    @media(max-width:1050px){
-      .hero{grid-template-columns:1fr}
-      .features{grid-template-columns:1fr}
-      .hero h2{font-size:42px}
-      .brand h1{font-size:34px}
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HeliosAstro • Heliophotonic Fusion 360 • Cerveau Vivant</title>
+<style>
+:root{--cyan:#48f5ff;--gold:#ffd75a;--pink:#ff55cb;--green:#78ff9f;--text:#eaf8ff;--panel:rgba(3,10,22,.72)}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#01040a;color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif}body{background:radial-gradient(circle at 50% 48%,rgba(25,90,180,.35),transparent 40%),radial-gradient(circle at 50% 50%,rgba(255,90,200,.08),transparent 58%),linear-gradient(135deg,#01030a,#06101d 48%,#010208)}#app{position:relative;width:100vw;height:100vh;overflow:hidden;touch-action:none;background:#020713}canvas{position:absolute;inset:0;width:100%;height:100%;display:block}.top{position:absolute;z-index:30;top:10px;left:50%;transform:translateX(-50%);text-align:center;pointer-events:none}.top h1{margin:0;color:#ffd75a;font-weight:500;letter-spacing:.18em;font-size:20px;text-shadow:0 0 18px rgba(255,215,90,.45)}.top p{margin:5px 0 0;color:#89dcff;font-size:11px;letter-spacing:.18em;text-transform:uppercase}.panel{position:absolute;z-index:20;border:1px solid rgba(80,210,255,.25);background:var(--panel);backdrop-filter:blur(14px);box-shadow:0 0 30px rgba(0,0,0,.55),inset 0 0 20px rgba(57,243,255,.035);border-radius:14px;color:#dffaff}.left{left:14px;top:62px;width:285px;bottom:78px;padding:14px}.right{right:14px;top:62px;width:285px;bottom:78px;padding:14px}.bar{position:absolute;z-index:25;left:50%;bottom:14px;transform:translateX(-50%);height:50px;display:flex;gap:8px;align-items:center;padding:8px;border:1px solid rgba(80,210,255,.23);border-radius:16px;background:rgba(3,10,22,.70);backdrop-filter:blur(12px)}h2{font-size:12px;margin:0 0 12px;color:#48f5ff;text-transform:uppercase;letter-spacing:.1em}.field{margin-bottom:11px}label{display:block;color:#9bc7d8;font-size:10px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}input,textarea{width:100%;background:rgba(0,0,0,.22);border:1px solid rgba(72,245,255,.18);border-radius:9px;color:#eaf8ff;padding:10px;outline:none}textarea{height:70px;resize:none}button{border:1px solid rgba(80,210,255,.28);background:rgba(4,16,32,.85);color:#dffaff;border-radius:10px;padding:10px 14px;cursor:pointer;text-transform:uppercase;font-weight:700;letter-spacing:.06em}button:hover{border-color:#48f5ff;box-shadow:0 0 18px rgba(72,245,255,.22)}.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.stat{display:flex;justify-content:space-between;gap:8px;border-bottom:1px solid rgba(72,245,255,.12);padding:6px 0;font-size:12px}.stat b{color:#ffd75a;font-weight:700}.planet{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(72,245,255,.10);font-size:12px}.planet span:first-child{font-size:18px}.pill{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(72,245,255,.2);border-radius:999px;padding:6px 10px;font-size:11px;color:#94eaff}.dot{width:8px;height:8px;border-radius:50%;background:#78ff9f;box-shadow:0 0 12px #78ff9f}.mini{height:80px;border:1px solid rgba(72,245,255,.12);border-radius:10px;background:linear-gradient(90deg,rgba(255,0,90,.2),rgba(0,220,255,.2),rgba(255,215,90,.2));margin:10px 0}.immersive .panel,.immersive .bar,.immersive .top{opacity:.08}.immersive .panel:hover,.immersive .bar:hover,.immersive .top:hover{opacity:1}@media(max-width:1050px){.left,.right{width:230px}.top h1{font-size:15px}.bar{left:auto;right:10px;transform:none}.right{display:none}}
+</style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <div class="brand">
-        <img src="./expert/assets/logo-heliosastro.png?v=1100" alt="Logo Helios Astro">
-        <div>
-          <h1>HELIOS ASTRO</h1>
-          <p>Astrologie géométrique premium</p>
-        </div>
-      </div>
-
-      <nav>
-        <a href="./index.html?v=1100">Accueil</a>
-        <a href="./offres.html?v=1100">Offres</a>
-        <a href="./logiciel.html?v=1100">Logiciel</a>
-        <a href="./livre.html?v=1100">Livre</a>
-        <a href="./contact.html?v=1100">Contact</a>
-        <a class="cta" href="./expert/?v=1100">Accéder au logiciel expert</a>
-      </nav>
-    </header>
-
-    <section class="hero">
-      <div class="panel">
-        <h2>Le logiciel Helios Astro</h2>
-        <p>
-          Accédez à l’interface expert Helios Astro pour générer une carte visuelle
-          haut de gamme avec maisons astrologiques, ascendant, MC, positions planétaires,
-          arcs colorés et export PDF.
-        </p>
-
-        <div class="actions">
-          <a class="btn" href="./expert/?v=1100">Ouvrir le logiciel</a>
-          <a class="ghost" href="./offres.html?v=1100">Voir les offres</a>
-        </div>
-      </div>
-
-      <div class="panel visual">
-        <img src="./expert/assets/roue-heliosastro.png?v=1100" alt="Roue Helios Astro">
-      </div>
-    </section>
-
-    <section class="features">
-      <article class="feature">
-        <h3>Thème complet</h3>
-        <p>
-          Affichage professionnel de la carte, des signes, des positions et de la
-          structure du thème.
-        </p>
-      </article>
-
-      <article class="feature">
-        <h3>Angles et maisons</h3>
-        <p>
-          Lecture de l’ascendant, du MC et des douze maisons dans une présentation
-          claire et visuelle.
-        </p>
-      </article>
-
-      <article class="feature">
-        <h3>Export premium</h3>
-        <p>
-          Export PDF pour remise au client dans un format propre, élégant et
-          immédiatement exploitable.
-        </p>
-      </article>
-    </section>
-
-    <footer>
-      <div>© 2026 Helios Astro</div>
-      <div>
-        <a href="./index.html?v=1100">Accueil</a> ·
-        <a href="./offres.html?v=1100">Offres</a> ·
-        <a href="./logiciel.html?v=1100">Logiciel</a> ·
-        <a href="./contact.html?v=1100">Contact</a>
-      </div>
-    </footer>
-  </div>
+<div id="app">
+<canvas id="hud"></canvas>
+<div class="top"><h1>HELIOS ASTRO • HELIOPHOTONIC FUSION 360</h1><p>Thème astral animé • vortex chromatique • cerveau vivant</p></div>
+<section class="panel left">
+<h2>Données natales</h2>
+<div class="field"><label>Date</label><input id="date" type="date" value="1988-05-15"></div>
+<div class="field"><label>Heure</label><input id="time" type="time" value="14:30"></div>
+<div class="field"><label>Lieu</label><input id="place" value="Paris, France"></div>
+<div class="grid"><button id="calc">Recalculer</button><button id="png">PNG</button></div>
+<div class="field" style="margin-top:14px"><label>Question / intention</label><textarea id="intent">mémoire</textarea></div>
+<button id="encode" style="width:100%">Encoder dans le cerveau</button>
+<h2 style="margin-top:18px">État vivant</h2>
+<div class="stat">Moteur astral <b>actif</b></div><div class="stat">Mémoire 360° <b id="mem">4%</b></div><div class="stat">Réponse cérébrale <b id="resp">0%</b></div><div class="stat">Flux photoniques <b id="flux">0</b></div>
+</section>
+<section class="panel right">
+<h2>Soleil & dominante</h2><div id="summary"></div>
+<h2 style="margin-top:18px">Positions planétaires</h2><div id="planetList"></div>
+<h2 style="margin-top:18px">Cerveau chromoluminique</h2><div class="mini"></div><div class="pill"><i class="dot"></i> Synapses visuelles actives</div>
+</section>
+<div class="bar"><button id="pause">Pause</button><button id="burst">Burst</button><button id="brain">Cerveau</button><button id="immersive">Immersion</button><button id="full">Plein écran</button></div>
+</div>
+<script>
+(()=>{'use strict';
+const canvas=document.getElementById('hud'),ctx=canvas.getContext('2d',{alpha:false}),app=document.getElementById('app'),$=id=>document.getElementById(id);let dpr=Math.max(1,Math.min(2,devicePixelRatio||1));
+const glyphs=['♈','♉','♊','♋','♌','♍','♎','♏','♐','♑','♒','♓'],signs=['Bélier','Taureau','Gémeaux','Cancer','Lion','Vierge','Balance','Scorpion','Sagittaire','Capricorne','Verseau','Poissons'];
+const planets=[['Soleil','☉',0,1,'#ffd75a'],['Lune','☽',38,13.2,'#48f5ff'],['Mercure','☿',82,4.1,'#37eaff'],['Vénus','♀',118,1.6,'#78ff9f'],['Mars','♂',152,.8,'#ff5548'],['Jupiter','♃',210,.20,'#ff9840'],['Saturne','♄',256,.09,'#ffd75a'],['Uranus','♅',300,.045,'#48f5ff'],['Neptune','♆',332,.025,'#9968ff'],['Pluton','♇',25,.016,'#ff55cb']];
+let S={w:1,h:1,t:0,last:performance.now(),run:true,stars:[],photons:[],thoughts:[],words:[],learn:Array(360).fill(.04),energy:0,response:0,modeBrain:true,checksum:0,sunDeg:55,seed:1};
+function resize(){S.w=innerWidth;S.h=innerHeight;canvas.width=S.w*dpr;canvas.height=S.h*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);S.stars=Array.from({length:260},()=>({x:Math.random()*S.w,y:Math.random()*S.h,r:Math.random()*1.2+.1,a:Math.random()*.45+.04,h:180+Math.random()*160}))}addEventListener('resize',resize);
+const ang=d=>(d-90)*Math.PI/180, hue=d=>(d+360)%360, avg=()=>S.learn.reduce((a,b)=>a+b,0)/360;
+function daysSince2000(date,time){let dt=new Date(`${date}T${time||'12:00'}:00`);return (dt-new Date('2000-01-01T12:00:00'))/86400000}
+function tropicalSunDeg(date){let [y,m,d]=date.split('-').map(Number);let md=[0,31,59,90,120,151,181,212,243,273,304,334][m-1]+d+(m>2&&((y%4===0&&y%100!==0)||y%400===0)?1:0);let starts=[80,110,141,172,204,235,266,296,326,356,21,50];let idx=0;for(let i=0;i<12;i++){let a=starts[i],b=starts[(i+1)%12];let ok=i===9?md>=a||md<starts[10]:(a<b?md>=a&&md<b:md>=a||md<b);if(ok){idx=i;break}}let deg=(starts[idx]<=md?md-starts[idx]:md+365-starts[idx]);return idx*30+Math.min(29.9,deg*.9856)}
+function signName(deg){return signs[Math.floor(((deg%360)+360)%360/30)]}function degText(deg){let d=((deg%30)+30)%30,m=Math.floor((d%1)*60);return `${String(Math.floor(d)).padStart(2,'0')}°${String(m).padStart(2,'0')}'`}
+function compute(){let date=$('date').value,time=$('time').value,days=daysSince2000(date,time);S.sunDeg=tropicalSunDeg(date);S.seed=Math.abs(Math.sin(days*.01)*9999);planets.forEach((p,i)=>{p[2]=(i===0?S.sunDeg:(S.sunDeg+p[2]+days*p[3])%360+360)%360});renderList();encode(($('intent').value||'Helios Astro')+' '+date+' '+time);}
+function renderList(){let sunSign=signName(S.sunDeg);$('summary').innerHTML=`<div class="stat">Soleil <b>${sunSign}</b></div><div class="stat">Degré <b>${degText(S.sunDeg)}</b></div><div class="stat">Lieu <b>${$('place').value||'—'}</b></div><p style="font-size:12px;line-height:1.55;color:#cdefff">Le vortex central agit comme carte 360°. Les planètes émettent des arcs photoniques courbes vers la rosace, puis le cerveau vivant encode l’intention.</p>`;$('planetList').innerHTML=planets.map(p=>`<div class="planet"><span style="color:${p[4]}">${p[1]}</span><span>${p[0]}</span><b>${degText(p[2])} ${signName(p[2])}</b></div>`).join('')}
+function encode(text){S.checksum=0;String(text).split('').forEach((ch,i)=>{let c=ch.charCodeAt(0)&255;S.checksum^=c;let deg=(i*137.507+c)%360;for(let k=-3;k<=3;k++)S.learn[(Math.floor(deg+k)+360)%360]=Math.min(1,S.learn[(Math.floor(deg+k)+360)%360]+.012)});S.response=Math.min(1,S.response+.18);spawn(120,S.sunDeg)}
+function spawn(n,base){for(let i=0;i<n;i++){let d=(Number.isFinite(base)?base+i*137.5:Math.random()*360)%360;S.photons.push({d,r:.04+Math.random()*.1,life:0,ttl:3+Math.random()*8,s:.3+Math.random()*1.4,h:hue(d),w:Math.random()*6.28})}if(S.photons.length>700)S.photons.splice(0,S.photons.length-700)}
+function bg(t){ctx.fillStyle='#020713';ctx.fillRect(0,0,S.w,S.h);ctx.save();ctx.globalCompositeOperation='lighter';S.stars.forEach(st=>{ctx.fillStyle=`hsla(${st.h},90%,70%,${st.a*(.5+.5*Math.sin(t+st.x))})`;ctx.beginPath();ctx.arc(st.x,st.y,st.r,0,7);ctx.fill()});ctx.restore()}
+function ringText(cx,cy,R){ctx.save();ctx.translate(cx,cy);ctx.textAlign='center';ctx.textBaseline='middle';for(let i=0;i<12;i++){let a=ang(i*30+15);ctx.fillStyle=`hsla(${i*30+20},95%,70%,.95)`;ctx.font=`${Math.max(24,R*.085)}px serif`;ctx.fillText(glyphs[i],Math.cos(a)*R*1.03,Math.sin(a)*R*1.03)}ctx.restore()}
+function wheel(cx,cy,R,t){ctx.save();ctx.translate(cx,cy);ctx.globalCompositeOperation='screen';for(let i=0;i<12;i++){let a=ang(i*30);ctx.strokeStyle='rgba(210,245,255,.55)';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(Math.cos(a)*R*.82,Math.sin(a)*R*.82);ctx.lineTo(Math.cos(a)*R*1.12,Math.sin(a)*R*1.12);ctx.stroke()}for(let r of [1.14,1.08,.99,.86,.72]){ctx.strokeStyle='rgba(72,245,255,.18)';ctx.lineWidth=r>1?2:.7;ctx.beginPath();ctx.arc(0,0,R*r,0,7);ctx.stroke()}for(let d=0;d<360;d++){let a=ang(d),maj=d%10===0,from=maj?R*.88:R*.91,to=maj?R*.98:R*.96;ctx.strokeStyle=maj?`hsla(${hue(d)},95%,70%,.7)`:'rgba(220,255,255,.20)';ctx.lineWidth=maj?1.1:.35;ctx.beginPath();ctx.moveTo(Math.cos(a)*from,Math.sin(a)*from);ctx.lineTo(Math.cos(a)*to,Math.sin(a)*to);ctx.stroke();if(maj&&d%30!==0){ctx.save();ctx.rotate(a);ctx.translate(R*.80,0);ctx.rotate(Math.PI/2);ctx.fillStyle='rgba(230,245,255,.62)';ctx.font=`700 ${Math.max(9,R*.026)}px Inter`;ctx.textAlign='center';ctx.fillText(d,0,0);ctx.restore()}}ctx.restore();ringText(cx,cy,R)}
+function chromaVortex(cx,cy,R,t){ctx.save();ctx.globalCompositeOperation='lighter';ctx.translate(cx,cy);ctx.rotate(t*.035);for(let d=0;d<360;d+=1.15){let a=ang(d+Math.sin(t*.4+d*.03)*4),h=hue(d),len=R*(.1+.66*(.7+.3*Math.sin(d*.09+t)));ctx.strokeStyle=`hsla(${h},100%,58%,.22)`;ctx.lineWidth=.65;ctx.beginPath();ctx.moveTo(0,0);let steps=36;for(let i=1;i<=steps;i++){let n=i/steps;let aa=a+n*n*1.9;let rr=len*n;ctx.lineTo(Math.cos(aa)*rr,Math.sin(aa)*rr)}ctx.stroke()}ctx.restore()}
+function mandala(cx,cy,R,t){ctx.save();ctx.globalCompositeOperation='lighter';ctx.translate(cx,cy);for(let layer=0;layer<5;layer++){ctx.rotate((layer%2?-1:1)*t*(.025+layer*.006));let lobes=12+layer*6,rad=R*(.30+layer*.055);for(let l=0;l<lobes;l++){let sh=l/lobes*7;ctx.save();ctx.rotate(sh);ctx.beginPath();for(let i=0;i<=90;i++){let n=i/90,a=n*7,rr=rad*(.22+.78*Math.sin(a*2)**2);let x=Math.cos(a)*rr,y=Math.sin(a)*rr*.35;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.strokeStyle=`hsla(${hue(l*360/lobes+layer*45+t*20)},100%,70%,${.08+layer*.025})`;ctx.lineWidth=.65;ctx.stroke();ctx.restore()}}let g=ctx.createRadialGradient(0,0,0,0,0,R*.18);g.addColorStop(0,'rgba(255,255,255,.95)');g.addColorStop(.25,'rgba(255,215,90,.75)');g.addColorStop(.7,'rgba(72,245,255,.18)');g.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(0,0,R*.2,0,7);ctx.fill();ctx.restore()}
+function arcToPlanet(cx,cy,R,p,t){let deg=p[2],a=ang(deg),endR=R*1.02,ex=cx+Math.cos(a)*endR,ey=cy+Math.sin(a)*endR;let startR=R*.12,sx=cx+Math.cos(a+t*.2)*startR,sy=cy+Math.sin(a+t*.2)*startR;let bend=ang(deg+55*Math.sin(deg*.03+t*.5));let c1x=cx+Math.cos(bend)*R*.55,c1y=cy+Math.sin(bend)*R*.55;ctx.save();ctx.globalCompositeOperation='lighter';for(let k=0;k<5;k++){ctx.beginPath();ctx.moveTo(sx,sy);ctx.bezierCurveTo(c1x+Math.sin(t*2+k)*R*.06,c1y+Math.cos(t*2+k)*R*.06,cx+Math.cos(a-.25)*R*.78,cy+Math.sin(a-.25)*R*.78,ex,ey);ctx.strokeStyle=k===0?`hsla(${hue(deg)},100%,65%,.72)`:`hsla(${hue(deg+k*18)},100%,75%,${.16-k*.02})`;ctx.lineWidth=k===0?2.1:5+k*2;ctx.stroke()}for(let i=0;i<7;i++){let q=(i/7+t*.28)%1;let x=(1-q)**3*sx+3*(1-q)**2*q*c1x+3*(1-q)*q*q*(cx+Math.cos(a-.25)*R*.78)+q**3*ex;let y=(1-q)**3*sy+3*(1-q)**2*q*c1y+3*(1-q)*q*q*(cy+Math.sin(a-.25)*R*.78)+q**3*ey;ctx.fillStyle=`hsla(${hue(deg+i*20)},100%,75%,.85)`;ctx.beginPath();ctx.arc(x,y,2.2,0,7);ctx.fill()}ctx.restore()}
+function planetsDraw(cx,cy,R,t){planets.forEach(p=>arcToPlanet(cx,cy,R,p,t));ctx.save();ctx.textAlign='center';ctx.textBaseline='middle';planets.forEach(p=>{let a=ang(p[2]),x=cx+Math.cos(a)*R*1.18,y=cy+Math.sin(a)*R*1.18;ctx.globalCompositeOperation='lighter';let g=ctx.createRadialGradient(x,y,0,x,y,R*.075);g.addColorStop(0,'rgba(255,255,255,.95)');g.addColorStop(.35,p[4]);g.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,R*.075,0,7);ctx.fill();ctx.fillStyle=p[4];ctx.font=`${Math.max(26,R*.082)}px serif`;ctx.fillText(p[1],x,y+1);ctx.font=`700 ${Math.max(10,R*.028)}px Inter`;ctx.fillText(p[0].toUpperCase(),x,y+R*.105);ctx.fillStyle='#dffaff';ctx.fillText(degText(p[2]),x,y+R*.14)});ctx.restore()}
+function brain(cx,cy,R,t){if(!S.modeBrain)return;ctx.save();ctx.globalCompositeOperation='screen';ctx.strokeStyle='rgba(200,245,255,.20)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(cx,cy-R*.42);ctx.bezierCurveTo(cx-R*.38,cy-R*.56,cx-R*.58,cy-R*.22,cx-R*.52,cy+R*.14);ctx.bezierCurveTo(cx-R*.48,cy+R*.42,cx-R*.17,cy+R*.50,cx,cy+R*.42);ctx.moveTo(cx,cy-R*.42);ctx.bezierCurveTo(cx+R*.38,cy-R*.56,cx+R*.58,cy-R*.22,cx+R*.52,cy+R*.14);ctx.bezierCurveTo(cx+R*.48,cy+R*.42,cx+R*.17,cy+R*.50,cx,cy+R*.42);ctx.stroke();for(let i=0;i<95;i++){let a=i*2.399+t*.12,rr=R*(.05+.42*((i%37)/37));let x=cx+Math.cos(a)*rr,y=cy+Math.sin(a)*rr*.75;let v=S.learn[i%360];ctx.fillStyle=`hsla(${180+v*140},100%,70%,${.12+v*.45})`;ctx.beginPath();ctx.arc(x,y,1+v*3,0,7);ctx.fill();if(i%3===0){ctx.strokeStyle=`hsla(${180+v*140},100%,70%,${.04+v*.13})`;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(x,y);ctx.stroke()}}ctx.fillStyle='rgba(120,255,180,.9)';ctx.font=`800 ${Math.max(9,R*.025)}px ui-monospace`;ctx.textAlign='center';ctx.fillText('CERVEAU VIVANT • MEMOIRE 360 • CHECKSUM '+S.checksum,cx,cy+R*.57);ctx.restore()}
+function photons(cx,cy,R,t){ctx.save();ctx.globalCompositeOperation='screen';for(let i=S.photons.length-1;i>=0;i--){let p=S.photons[i];p.life+=.012*p.s;if(p.life>p.ttl){S.photons.splice(i,1);continue}p.d=(p.d+.22*p.s)%360;p.r=Math.min(1,p.r+.001*p.s);let a=ang(p.d+Math.sin(t*4+p.w)*8),rr=R*(.12+p.r*.9),x=cx+Math.cos(a)*rr,y=cy+Math.sin(a)*rr;ctx.fillStyle=`hsla(${hue(p.h+t*20)},100%,75%,${.5*(1-p.life/p.ttl)})`;ctx.beginPath();ctx.arc(x,y,1.2+p.r*2.5,0,7);ctx.fill()}ctx.restore()}
+function frame(now){let dt=Math.min(.05,(now-S.last)/1000);S.last=now;if(S.run)S.t+=dt;let t=S.t;S.response*=.995;S.energy*=.995;bg(t);let cx=S.w/2,cy=S.h/2+10,R=Math.min(S.w-620,S.h-135)*.43;if(S.w<1050)R=Math.min(S.w,S.h)*.38;R=Math.max(170,R);chromaVortex(cx,cy,R,t);wheel(cx,cy,R,t);mandala(cx,cy,R,t);planetsDraw(cx,cy,R,t);brain(cx,cy,R,t);photons(cx,cy,R,t);$('mem').textContent=Math.floor(avg()*100)+'%';$('resp').textContent=Math.floor(S.response*100)+'%';$('flux').textContent=S.photons.length;if(S.run&&Math.random()<.035)spawn(3);requestAnimationFrame(frame)}
+function interact(x,y){let cx=S.w/2,cy=S.h/2+10,deg=(Math.atan2(y-cy,x-cx)*180/Math.PI+90+360)%360;S.energy=Math.min(1,S.energy+.08);S.response=Math.min(1,S.response+.05);for(let k=-8;k<=8;k++)S.learn[(Math.floor(deg+k)+360)%360]=Math.min(1,S.learn[(Math.floor(deg+k)+360)%360]+.018);spawn(24,deg)}
+canvas.addEventListener('pointerdown',e=>interact(e.clientX,e.clientY));canvas.addEventListener('pointermove',e=>{if(e.buttons)interact(e.clientX,e.clientY)});
+$('calc').onclick=compute;$('encode').onclick=()=>encode($('intent').value||'mémoire heliophotonic');$('pause').onclick=()=>{S.run=!S.run;$('pause').textContent=S.run?'Pause':'Play'};$('burst').onclick=()=>spawn(180);$('brain').onclick=()=>S.modeBrain=!S.modeBrain;$('immersive').onclick=()=>app.classList.toggle('immersive');$('full').onclick=()=>document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen().catch(()=>{});$('png').onclick=()=>{let a=document.createElement('a');a.href=canvas.toDataURL('image/png');a.download='heliosastro-vortex-cerveau-vivant.png';a.click()};
+addEventListener('keydown',e=>{if(e.key===' '){e.preventDefault();$('pause').click()}if(e.key.toLowerCase()==='f')$('full').click();if(e.key.toLowerCase()==='b')$('burst').click()});
+resize();compute();spawn(240);requestAnimationFrame(frame);
+})();
+</script>
 </body>
 </html>
