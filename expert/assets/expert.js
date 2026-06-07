@@ -19,7 +19,15 @@ function resizeCanvas() {
   const parent = canvas.parentElement;
   const box = parent.getBoundingClientRect();
 
-  const size = Math.max(520, Math.min(box.width, box.height || box.width, 940));
+  const isMobile = window.innerWidth <= 700;
+
+  let size;
+
+  if (isMobile) {
+    size = Math.min(window.innerWidth * 0.92, 420);
+  } else {
+    size = Math.max(520, Math.min(box.width, box.height || box.width, 940));
+  }
 
   canvas.width = size;
   canvas.height = size;
@@ -33,7 +41,12 @@ function resizeCanvas() {
   H = size;
   CX = W / 2;
   CY = H / 2;
-  R = size * 0.415;
+
+  if (isMobile) {
+    R = size * 0.34;
+  } else {
+    R = size * 0.415;
+  }
 }
 
 function degToRad(deg) {
