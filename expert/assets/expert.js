@@ -354,7 +354,13 @@ function animate() {
   animationId = requestAnimationFrame(animate);
 }
 
-window.addEventListener("resize", renderAll);
+window.addEventListener("resize", () => {
+  renderAll();
+});
+
+window.addEventListener("orientationchange", () => {
+  setTimeout(renderAll, 300);
+});
 
 const generateBtn = document.getElementById("generate-btn");
 const demoBtn = document.getElementById("demo-btn");
